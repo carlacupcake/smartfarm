@@ -1,0 +1,11 @@
+﻿Source,Location ID,City,State,Country,Latitude,Longitude,Time Zone,Elevation,Local Time Zone,Dew Point Units,DHI Units,DNI Units,GHI Units,Temperature Units,Pressure Units,Wind Direction Units,Wind Speed Units,Surface Albedo Units,Version
+NSRDB,137320,Napa,California,USA,38.45,-122.42,-8,102,-8,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,1014287,Thonotosassa,Florida,USA,28.05,-82.3,-5,27,-5,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,1013393,Waycross,Georgia,USA,31.21,-82.34,-5,44,-5,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,773067,Pleasant Hill,Iowa,USA,41.61,-93.5,-6,263,-6,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.2
+NSRDB,680151,McPherson,Kansas,USA,38.37,-97.66,-6,459,-6,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,830346,Thibodaux,Louisiana,USA,29.81,-90.82,-6,8,-6,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,792115,Kirksville,Missouri,USA,40.21,-92.58,-6,297,-6,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,1137861,Grimesland,North Carolina,USA,35.57,-77.26,-5,18,-5,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,674892,Kingsville,Texas,USA,27.53,-97.86,-6,21,-6,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.4
+NSRDB,451038,Casper,Wyoming,USA,42.85,-106.34,-7,1576,-7,c,w/m2,w/m2,w/m2,c,mbar,Degrees,m/s,N/A,3.2.2

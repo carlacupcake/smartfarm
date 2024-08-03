@@ -1,0 +1,62 @@
+{
+    "wyoming": {
+        "crop": "hay",
+        "zip_code": "82601",
+        "nsrdb_code": "451038",
+        "city": "Casper, WY"
+    },
+    "iowa": {
+        "crop": "corn",
+        "zip_code": "50327",
+        "nsrdb_code": "773067",
+        "city": "Pleasant Hill, IA"
+    },
+    "ncarolina": {
+        "crop": "soybeans",
+        "zip_code": "27829",
+        "nsrdb_code": "1137861",
+        "city": "Grimesland, NC"
+    },
+    "kansas": {
+        "crop": "wheat",
+        "zip_code": "67460",
+        "nsrdb_code": "680151",
+        "city": "McPherson, KS"
+    },
+    "georgia": {
+        "crop": "cotton",
+        "zip_code": "31501",
+        "nsrdb_code": "1013393",
+        "city": "Waycross, GA"
+    },
+    "missouri": {
+        "crop": "rice",
+        "zip_code": "63501",
+        "nsrdb_code": "792115",
+        "city": "Kirksville, MO"
+    },
+    "florida": {
+        "crop": "oranges",
+        "zip_code": "33592",
+        "nsrdb_code": "1014287",
+        "city": "Thonotosassa, FL"
+    },
+    "louisiana": {
+        "crop": "sugarcane",
+        "zip_code": "70301",
+        "nsrdb_code": "830346",
+        "city": "Thibodaux, LA"
+    },
+    "texas": {
+        "crop": "sorghum",
+        "zip_code": "78363",
+        "nsrdb_code": "674892",
+        "city": "Kingsville, TX"
+    },
+    "california": {
+        "crop": "grapes",
+        "zip_code": "94558",
+        "nsrdb_code": "137320",
+        "city": "Napa, CA"
+    }
+}
