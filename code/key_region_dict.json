@@ -1,62 +1,232 @@
-{
-    "wyoming": {
-        "crop": "hay",
-        "zip_code": "82601",
-        "nsrdb_code": "451038",
-        "city": "Casper, WY"
-    },
-    "iowa": {
-        "crop": "corn",
-        "zip_code": "50327",
-        "nsrdb_code": "773067",
-        "city": "Pleasant Hill, IA"
-    },
-    "ncarolina": {
-        "crop": "soybeans",
-        "zip_code": "27829",
-        "nsrdb_code": "1137861",
-        "city": "Grimesland, NC"
-    },
-    "kansas": {
-        "crop": "wheat",
-        "zip_code": "67460",
-        "nsrdb_code": "680151",
-        "city": "McPherson, KS"
-    },
-    "georgia": {
-        "crop": "cotton",
-        "zip_code": "31501",
-        "nsrdb_code": "1013393",
-        "city": "Waycross, GA"
-    },
-    "missouri": {
-        "crop": "rice",
-        "zip_code": "63501",
-        "nsrdb_code": "792115",
-        "city": "Kirksville, MO"
+{   
+    "california": {
+        "crop":       "grapes",
+        "zip_code":   "94558",
+        "nsrdb_code": "137320",
+        "city":       "Napa, CA",
+        "latitude":   38.45,
+        "longitude":  -122.42,
+        "timezone":   -7,
+        "years_of_monthly_data":{
+            "january":   2021,
+            "february":  2008,
+            "march":     2010,
+            "april":     2020,
+            "may":       2009,
+            "june":      2016,
+            "july":      2002,
+            "august":    2008,
+            "september": 2003,
+            "october":   2002,
+            "november":  2004,
+            "december":  2004
+        }
     },
     "florida": {
-        "crop": "oranges",
-        "zip_code": "33592",
+        "crop":       "oranges",
+        "zip_code":   "33592",
         "nsrdb_code": "1014287",
-        "city": "Thonotosassa, FL"
+        "city":       "Thonotosassa, FL",
+        "latitude":   28.05,
+        "longitude":  -82.30,
+        "timezone":   -4,
+        "years_of_monthly_data":{
+            "january":   2021,
+            "february":  2007,
+            "march":     2011,
+            "april":     2008,
+            "may":       2016,
+            "june":      2020,
+            "july":      2000,
+            "august":    2016,
+            "september": 2009,
+            "october":   2016,
+            "november":  2011,
+            "december":  2017
+        }
+    },
+    "georgia": {
+        "crop":       "cotton",
+        "zip_code":   "31501",
+        "nsrdb_code": "1013393",
+        "city":       "Waycross, GA",
+        "latitude":   31.21,
+        "longitude":  -82.34,
+        "timezone":   -4,
+        "years_of_monthly_data":{
+            "january":   2004,
+            "february":  2022,
+            "march":     2011,
+            "april":     2020,
+            "may":       2020,
+            "june":      2007,
+            "july":      2004,
+            "august":    2017,
+            "september": 2003,
+            "october":   2012,
+            "november":  2002,
+            "december":  2013
+        }
+    },
+    "iowa": {
+        "crop":       "corn",
+        "zip_code":   "50327",
+        "nsrdb_code": "773067",
+        "city":       "Pleasant Hill, IA",
+        "latitude":   41.61,
+        "longitude":  -93.5,
+        "timezone":   -5,
+        "years_of_monthly_data":{
+            "january":   2004,
+            "february":  2011,
+            "march":     2003,
+            "april":     2003,
+            "may":       2013,
+            "june":      2010,
+            "july":      2020,
+            "august":    2019,
+            "september": 2017,
+            "october":   2008,
+            "november":  2010,
+            "december":  2016
+        }
+    },
+    "kansas": {
+        "crop":       "wheat",
+        "zip_code":   "67460",
+        "nsrdb_code": "680151",
+        "city":       "McPherson, KS",
+        "latitude":   38.37,
+        "longitude":  -97.66,
+        "timezone":   -5,
+        "years_of_monthly_data":{
+            "january":   2013,
+            "february":  2012,
+            "march":     2008,
+            "april":     2004,
+            "may":       2005,
+            "june":      2021,
+            "july":      2022,
+            "august":    2015,
+            "september": 2010,
+            "october":   2017,
+            "november":  2008,
+            "december":  2012
+        }
     },
     "louisiana": {
-        "crop": "sugarcane",
-        "zip_code": "70301",
+        "crop":       "sugarcane",
+        "zip_code":   "70301",
         "nsrdb_code": "830346",
-        "city": "Thibodaux, LA"
+        "city":       "Thibodaux, LA",
+        "latitude":   29.81,
+        "longitude":  -90.82,
+        "timezone":   -5,
+        "years_of_monthly_data":{
+            "january":   2004,
+            "february":  2020,
+            "march":     2009,
+            "april":     2008,
+            "may":       2005,
+            "june":      2007,
+            "july":      2002,
+            "august":    2005,
+            "september": 2015,
+            "october":   2003,
+            "november":  2007,
+            "december":  2011
+        }
+    },
+    "missouri": {
+        "crop":       "rice",
+        "zip_code":   "63501",
+        "nsrdb_code": "792115",
+        "city":       "Kirksville, MO",
+        "latitude":   40.21,
+        "longitude":  -92.58,
+        "timezone":   -5,
+        "years_of_monthly_data":{
+            "january":   2019,
+            "february":  2013,
+            "march":     2009,
+            "april":     2019,
+            "may":       2009,
+            "june":      2007,
+            "july":      2002,
+            "august":    1988,
+            "september": 2013,
+            "october":   2013,
+            "november":  2010,
+            "december":  1999
+        }
+    },
+    "ncarolina": {
+        "crop":       "soybeans",
+        "zip_code":   "27829",
+        "nsrdb_code": "1137861",
+        "city":       "Grimesland, NC",
+        "latitude":   35.57,
+        "longitude":  -77.26,
+        "timezone":   -4,
+        "years_of_monthly_data":{
+            "january":   2002,
+            "february":  2005,
+            "march":     2004,
+            "april":     2012,
+            "may":       2013,
+            "june":      2017,
+            "july":      2017,
+            "august":    2006,
+            "september": 2003,
+            "october":   2003,
+            "november":  2002,
+            "december":  2020
+        }
     },
     "texas": {
-        "crop": "sorghum",
-        "zip_code": "78363",
+        "crop":       "sorghum",
+        "zip_code":   "78363",
         "nsrdb_code": "674892",
-        "city": "Kingsville, TX"
+        "city":       "Kingsville, TX",
+        "latitude":   27.53,
+        "longitude":  -97.86,
+        "timezone":   -5,
+        "years_of_monthly_data":{
+            "january":   2013,
+            "february":  2013,
+            "march":     2016,
+            "april":     2014,
+            "may":       2010,
+            "june":      2003,
+            "july":      2014,
+            "august":    2023,
+            "september": 2017,
+            "october":   2014,
+            "november":  2012,
+            "december":  2001
+        }
     },
-    "california": {
-        "crop": "grapes",
-        "zip_code": "94558",
-        "nsrdb_code": "137320",
-        "city": "Napa, CA"
+    "wyoming": {
+        "crop":       "hay",
+        "zip_code":   "82601",
+        "nsrdb_code": "451038",
+        "city":       "Casper, WY",
+        "latitude":   42.85,
+        "longitude":  -106.34,
+        "timezone":   -6,
+        "years_of_monthly_data":{
+            "january":   2011,
+            "february":  2003,
+            "march":     2010,
+            "april":     2017,
+            "may":       2005,
+            "june":      2011,
+            "july":      2011,
+            "august":    2021,
+            "september": 2020,
+            "october":   2011,
+            "november":  2015,
+            "december":  2018
+        }
     }
 }
