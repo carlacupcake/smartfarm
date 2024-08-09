@@ -78,6 +78,9 @@ class SolarPosition:
     def get_solar_zenith_angle(self):
 
         # Returns the solar zenith angle in degrees
+        # angle at which radiation hits farm w.r.t. z-axis,
+        '''
+        TODO, debug with NOAA formulas
         apparent_solar_time =  self.get_apparent_solar_time()
         hour_angle = math.radians(1/MINUTES_PER_DEGREE*apparent_solar_time - 180)
         solar_decl_angle = math.radians(self.get_solar_decl_angle())
@@ -86,24 +89,36 @@ class SolarPosition:
         latitude  = math.radians(region_info["latitude"])
 
         solar_zenith_angle = math.degrees(math.acos(math.sin(latitude) * math.sin(solar_decl_angle) + math.cos(latitude) * math.cos(hour_angle)))
+        '''
+
+        # Below is a very basic placeholder !!
+        time_in_hours = self.date_time.hour + (self.date_time.minute + self.date_time.second * 1/SECONDS_PER_MINUTE) * 1/MINUTES_PER_HOUR
+        solar_zenith_angle = np.pi * time_in_hours / (self.get_sunset_time() - self.get_sunrise_time())
 
         return solar_zenith_angle
     
     def get_solar_azimuth_angle(self):
 
         # Returns the solar azimuth angle (measured clockwise from north) in degrees
+        #angle at which radiation hits farm in x-y plane
+        '''
+        TODO, debug with NOAA formulas
         region_info = self.key_region_dict[self.region]
         latitude  = math.radians(region_info["latitude"])
         solar_zenith_angle = math.radians(self.get_solar_zenith_angle())
         solar_decl_angle = math.radians(self.get_solar_decl_angle())
 
         solar_azimuth_angle = 1/2*DEGREES_IN_CIRCLE - math.degrees(math.acos(-(math.sin(latitude) * math.cos(solar_zenith_angle) - math.sin(solar_decl_angle)) / (math.cos(latitude) * math.sin(solar_zenith_angle))))
+        '''
+        solar_azimuth_angle = 126.54
 
         return solar_azimuth_angle
     
     def get_sunrise_time(self):
 
         # Returns the sunrise time in minutes
+        '''
+        TODO, debug with NOAA formulas
         region_info = self.key_region_dict[self.region]
         latitude  = math.radians(region_info["latitude"])
         longitude = math.radians(region_info["longitude"])
@@ -114,12 +129,16 @@ class SolarPosition:
 
         hour_angle = np.abs(math.acos(math.cos(sunrise_zenith_angle)/(math.cos(latitude)*math.cos(solar_decl_angle)) - math.tan(latitude)*math.tan(solar_decl_angle)))
         sunrise_time = 3*DEGREES_IN_CIRCLE - MINUTES_PER_DEGREE*(longitude * hour_angle) - equation_of_time
+        '''
+        sunrise_time = 6
 
         return sunrise_time
 
     def get_sunset_time(self):
 
         # Returns the sunset time in minutes
+        '''
+        TODO, debug with NOAA formulas
         region_info = self.key_region_dict[self.region]
         latitude  = math.radians(region_info["latitude"])
         longitude = math.radians(region_info["longitude"])
@@ -130,6 +149,8 @@ class SolarPosition:
 
         hour_angle = -np.abs(math.acos(math.cos(sunset_zenith_angle)/(math.cos(latitude)*math.cos(solar_decl_angle)) - math.tan(latitude)*math.tan(solar_decl_angle)))
         sunset_time = 3*DEGREES_IN_CIRCLE - MINUTES_PER_DEGREE*(longitude * hour_angle) - equation_of_time
+        '''
+        sunset_time = 20
 
         return sunset_time
     
@@ -143,21 +164,6 @@ class SolarPosition:
         solar_noon = 3*DEGREES_IN_CIRCLE - MINUTES_PER_DEGREE*longitude - equation_of_time
 
         return solar_noon
-    
-    def get_initial_irradiance(self):
-
-        # Returns the initial irradiance in W/m2 at the Earth's surface in the chosen region
-        # Calculated as a sum of DNI, DHI, and GHI
-        region_info = self.key_region_dict[self.region]
-        nsrdb_data = region_info['nsrdb_data']
-
-        DHI = nsrdb_data['DHI'] # diffuse horizontal irradiance [W/m2]
-        DNI = nsrdb_data['DNI'] # direct normal irradiance      [W/m2]
-        GHI = nsrdb_data['GHI'] # global horizontal irradiance  [W/m2]
-
-        initial_irradiance = DHI + DNI + GHI
-
-        return initial_irradiance
     
     
 
