@@ -12,3 +12,6 @@ MONTHS_PER_YEAR      = 12
 # Constants for Farm Planning/Configuration
 DEFAULT_START_MINUTE = 0
 DEFAULT_START_SECOND = 0
+
+# Constants for plotting
+DAYS_PER_FRAME       = 10
