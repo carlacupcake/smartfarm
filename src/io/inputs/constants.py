@@ -14,4 +14,4 @@ DEFAULT_START_MINUTE = 0
 DEFAULT_START_SECOND = 0
 
 # Constants for plotting
-DAYS_PER_FRAME       = 10
+DAYS_PER_FRAME       = 1
