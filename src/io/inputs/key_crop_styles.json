@@ -1,13 +1,4 @@
 {
-    "hay": {
-        "stem_color":                   "darkgreen",
-        "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "limegreen",
-        "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        1,
-        "list_of_fruit_azim_angles":    [0],
-        "fruit_to_canopy_radius_ratio": 0.08
-    },
     "corn": {
         "stem_color":                   "green",
         "canopy_colormap_name":         "YlGn",
@@ -16,24 +7,6 @@
         "num_fruits_per_canopy":        1,
         "list_of_fruit_azim_angles":    [0],
         "fruit_to_canopy_radius_ratio": 0.3
-    },
-    "soybeans": {
-        "stem_color":                   "green",
-        "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "yellowgreen",
-        "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        6,
-        "list_of_fruit_azim_angles":    [0.785, 2.355],
-        "fruit_to_canopy_radius_ratio": 0.07
-    },
-    "wheat": {
-        "stem_color":                   "darkgoldenrod",
-        "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "goldenrod",
-        "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        1,
-        "list_of_fruit_azim_angles":    [0],
-        "fruit_to_canopy_radius_ratio": 0.08
     },
     "cotton": {
         "stem_color":                   "saddlebrown",
@@ -44,10 +17,19 @@
         "list_of_fruit_azim_angles":    [0.785, 2.355],
         "fruit_to_canopy_radius_ratio": 0.1
     },
-    "rice": {
+    "grapes": {
         "stem_color":                   "brown",
         "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "goldenrod",
+        "fruit_color":                  "purple",
+        "num_leaves_per_canopy":        40,
+        "num_fruits_per_canopy":        20,
+        "list_of_fruit_azim_angles":    [0.785, 1.57, 2.355],
+        "fruit_to_canopy_radius_ratio": 0.08
+    },
+    "hay": {
+        "stem_color":                   "darkgreen",
+        "canopy_colormap_name":         "YlGn",
+        "fruit_color":                  "limegreen",
         "num_leaves_per_canopy":        40,
         "num_fruits_per_canopy":        1,
         "list_of_fruit_azim_angles":    [0],
@@ -58,14 +40,14 @@
         "canopy_colormap_name":         "YlGn",
         "fruit_color":                  "orange",
         "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        10,
+        "num_fruits_per_canopy":        20,
         "list_of_fruit_azim_angles":    [0.785, 2.355],
-        "fruit_to_canopy_radius_ratio": 0.1
+        "fruit_to_canopy_radius_ratio": 0.15
     },
-    "sugarcane": {
-        "stem_color":                   "mediumvioletred",
+    "rice": {
+        "stem_color":                   "brown",
         "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "khaki",
+        "fruit_color":                  "goldenrod",
         "num_leaves_per_canopy":        40,
         "num_fruits_per_canopy":        1,
         "list_of_fruit_azim_angles":    [0],
@@ -80,13 +62,31 @@
         "list_of_fruit_azim_angles":    [0.785, 1.57, 2.355],
         "fruit_to_canopy_radius_ratio": 0.08
     },
-    "grapes": {
-        "stem_color":                   "brown",
+    "soybeans": {
+        "stem_color":                   "green",
         "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "purple",
+        "fruit_color":                  "yellowgreen",
         "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        20,
-        "list_of_fruit_azim_angles":    [0.785, 1.57, 2.355],
+        "num_fruits_per_canopy":        6,
+        "list_of_fruit_azim_angles":    [0.785, 2.355],
+        "fruit_to_canopy_radius_ratio": 0.07
+    },
+    "sugarcane": {
+        "stem_color":                   "mediumvioletred",
+        "canopy_colormap_name":         "YlGn",
+        "fruit_color":                  "khaki",
+        "num_leaves_per_canopy":        40,
+        "num_fruits_per_canopy":        1,
+        "list_of_fruit_azim_angles":    [0],
+        "fruit_to_canopy_radius_ratio": 0.08
+    },
+    "wheat": {
+        "stem_color":                   "darkgoldenrod",
+        "canopy_colormap_name":         "YlGn",
+        "fruit_color":                  "goldenrod",
+        "num_leaves_per_canopy":        40,
+        "num_fruits_per_canopy":        1,
+        "list_of_fruit_azim_angles":    [0],
         "fruit_to_canopy_radius_ratio": 0.08
     }
 }
