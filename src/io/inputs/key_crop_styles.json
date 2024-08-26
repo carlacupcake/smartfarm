@@ -1,4 +1,13 @@
 {
+    "alfalfa": {
+        "stem_color":                   "darkgreen",
+        "canopy_colormap_name":         "YlGn",
+        "fruit_color":                  "limegreen",
+        "num_leaves_per_canopy":        40,
+        "num_fruits_per_canopy":        1,
+        "list_of_fruit_azim_angles":    [0],
+        "fruit_to_canopy_radius_ratio": 0.08
+    },
     "corn": {
         "stem_color":                   "green",
         "canopy_colormap_name":         "YlGn",
@@ -24,15 +33,6 @@
         "num_leaves_per_canopy":        40,
         "num_fruits_per_canopy":        20,
         "list_of_fruit_azim_angles":    [0.785, 1.57, 2.355],
-        "fruit_to_canopy_radius_ratio": 0.08
-    },
-    "hay": {
-        "stem_color":                   "darkgreen",
-        "canopy_colormap_name":         "YlGn",
-        "fruit_color":                  "limegreen",
-        "num_leaves_per_canopy":        40,
-        "num_fruits_per_canopy":        1,
-        "list_of_fruit_azim_angles":    [0],
         "fruit_to_canopy_radius_ratio": 0.08
     },
     "oranges": {

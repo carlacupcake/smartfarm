@@ -207,7 +207,7 @@
         }
     },
     "wyoming": {
-        "crop":       "hay",
+        "crop":       "alfalfa",
         "zip_code":   "82601",
         "nsrdb_code": "451038",
         "city":       "Riverton, WY",
