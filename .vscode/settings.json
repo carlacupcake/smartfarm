@@ -79,6 +79,7 @@
         "type_traits": "cpp",
         "format": "cpp",
         "thread": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "random": "cpp"
     }
 }

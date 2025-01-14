@@ -1,4 +1,6 @@
-function basic_plot(filename)
+function plot_farm_sim_inputs(filename)
+
+% Run as >> plot_farm_sim_inputs('farm_sim_inputs.csv')
 
 %% Column data assumed to be
 % 1  hourly_temperatures
@@ -149,21 +151,21 @@ figure('Position', [figureLeft, figureBottom, figureWidth, figureHeight]);
 subplot(3, 1, 1);
 plot(days, leaf_sensitivity_temp, 'Color', [0, 0.5, 0], 'LineWidth', 2);
 xlabel('Index');
-ylabel('Temperature (degC-hour)');
+ylabel('Unitless (1 =  neutral)');
 title('Leaf Sensitivity to Temperature');
 
 % Daily Cumulative Irrigation
 subplot(3, 1, 2);
 plot(days, fruit_sensitivity_temp, 'Color', [0, 0.5, 0], 'LineWidth', 2);
 xlabel('Index');
-ylabel('Water for Irrigation (kg-hour)');
+ylabel('Unitless (1 =  neutral)');
 title('Fruit Sensitivity to Temperature');
 
 % Daily Cumulative Fertilizer
 subplot(3, 1, 3);
 plot(days, leaf_sensitivity_water, 'Color', [0, 0.5, 0], 'LineWidth', 2);
 xlabel('Index');
-ylabel('Fertilizer Deposited (kg-hour)');
-title('Leaf Sensitivity to');
+ylabel('Unitless (1 =  neutral)');
+title('Leaf Sensitivity to Irrigation');
 
 end
