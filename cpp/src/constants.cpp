@@ -17,7 +17,7 @@ const int DEFAULT_START_SECOND    = 0;
 
 // TODO - TEMPORARY CONSTANTS -> Use SolarPosition Logic to Calculate
 double sunrise_hour = 6.0;
-double sunset_hour = 18.0;
+double sunset_hour = 20.0;
 double solar_azimuth_angle = 2.209; // radians
 
 // Variable Glossary - Field Configuration
@@ -84,7 +84,7 @@ const double carrying_capacity_leaf_area      = 15.0e-4; // m2
 const double gains_height_from_fertilizer    = 4.0e-5; // m/kg
 const double gains_height_from_water         = 4.0e-5; // m/kg
 const double gains_leaf_area_from_fertilizer = 6.0e-6; // m2/kg
-const double gains_leaf_area_from_temp       = 2.5-6;  // m2/degC
+const double gains_leaf_area_from_temp       = 2.5e-6;  // m2/degC
 const double gains_leaf_area_from_water      = 6.0e-6; // m2/kg
 
 // Variable Glossary - Thresholds for Growth/Decay

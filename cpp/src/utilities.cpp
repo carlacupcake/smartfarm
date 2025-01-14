@@ -150,6 +150,7 @@ std::vector<double> calc_eff_values(std::vector<double> hourly_values,
                                     int total_time_steps) {
     std::vector<double> effective_values(total_time_steps, 0.0);
 
+    
     for (int point = 0; point < total_time_steps; point += HOURS_PER_DAY) {
         double sum = 0.0;
         for (size_t i = 0; i < HOURS_PER_DAY; ++i) {
@@ -167,8 +168,9 @@ std::vector<double> calc_cum_values(std::vector<double> effective_values,
                                     int total_time_steps) {
     std::vector<double> cumulative_values(total_time_steps, 0.0);
 
+    // Start after the first day
     double sum = 0.0;
-    for (int point = 0; point < total_time_steps; point += HOURS_PER_DAY) {
+    for (int point = HOURS_PER_DAY; point < total_time_steps; point += HOURS_PER_DAY) {
         sum += effective_values[point];
         for (size_t i = 0; i < HOURS_PER_DAY; ++i) {
             cumulative_values[point+i] = sum;

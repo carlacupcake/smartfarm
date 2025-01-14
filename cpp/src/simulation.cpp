@@ -137,7 +137,7 @@ int main() {
                                                                 total_time_steps);
     
     // Save input data to CSV for plotting
-    std::string output_filename = "farm_sim_inputs.csv";
+    std::string farm_sim_inputs_filename = "farm_sim_inputs.csv";
     std::vector<std::vector<double>> all_eff_vectors = {hourly_temperature,
                                                         hourly_irrigation,
                                                         hourly_fertilizer,
@@ -150,7 +150,7 @@ int main() {
                                                         leaf_sensitivity_temp,
                                                         fruit_sensitivity_temp,
                                                         leaf_sensitivity_water};
-    write_vectors_to_csv(output_filename, all_eff_vectors);
+    write_vectors_to_csv(farm_sim_inputs_filename, all_eff_vectors);
 
     //--- MAIN SIMULATION ---//
 
@@ -176,6 +176,7 @@ int main() {
         // Update days after sowing and today's date
         days_after_sowing += 1;
         todays_date.day += 1;
+        todays_date.hour = 0; // reset the hour to 0 at the beginning of each day
 
         // Loop over time steps (for updates that happen throughout a single day)
         for (int time_step = 0; time_step < num_time_steps_per_day; ++time_step) {
@@ -186,12 +187,13 @@ int main() {
                 break; // cannot fill the t+1 position if this condition is true, so break the loop
             }
 
-            // Update today's date to the hour
-            todays_date.hour += 1;
-
             // TODO: Add SolarPosition logic
             double time_in_hours = todays_date.hour + (todays_date.minute + todays_date.second * 1/SECONDS_PER_MINUTE) * 1/MINUTES_PER_HOUR;
-            double solar_zenith_angle = M_PI * time_in_hours / (sunset_hour - sunrise_hour);
+            double solar_zenith_angle_degrees = M_PI * time_in_hours / (sunset_hour - sunrise_hour);
+            double solar_zenith_angle = 2*M_PI / 360 * solar_zenith_angle_degrees;
+
+            // Update today's date to the hour
+            todays_date.hour += 1;
 
             // Plant Height Update
             double dhdt = 0;
@@ -230,12 +232,7 @@ int main() {
 
             // Leaf area update 
             double dAdt = 0;
-            double temperature_decay_term = -1 * decay_rate_leaf_area_temp_specific * leaf_sensitivity_temp[day] * leaf_area[t];
-            double irrigation_decay_term = -1 * decay_rate_leaf_area_water_specific * leaf_sensitivity_water[day] * leaf_area[t];
             double gaussian_temperature_term = 0;
-            gaussian_irrigation_term = 0;
-            gaussian_fertilizer_term = 0;
-
             if (effective_temperatures[t] == 0) {
                 gaussian_temperature_term = 0;
             }
@@ -244,23 +241,26 @@ int main() {
                                             * std::exp(-std::pow((cumulative_temperatures[t] - scaling_factor_peak_leaf_area_growth_temp_specific * effective_temperatures[t]) / \
                                                                  (scaling_factor_peak_growth_time_leaf_area_temp_specific * effective_temperatures[t]), 2));
             }
-            if (effective_irrigation[day] == 0) {
+            if (effective_irrigation[t] == 0) {
                 gaussian_irrigation_term = 0;
             }
             else {
                 gaussian_irrigation_term = gains_leaf_area_from_water * growth_rate_leaf_area_water_specific * effective_irrigation[t] \
-                                           * std::exp(-std::pow((cumulative_irrigation[t] - scaling_factor_peak_leaf_area_growth_water_specific * effective_irrigation[day]) / \
+                                           * std::exp(-std::pow((cumulative_irrigation[t] - scaling_factor_peak_leaf_area_growth_water_specific * effective_irrigation[t]) / \
                                                                 (scaling_factor_peak_growth_time_leaf_area_water_specific * effective_irrigation[t]), 2));
             }
-            if (effective_fertilizer[day] == 0) {
+            if (effective_fertilizer[t] == 0) {
                 gaussian_fertilizer_term = 0;
             }
             else {
                 gaussian_fertilizer_term = gains_leaf_area_from_fertilizer * growth_rate_leaf_area_fertilizer_specific * effective_fertilizer[t] \
-                                          * std::exp(-std::pow((cumulative_fertilizer[t] - scaling_factor_peak_leaf_area_growth_fertilizer_specific * effective_fertilizer[day]) / \
+                                          * std::exp(-std::pow((cumulative_fertilizer[t] - scaling_factor_peak_leaf_area_growth_fertilizer_specific * effective_fertilizer[t]) / \
                                                                (scaling_factor_peak_growth_time_leaf_area_fertilizer_specific * effective_fertilizer[t]), 2));
             }
-            
+
+            double temperature_decay_term = -1 * decay_rate_leaf_area_temp_specific * leaf_sensitivity_temp[t] * leaf_area[t];
+            double irrigation_decay_term = -1 * decay_rate_leaf_area_water_specific * leaf_sensitivity_water[t] * leaf_area[t];
+
             if (leaf_area[t] > carrying_capacity_leaf_area) {
                 leaf_decay_triggered = true;
             }
@@ -344,9 +344,58 @@ int main() {
             // Update the total irradiance at the leaf surface for the representative plant     
             double irradiance_leaf_surface = avg_irradiance_leaf_surface;
 
+            // Canopy biomass update
+            double dcdt = 0;
+            if (dAdt < threshold_dAdt_canopy_fruit_decay) {
+                fruit_canopy_decay_triggered = true;
+            }
+            if (fruit_canopy_decay_triggered) {          
+                dcdt = efficiency_coefficient_photosynthesis * irradiance_leaf_surface * leaf_area[t] \
+                       * (growth_rate_canopy_biomass * canopy_biomass[t] \
+                          * (1 - canopy_biomass[t]/carrying_capacity_canopy_biomass) \
+                          - decay_rate_canopy_biomass * canopy_biomass[t]);
+            }
+            else {
+                dcdt = efficiency_coefficient_photosynthesis * irradiance_leaf_surface * leaf_area[t] \
+                       * growth_rate_canopy_biomass * canopy_biomass[t] \
+                       * (1 - canopy_biomass[t]/carrying_capacity_canopy_biomass);
+            }
+            canopy_biomass[t+1] = canopy_biomass[t] + dcdt * time_step_size;
+
+            // Fruit biomass update
+            // Vegetative --> flowering/fruiting transition (TODO review model)
+            double dPdt = 0;
+            if (canopy_biomass[t] > threshold_canopy_fruit_growth) {
+                if (fruit_canopy_decay_triggered) {                         
+                    dPdt = growth_rate_fruit_biomass * fruit_sensitivity_temp[t] \
+                           * canopy_biomass[t]/carrying_capacity_canopy_biomass \
+                           * fruit_biomass[t] * (1 - fruit_biomass[t]/carrying_capacity_fruit_biomass) \
+                           - decay_rate_fruit_biomass * fruit_biomass[t];
+                }
+                else {
+                    dPdt = growth_rate_fruit_biomass * fruit_sensitivity_temp[t] \
+                           * canopy_biomass[t]/carrying_capacity_canopy_biomass \
+                           * fruit_biomass[t] * (1 - fruit_biomass[t]/carrying_capacity_fruit_biomass);
+                }
+            }
+            else {
+                dPdt = 0;
+            }
+            fruit_biomass[t+1] = fruit_biomass[t] + dPdt * time_step_size;
+
         }
 
     }
+
+    //--- END MAIN SIMULATION ---//
+
+    // Save time-evolved state variable data to CSV for plotting
+    std::string farm_sim_outputs_filename = "farm_sim_outputs.csv";
+    std::vector<std::vector<double>> all_state_vectors = {height,
+                                                          leaf_area,
+                                                          canopy_biomass,
+                                                          fruit_biomass};
+    write_vectors_to_csv(farm_sim_outputs_filename, all_state_vectors);
 
     return 0;
 }
