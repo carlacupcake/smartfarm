@@ -1,9 +1,11 @@
 // utilities.cpp
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "constants.h"
 #include "utilities.h"
 
@@ -89,6 +91,60 @@ std::vector<double> load_hourly_inputs(int start_point,
     return hourly_inputs;
 }
 
+std::vector<double> calc_avg_daily_values(std::vector<double> hourly_values,
+                                          int total_time_steps) {
+    std::vector<double> average_values(total_time_steps, 0.0);
+
+    for (int point = 0; point < total_time_steps; point += HOURS_PER_DAY) {
+        double sum = 0.0;
+        for (size_t i = 0; i < HOURS_PER_DAY; ++i) {
+            sum += hourly_values[point + i];
+        }
+        double todays_avg_value = sum / HOURS_PER_DAY;
+        for (size_t i = 0; i < HOURS_PER_DAY; ++i) {
+            average_values[point + i] = todays_avg_value;
+        }
+    }
+    return average_values;
+}
+
+std::vector<double> calc_leaf_sens_values(std::vector<double> average_temperatures,
+                                          double critical_value,
+                                          double optimal_value,
+                                          int total_time_steps) {
+    std::vector<double> leaf_sensitivity_values(total_time_steps, 0.0);
+
+    for (size_t point = 0; point < total_time_steps; ++point) {
+        leaf_sensitivity_values[point] = (optimal_value - critical_value)/\
+                                         (average_temperatures[point] - critical_value);
+    }
+
+    return leaf_sensitivity_values;
+}
+
+std::vector<double> calc_fruit_sens_values(std::vector<double> average_temperatures,
+                                           std::vector<double> leaf_sensitivity_values,
+                                           double temp_critical_fruit_growth,
+                                           double temp_ceiling_fruit_growth,
+                                           double temp_optimal_fruit_growth,
+                                           int total_time_steps) {
+    std::vector<double> fruit_sensitivity_values(total_time_steps, 0.0);
+
+    for (size_t point = 0; point < total_time_steps; ++point) {
+        if (average_temperatures[point] <= temp_optimal_fruit_growth) {
+            fruit_sensitivity_values[point] = 1.0;
+        } else if (average_temperatures[point] > temp_optimal_fruit_growth && \
+                   average_temperatures[point] < temp_ceiling_fruit_growth) {
+            fruit_sensitivity_values[point] = 1.0 - std::abs(1 - fruit_biomass_temp_sensitivity_parameter/ \
+                                                                 leaf_sensitivity_values[point]);
+        } else {
+            fruit_sensitivity_values[point] = 0.0;
+        }
+    }
+
+    return fruit_sensitivity_values;
+}
+
 std::vector<double> calc_eff_values(std::vector<double> hourly_values,
                                     double critical_value,
                                     int total_time_steps) {
@@ -105,6 +161,20 @@ std::vector<double> calc_eff_values(std::vector<double> hourly_values,
         }
     }
     return effective_values;
+}
+
+std::vector<double> calc_cum_values(std::vector<double> effective_values,
+                                    int total_time_steps) {
+    std::vector<double> cumulative_values(total_time_steps, 0.0);
+
+    double sum = 0.0;
+    for (int point = 0; point < total_time_steps; point += HOURS_PER_DAY) {
+        sum += effective_values[point];
+        for (size_t i = 0; i < HOURS_PER_DAY; ++i) {
+            cumulative_values[point+i] = sum;
+        }
+    }
+    return cumulative_values;
 }
 
 void write_vectors_to_csv(const std::string& filename, 

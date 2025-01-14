@@ -67,15 +67,14 @@ int main() {
     int total_time_steps      = total_simulation_days * num_time_steps_per_day - 1;
 
     // Read-in input solar radiation and temperature data (no header) from CSV
-    std::string input_filename   = "hourly_temp_rad.csv";
     int radiation_column_index   = 0;
     int temperature_column_index = 1;
     bool has_header              = false;
 
-    std::vector<double> hourly_radiation = load_data_from_csv_column(input_filename, 
+    std::vector<double> hourly_radiation = load_data_from_csv_column(disturbance_data_filename, 
                                                                      radiation_column_index, 
                                                                      has_header);
-    std::vector<double> hourly_temperature = load_data_from_csv_column(input_filename, 
+    std::vector<double> hourly_temperature = load_data_from_csv_column(disturbance_data_filename, 
                                                                        temperature_column_index, 
                                                                        has_header);
     hourly_temperature.erase(hourly_temperature.begin());
@@ -100,15 +99,62 @@ int main() {
                                                                fertilizer_amount_per_plant, 
                                                                total_time_steps);
 
-    // Calculate effective temperatures over simulation length
+    // Calculate average temperature over simulation length
+    std::vector<double> average_temperatures = calc_avg_daily_values(hourly_temperature,
+                                                                     total_time_steps);
+    std::vector<double> average_irrigation = calc_avg_daily_values(hourly_irrigation,
+                                                                   total_time_steps);
+
+    // Calculate leaf and fruit sensitivity values over the simulation length
+    std::vector<double> leaf_sensitivity_temp = calc_leaf_sens_values(average_temperatures,
+                                                                       temp_critical_fruit_growth,
+                                                                       temp_optimal_fruit_growth,
+                                                                       total_time_steps);
+    std::vector<double> fruit_sensitivity_temp = calc_fruit_sens_values(average_temperatures,
+                                                                        leaf_sensitivity_temp,
+                                                                        temp_critical_fruit_growth,
+                                                                        temp_ceiling_fruit_growth,
+                                                                        temp_optimal_fruit_growth,
+                                                                        total_time_steps);
+    std::vector<double> leaf_sensitivity_water = calc_leaf_sens_values(average_irrigation,
+                                                                       water_critical_fruit_growth,
+                                                                       water_optimal_fruit_growth,
+                                                                       total_time_steps);
+
+    // Calculate effective values over simulation length
     std::vector<double> effective_temperatures = calc_eff_values(hourly_temperature,
                                                                  temp_critical_fruit_growth,
                                                                  total_time_steps);
+    std::vector<double> effective_irrigation = calc_eff_values(hourly_irrigation,
+                                                               water_critical_fruit_growth,
+                                                               total_time_steps);
+    std::vector<double> effective_fertilizer = calc_eff_values(hourly_fertilizer,
+                                                               fertilizer_critical_fruit_growth,
+                                                               total_time_steps);
+
+    // Calculate cumulative values over simulation length
+    std::vector<double> cumulative_temperatures = calc_cum_values(effective_temperatures,
+                                                                  total_time_steps);
+    std::vector<double> cumulative_irrigation = calc_cum_values(effective_irrigation,
+                                                                total_time_steps);
+    std::vector<double> cumulative_fertilizer = calc_cum_values(effective_fertilizer,
+                                                                total_time_steps);
     
-    // Output data for plotting
+    // Save input data to CSV for plotting
     std::string output_filename = "output.csv";
-    std::vector<std::vector<double>> all_vectors = {effective_temperatures};
-    write_vectors_to_csv(output_filename, all_vectors);
+    std::vector<std::vector<double>> all_eff_vectors = {hourly_temperature,
+                                                        hourly_irrigation,
+                                                        hourly_fertilizer,
+                                                        effective_temperatures,
+                                                        effective_irrigation,
+                                                        effective_fertilizer,
+                                                        cumulative_temperatures,
+                                                        cumulative_irrigation,
+                                                        cumulative_fertilizer,
+                                                        leaf_sensitivity_temp,
+                                                        fruit_sensitivity_temp,
+                                                        leaf_sensitivity_water};
+    write_vectors_to_csv(output_filename, all_eff_vectors);
 
     return 0;
 }

@@ -3,6 +3,9 @@
 #define USER_INPUT_H
 #include <string>
 
+// Disturbance Dat
+std::string disturbance_data_filename = "hourly_rad_temp_iowa.csv";
+
 // Genetic Algorithm User Inputs
 const double water_period      = 24;  // plants are watered every x hours    [hours, in {0, 2927}]
 const double fertilizer_period = 720; // plants are fertilized every x hours [hours, in {0, 2927}]
@@ -33,8 +36,8 @@ const int water_start_minute = DEFAULT_START_MINUTE; // minute in which the firs
 const int water_start_second = DEFAULT_START_SECOND; // second at which the first watering occurs [unitless, in {1, 60}]
 
 const int fertilizer_start_year   = start_year;            // year in which the first fertilization occurs   [unitless, in {1, 2024}]
-const int fertilizer_start_month  = 5;                     // month in which the first fertilization occurs  [unitless, in {1, 12}]
-const int fertilizer_start_day    = 31;                    // day on which the first fertilization occurs    [unitless, in {1, 31}]
+const int fertilizer_start_month  = 6;                     // month in which the first fertilization occurs  [unitless, in {1, 12}]
+const int fertilizer_start_day    = 29;                    // day on which the first fertilization occurs    [unitless, in {1, 31}]
 const int fertilizer_start_hour   = 15;                    // hour in which the first fertilization occurs   [unitless, in {1, 24}]
 const int fertilizer_start_minute = DEFAULT_START_MINUTE;  // minute in which the first fertilization occurs [unitless, in {1, 60}]
 const int fertilizer_start_second = DEFAULT_START_SECOND;  // second at which the first fertilization occurs [unitless, in {1, 60}]

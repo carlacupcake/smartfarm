@@ -22,8 +22,8 @@ const int num_plants_y           = 9;                           // number of pla
 const int num_plants             = num_plants_x * num_plants_y; // number of plants in the field,                              [unitless]
 const double field_dim_x         = 16;                          // length of the field in the x-direction                      [m]
 const double field_dim_y         = 8;                           // width of the field in the y-direction                       [m]
-const double field_azimuth_angle = 0;                           // clockwise rotation of farm origin from north,               [degrees]
-const double field_zenith_angle  = 0;                           // surface normal of plane in which field lives w.r.t. z-axis, [degrees]  
+const double field_azimuth_angle = 0;                           // clockwise rotation of farm origin from north,               [radians]
+const double field_zenith_angle  = 0;                           // surface normal of plane in which field lives w.r.t. z-axis, [radians]  
 
 // Variable Glossary - Simulation Settings
 const double time_step_size           = 1.0;                                                         // simulation time step size in hours,    [hours] 
@@ -90,7 +90,7 @@ const double threshold_dAdt_canopy_fruit_decay = -2.5e-6; // m2/s
 
 // Variable Glossary - Other Crop-specific Parameters
 const double absorption_factor_single_leaf            = 1.0e0;  // unitless
-const double conal_angle_leaves_wrt_stem              = 4.5e1;  // degrees
+const double conal_angle_leaves_wrt_stem              = 0.785;  // radians (45 degrees)
 const double efficiency_coefficient_photosynthesis    = 5.0e-2; // 1/W
 const double fruit_biomass_temp_sensitivity_parameter = 1.0e0;  // unitless
 const double typical_canopy_density                   = 1.0e0;  // kg/m3
