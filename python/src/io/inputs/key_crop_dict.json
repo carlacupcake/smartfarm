@@ -1,7 +1,7 @@
 {
     "alfalfa": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -50,7 +50,7 @@
     },
     "corn": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -99,7 +99,7 @@
     },
     "cotton": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -148,7 +148,7 @@
     },
     "grapes": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -197,7 +197,7 @@
     },
     "oranges": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -246,7 +246,7 @@
     },
     "rice": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -295,7 +295,7 @@
     },   
     "sorghum": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -344,7 +344,7 @@
     },
     "soybeans": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -393,7 +393,7 @@
     },
     "sugarcane": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],
@@ -442,7 +442,7 @@
     },
     "wheat": {
         "absorption_factor_single_leaf":                                 [1e0, "unitless"],
-        "carrying_capacity_canopy_biomass":                              [1e0, "m2"],
+        "carrying_capacity_canopy_biomass":                              [1e0, "kg"],
         "carrying_capacity_fruit_biomass":                               [5e0, "kg"],
         "carrying_capacity_height":                                      [1e0, "m"],
         "carrying_capacity_leaf_area":                                   [15e-4, "m2"],

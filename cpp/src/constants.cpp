@@ -44,23 +44,23 @@ const double initial_canopy_biomass          = 0.01;   // initial canopy biomass
 const double initial_fruit_biomass           = 0.01;   // initial fruit biomass of representative plant,              [kg]
 
 // Variable Glossary - Growth Rates
-const double growth_rate_canopy_biomass                = 1.0e0;  // 1/s
-const double growth_rate_fruit_biomass                 = 1.0e0;  // 1/s
-const double growth_rate_height                        = 8.0e-3; // 1/s
-const double growth_rate_height_fertilizer_specific    = 7.5e-2; // 1/s
-const double growth_rate_height_water_specific         = 7.5e-2; // 1/s
-const double growth_rate_leaf_area_fertilizer_specific = 8.0e-3; // 1/s
-const double growth_rate_leaf_area_temp_specific       = 8.0e-2; // 1/s
-const double growth_rate_leaf_area_water_specific      = 8.0e-3; // 1/s
+const double growth_rate_canopy_biomass                = 1.0e0;  // 1/hr
+const double growth_rate_fruit_biomass                 = 1.0e0;  // 1/hr
+const double growth_rate_height                        = 8.0e-3; // 1/hr
+const double growth_rate_height_fertilizer_specific    = 7.5e-2; // 1/hr
+const double growth_rate_height_water_specific         = 7.5e-2; // 1/hr
+const double growth_rate_leaf_area_fertilizer_specific = 8.0e-3; // 1/hr
+const double growth_rate_leaf_area_temp_specific       = 8.0e-2; // 1/hr
+const double growth_rate_leaf_area_water_specific      = 8.0e-3; // 1/hr
 
 // Variable Glossary - Peak Growth Times
-const double scaling_factor_peak_growth_time_height_fertilizer_specific    = 3.5e1; // 1/s
-const double scaling_factor_peak_growth_time_height_water_specific         = 3.5e1; // 1/s
-const double scaling_factor_peak_growth_time_leaf_area_fertilizer_specific = 2.0e1; // 1/s
-const double scaling_factor_peak_growth_time_leaf_area_temp_specific       = 2.0e1; // 1/s
-const double scaling_factor_peak_growth_time_leaf_area_water_specific      = 2.0e1; // 1/s
+const double scaling_factor_peak_growth_time_height_fertilizer_specific    = 3.5e1; // 1/hr
+const double scaling_factor_peak_growth_time_height_water_specific         = 3.5e1; // 1/hr
+const double scaling_factor_peak_growth_time_leaf_area_fertilizer_specific = 2.0e1; // 1/hr
+const double scaling_factor_peak_growth_time_leaf_area_temp_specific       = 2.0e1; // 1/hr
+const double scaling_factor_peak_growth_time_leaf_area_water_specific      = 2.0e1; // 1/hr
 
-// Variable Glossary - Other Peak Growth Parameters
+// Variable Glossary - For Peak Growth Value Tuning
 const double scaling_factor_peak_height_growth_fertilizer_specific    = 8.0e1; // unitless
 const double scaling_factor_peak_height_growth_water_specific         = 8.0e1; // unitless
 const double scaling_factor_peak_leaf_area_growth_fertilizer_specific = 6.5e1; // unitless
@@ -68,14 +68,14 @@ const double scaling_factor_peak_leaf_area_growth_temp_specific       = 6.5e1; /
 const double scaling_factor_peak_leaf_area_growth_water_specific      = 3.7e1; // unitless
 
 // Variable Glossary - Decay Rates
-const double decay_rate_canopy_biomass           = 1.0e-2; // 1/s
-const double decay_rate_fruit_biomass            = 1.0e-2; // 1/s
-const double decay_rate_height                   = 5.0e-3; // 1/s
-const double decay_rate_leaf_area_temp_specific  = 1.0e-3; // 1/s/degC
+const double decay_rate_canopy_biomass           = 1.0e-2; // 1/hr
+const double decay_rate_fruit_biomass            = 1.0e-2; // 1/hr
+const double decay_rate_height                   = 5.0e-3; // 1/hr
+const double decay_rate_leaf_area_temp_specific  = 1.0e-3; // 1/hr/degC
 const double decay_rate_leaf_area_water_specific = 8.0e-4; // 1/kg
 
 // Variable Glossary - Carrying Capacities
-const double carrying_capacity_canopy_biomass = 1.0e0;   // m2
+const double carrying_capacity_canopy_biomass = 1.0e0;   // kg
 const double carrying_capacity_fruit_biomass  = 5.0e0;   // kg
 const double carrying_capacity_height         = 1.0e0;   // m
 const double carrying_capacity_leaf_area      = 15.0e-4; // m2
