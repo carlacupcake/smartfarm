@@ -1,0 +1,3 @@
+src/smartfarm/core/.env
+src/smartfarm/core/aws/smartfarm-key.prem
+src/smartfarm/core/aws/ec2-user@204.236.162.217
