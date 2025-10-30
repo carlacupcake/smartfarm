@@ -115,7 +115,6 @@ class Population:
         for i in range(num_members):
             this_member = Member(
                 ga_params            = self.ga_params,
-                bounds               = self.bounds,
                 carrying_capacities  = self.carrying_capacities,
                 disturbances         = self.disturbances,
                 growth_rates         = self.growth_rates,

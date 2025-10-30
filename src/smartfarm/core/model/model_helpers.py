@@ -16,7 +16,7 @@ def get_nutrient_factor(x, mu):
         except RuntimeWarning as e:
             # This block will now catch the promoted RuntimeWarning
             print(f"RuntimeWarning occurred: {e}")
-            print(f'x: {x}, mu: {mu}, exp arg: {exp_arg}, exp: {exp_val}')
+            print(f'x: {x}, mu: {mu}, exp arg: {exp_arg}')
             # You might want to return a specific value or re-raise
             return np.nan # Or a sensible default value
         except Exception as e:

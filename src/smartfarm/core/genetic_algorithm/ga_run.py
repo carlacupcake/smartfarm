@@ -133,7 +133,6 @@ class GeneticAlgorithm:
                 # Cast offspring to members and evaluate costs
                 kid1 = Member(
                     ga_params            = self.ga_params,
-                    bounds               = self.bounds,
                     carrying_capacities  = self.carrying_capacities,
                     disturbances         = self.disturbances,
                     growth_rates         = self.growth_rates,
@@ -143,7 +142,6 @@ class GeneticAlgorithm:
                     values               = kid1)
                 kid2 = Member(
                     ga_params            = self.ga_params,
-                    bounds               = self.bounds,
                     carrying_capacities  = self.carrying_capacities,
                     disturbances         = self.disturbances,
                     growth_rates         = self.growth_rates,
