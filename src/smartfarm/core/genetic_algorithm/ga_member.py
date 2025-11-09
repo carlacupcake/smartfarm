@@ -66,10 +66,10 @@ class Member:
         hourly_radiation     = self.disturbances.radiation
 
         # Unpack typical disturbances
-        WC_opt = self.typical_disturbances.optimal_cumulative_water
-        FC_opt = self.typical_disturbances.optimal_cumulative_fertilizer
-        T_typ  = self.typical_disturbances.typical_temperature
-        R_typ  = self.typical_disturbances.typical_radiation
+        W_typ = self.typical_disturbances.typical_water
+        F_typ = self.typical_disturbances.typical_fertilizer
+        T_typ = self.typical_disturbances.typical_temperature
+        R_typ = self.typical_disturbances.typical_radiation
 
         # Unpack initial conditions
         h0 = self.initial_conditions.h0
@@ -127,8 +127,10 @@ class Member:
         P = np.full(total_time_steps, P0)
 
         # Initialize storage of cumulative water and fertilizer values
-        cumulative_water = np.zeros(total_time_steps)
-        cumulative_fertilizer = np.zeros(total_time_steps)
+        cumulative_radiation   = np.zeros(total_time_steps)
+        cumulative_temperature = np.zeros(total_time_steps)
+        cumulative_water       = np.zeros(total_time_steps)
+        cumulative_fertilizer  = np.zeros(total_time_steps)
 
         # Run the season simulation for the given member
         for t in range(total_time_steps - 1):
@@ -138,6 +140,12 @@ class Member:
             W = irrigation[t]
             F = fertilizer[t]
 
+            RC = cumulative_radiation[t] + R
+            cumulative_radiation[t+1] = RC
+
+            TC = cumulative_temperature[t] + T
+            cumulative_temperature[t+1] = TC
+
             WC = cumulative_water[t] + W + S
             cumulative_water[t+1] = WC
 
@@ -145,10 +153,10 @@ class Member:
             cumulative_fertilizer[t+1] = FC
 
             # Nutrient factors (bounded, nonnegative)
-            nuW = get_nutrient_factor(WC, WC / max(WC_opt, 1e-9)) # optimal is over whole season TODO change accordingly
-            nuF = get_nutrient_factor(FC, FC / max(FC_opt, 1e-9)) # optimal is over whole season
-            nuT = get_nutrient_factor(T,  T  / max(T_typ, 1e-9))
-            nuR = get_nutrient_factor(R,  R  / max(R_typ, 1e-9))
+            nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.5)
+            nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.01)
+            nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.5)
+            nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.5)
 
             # Growth rates (FIX: use parentheses in fractional powers)
             ah_hat = ah * (nuF * nuT * nuR)**(1/3)
@@ -201,10 +209,10 @@ class Member:
         hourly_radiation     = self.disturbances.radiation
 
         # Unpack typical disturbances
-        WC_opt = self.typical_disturbances.optimal_cumulative_water
-        FC_opt = self.typical_disturbances.optimal_cumulative_fertilizer
-        T_typ  = self.typical_disturbances.typical_temperature
-        R_typ  = self.typical_disturbances.typical_radiation
+        W_typ = self.typical_disturbances.typical_water
+        F_typ = self.typical_disturbances.typical_fertilizer
+        T_typ = self.typical_disturbances.typical_temperature
+        R_typ = self.typical_disturbances.typical_radiation
 
         # Unpack initial conditions
         h0 = self.initial_conditions.h0
@@ -282,8 +290,10 @@ class Member:
         kP_hat_values = np.zeros(total_time_steps)
 
         # Initialize storage of cumulative water and fertilizer values
-        cumulative_water = np.zeros(total_time_steps)
-        cumulative_fertilizer = np.zeros(total_time_steps)
+        cumulative_radiation   = np.zeros(total_time_steps)
+        cumulative_temperature = np.zeros(total_time_steps)
+        cumulative_water       = np.zeros(total_time_steps)
+        cumulative_fertilizer  = np.zeros(total_time_steps)
 
         # Run the season simulation for the given member
         for t in range(total_time_steps - 1):
@@ -293,6 +303,12 @@ class Member:
             W = irrigation[t]
             F = fertilizer[t]
 
+            RC = cumulative_radiation[t] + R
+            cumulative_radiation[t+1] = RC
+
+            TC = cumulative_temperature[t] + T
+            cumulative_temperature[t+1] = TC
+
             WC = cumulative_water[t] + W + S
             cumulative_water[t+1] = WC
 
@@ -300,10 +316,10 @@ class Member:
             cumulative_fertilizer[t+1] = FC
 
             # Nutrient factors (bounded, nonnegative)
-            nuW = get_nutrient_factor(WC, WC / max(WC_opt, 1e-9)) # optimal is over whole season TODO change accordingly
-            nuF = get_nutrient_factor(FC, FC / max(FC_opt, 1e-9)) # optimal is over whole season
-            nuT = get_nutrient_factor(T,  T  / max(T_typ, 1e-9))
-            nuR = get_nutrient_factor(R,  R  / max(R_typ, 1e-9))
+            nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.7)
+            nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.1)
+            nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.5)
+            nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.7)
 
             nuW_values[t] = nuW
             nuF_values[t] = nuF

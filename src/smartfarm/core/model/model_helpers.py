@@ -2,27 +2,24 @@
 import numpy as np
 import warnings # temporary
 
-def get_nutrient_factor(x, mu):
-    # Set up a context manager to temporarily treat RuntimeWarnings as exceptions
+def get_nutrient_factor(x, mu, sensitivity=0.5):
+    # sensitivity parameter between 0 and 1
     with warnings.catch_warnings():
-        # Specifically filter RuntimeWarnings to be raised as an exception
         warnings.filterwarnings("error", category=RuntimeWarning)
         try:
-            # The calculation where the warning might occur
-            exp_arg = 1/100*(x - mu)
-            exp_val = np.exp(exp_arg)
-            nu = 1/2 * (1 / (1 + exp_val) + 1)
+            sigma_min = 0.1 * mu
+            sigma_max = 100 * mu
+            sigma = sigma_max**(1 - sensitivity) * sigma_min**(sensitivity)
+            exp_arg = -(x - mu)**2/(2*sigma**2)
+            nu = np.exp(exp_arg)
             return nu
         except RuntimeWarning as e:
-            # This block will now catch the promoted RuntimeWarning
             print(f"RuntimeWarning occurred: {e}")
             print(f'x: {x}, mu: {mu}, exp arg: {exp_arg}')
-            # You might want to return a specific value or re-raise
-            return np.nan # Or a sensible default value
+            return np.nan
         except Exception as e:
-            # This catches any other non-Runtime exceptions
             print(f"Other Error occurred: {e}")
-            return np.nan # Or a sensible default value
+            return np.nan
         
 
 def get_sim_inputs_from_hourly(

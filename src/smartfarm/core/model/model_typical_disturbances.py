@@ -7,19 +7,19 @@ class ModelTypicalDisturbances(BaseModel):
     Class to hold the parameters used for the genetic algorithm.
     """
 
-    optimal_cumulative_water: PositiveFloat = Field(
+    typical_water: PositiveFloat = Field(
         default=28,
-        description="Optimal cumulative water in inches/acre."
+        description="Typical water/hour in inches/acre."
     )
-    optimal_cumulative_fertilizer: PositiveFloat = Field(
+    typical_fertilizer: PositiveFloat = Field(
         default=355,
-        description="Optimal cumulative fertilizer in pounds/acre."
+        description="Typical fertilizer/hour in pounds/acre."
     )
     typical_temperature: PositiveFloat = Field(
         default=23,
-        description="Typical (mean) daily temperature in degrees Celsius."
+        description="Typical (mean) hourly temperature in degrees Celsius."
     )
     typical_radiation: PositiveFloat = Field(
         default=1500,
-        description="Typical (3/4 max) daily radiation in watts/m²."
+        description="Typical (mean) hourly radiation in watts/m²."
     )
