@@ -180,7 +180,7 @@ class Member:
             P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
 
         # Combined objective (negative because GA minimizes)
-        cost = -(self.ga_params.weight_height * h[-1] + self.ga_params.weight_fruit_biomass * P[-1])
+        cost = -(self.ga_params.weight_fruit_biomass * P[-1])
         return float(cost)
     
 

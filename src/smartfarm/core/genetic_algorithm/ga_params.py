@@ -29,6 +29,6 @@ class GeneticAlgorithmParams(BaseModel):
         description="TODO add doc string"
     )
     weight_fruit_biomass: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=1.0,
+        default=4450, # $4/bushel, 1 bushel is ~25.5 kg so $0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
         description="TODO add doc string"
     )

@@ -1,6 +1,6 @@
 """ga_result.py."""
 import numpy as np
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 from .ga_params import GeneticAlgorithmParams
 from .ga_population import Population
@@ -45,116 +45,88 @@ class GeneticAlgorithmResult():
             table_of_best_designs (ndarray)
         """
 
-        [unique_values, unique_eff_props, unique_costs] = self.final_population.get_unique_designs()
+        [unique_values, unique_costs] = self.final_population.get_unique_designs()
         table_of_best_designs = np.hstack((unique_values[0:rows, :],
-                                           unique_eff_props[0:rows, :],
                                            unique_costs[0:rows].reshape(-1, 1)))
         return table_of_best_designs
 
 
     def print_table_of_best_designs(self, rows: int = 10):
         """
-        Generates and displays a formatted table of the top-performing designs.
+        Generates and displays a formatted table of the top-performing designs
+        using matplotlib.
 
         Args:
-            rows (int, optional)
+            rows (int, optional): Number of designs to include.
 
         Returns:
-            plotly.graph_objects.Figure
+            matplotlib.figure.Figure
         """
 
+        # Get data: expected shape (rows, 4)
         table_data = self.get_table_of_best_designs(rows)
+
         headers = [
             "Irrigation Frequency (1/hr)",
             "Irrigation Amount (inches/irrigation)",
             "Fertilizer Frequency (1/hr)",
-            "Fertilizer Amount (lb/fertilization)"]
+            "Fertilizer Amount (lb/fertilization)",
+        ]
 
-        header_color   = "lavender"
-        odd_row_color  = "white"
-        even_row_color = "lightgrey"
-        if rows % 2 == 0:
-            multiplier  = int(rows/2)
-            cells_color = [[odd_row_color, even_row_color]*multiplier]
-        else:
-            multiplier  = int(np.floor(rows/2))
-            cells_color = [[odd_row_color, even_row_color]*multiplier]
-            cells_color.append(odd_row_color)
+        # Create figure and axis
+        # Height scales a bit with number of rows so it doesn't get cramped
+        fig, ax = plt.subplots(figsize=(10, 0.4 * rows + 1))
 
-        fig = go.Figure(data=[go.Table(
-            columnwidth = 1000,
-            header = dict(
-                values=headers,
-                fill_color=header_color,
-                align="left",
-                font=dict(size=12),
-                height=30
-            ),
-            cells = dict(
-                values=[table_data[:, i] for i in range(table_data.shape[1])],
-                fill_color=cells_color,
-                align="left",
-                font=dict(size=12),
-                height=30,
-            )
-        )])
+        ax.axis("off")
+        ax.axis("tight")
 
-        # Update layout for horizontal scrolling
-        fig.update_layout(
-            title="Optimal Properties Recommended by Genetic Algorithm",
-            title_font_size=20,
-            title_x=0.2,
-            margin=dict(l=0, r=0, t=40, b=0),
-            height=400,
-            autosize=True
+        # Matplotlib's table expects rows, not columns
+        table = ax.table(
+            cellText=table_data,
+            colLabels=headers,
+            loc="center",
         )
 
+        # Some basic formatting
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.auto_set_column_width(col=list(range(len(headers))))
+
+        ax.set_title(
+            "Optimal Properties Recommended by Genetic Algorithm",
+            pad=20,
+            fontsize=14,
+        )
+
+        fig.tight_layout()
         return fig
 
 
     def plot_optimization_results(self):
         """
-        Generates a plot visualizing the optimization convergence over generations.
+        Generates a plot visualizing optimization convergence over generations
+        using matplotlib.
 
         Returns:
-            plotly.graph_objects.Figure
+            matplotlib.figure.Figure
         """
 
-        fig = go.Figure()
+        gens = list(range(self.ga_params.num_generations))
 
-        fig.add_trace(go.Scatter(
-            x=list(range(self.ga_params.num_generations)),
-            y=self.avg_parent_costs,
-            mode="lines",
-            name="Avg. of top 10 performers"
-        ))
+        fig, ax = plt.subplots(figsize=(8, 5))
 
-        fig.add_trace(go.Scatter(
-            x=list(range(self.ga_params.num_generations)),
-            y=self.lowest_costs,
-            mode="lines",
-            name="Best costs"
-        ))
+        ax.plot(gens, self.avg_parent_costs, label="Avg. of top 10 performers")
+        ax.plot(gens, self.lowest_costs, label="Best costs")
 
-        fig.update_layout(
-            title="Convergence of Genetic Algorithm",
-            title_x=0.25,
-            xaxis_title="Generation",
-            yaxis_title="Cost",
-            legend=dict(
-                font=dict(size=14),
-                x=1,
-                y=1,
-                xanchor="right",
-                yanchor="top",
-                bgcolor="rgba(255, 255, 255, 0.5)"
-            ),
-            title_font_size=24,
-            xaxis_title_font_size=20,
-            yaxis_title_font_size=20,
-            width=600,
-            height=400,
-            margin=dict(l=50, r=50, t=50, b=50)
+        ax.set_title("Convergence of Genetic Algorithm", fontsize=16, pad=15)
+        ax.set_xlabel("Generation", fontsize=13)
+        ax.set_ylabel("Cost", fontsize=13)
+
+        ax.legend(
+            fontsize=12,
+            loc="upper right",
+            framealpha=0.5
         )
 
+        fig.tight_layout()
         return fig

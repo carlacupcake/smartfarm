@@ -1,0 +1,35 @@
+{
+  "members": [
+    { "values": [336, 0.1, 720, 100] },
+    { "values": [300, 0.15, 650, 75] }
+  ],
+  "sim_context": {
+    "dt": 0.1,
+    "total_time_steps": 40,
+    "simulation_hours": 4,
+    "hourly_precipitation": [0, 0, 0, 0],
+    "hourly_temperature": [25, 25, 25, 25],
+    "hourly_radiation": [1000, 1000, 1000, 1000],
+    "W_typ": 0.009,
+    "F_typ": 0.118,
+    "T_typ": 21.8,
+    "R_typ": 500,
+    "h0": 0.00103,
+    "A0": 0.000224,
+    "N0": 0.0069,
+    "c0": 0.345,
+    "P0": 0.0000862,
+    "ah": 0.01,
+    "aA": 0.0105,
+    "aN": 0.011,
+    "ac": 0.01,
+    "aP": 0.005,
+    "kh": 3.0,
+    "kA": 0.65,
+    "kN": 20,
+    "kc": 1000,
+    "kP": 0.25,
+    "weight_height": 1.0,
+    "weight_fruit_biomass": 1.0
+  }
+}
