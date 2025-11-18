@@ -129,4 +129,4 @@ class GeneticAlgorithmResult():
         )
 
         fig.tight_layout()
-        return fig
+        return

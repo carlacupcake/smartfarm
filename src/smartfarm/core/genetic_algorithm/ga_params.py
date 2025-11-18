@@ -24,8 +24,12 @@ class GeneticAlgorithmParams(BaseModel):
         default=200,
         description="Total number of members in each generation of the population."
     )
-    weight_height: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=1.0,
+    weight_irrigation: Annotated[float, Field(strict=True, ge=0)] = Field(
+        default=2.0, # $2/acre-inch
+        description="TODO add doc string"
+    )
+    weight_fertilizer: Annotated[float, Field(strict=True, ge=0)] = Field(
+        default=0.614, # from typical NPK ratio for corn: 230 lb/acre N ($0.68/lb), 60 P ($.56/lb), 65 K ($0.43/lb) => 1/(230 + 65 + 60) * (230 * 0.68 + 60 * 0.56 + 65 * 0.43) = $0.614 per lb-acre of fertilizer
         description="TODO add doc string"
     )
     weight_fruit_biomass: Annotated[float, Field(strict=True, ge=0)] = Field(

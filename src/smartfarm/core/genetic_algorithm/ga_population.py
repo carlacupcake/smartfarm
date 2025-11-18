@@ -334,8 +334,9 @@ class Population:
             "kP": float(carrying_capacities.kP),
 
             # GA weights used in the cost
-            "weight_height":         float(getattr(ga, "weight_height", 1.0)),
             "weight_fruit_biomass":  float(getattr(ga, "weight_fruit_biomass", 1.0)),
+            "weight_irrigation":     float(getattr(ga, "weight_irrigation",    1.0)),
+            "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),
         }
 
         return sim_context

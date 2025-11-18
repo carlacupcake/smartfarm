@@ -180,7 +180,11 @@ class Member:
             P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
 
         # Combined objective (negative because GA minimizes)
-        cost = -(self.ga_params.weight_fruit_biomass * P[-1])
+        profit = self.ga_params.weight_fruit_biomass * P[-1]
+        expenses = (self.ga_params.weight_irrigation * np.sum(irrigation)
+                    + self.ga_params.weight_fertilizer * np.sum(fertilizer))
+        revenue = profit - expenses
+        cost = -revenue # GA minimizes cost, but we want to maximize revenue
         return float(cost)
     
 

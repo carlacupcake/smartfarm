@@ -213,9 +213,6 @@ class GeneticAlgorithm:
         # Generation counter
         g = 0
 
-        # Initialize array to store costs for current generation
-        costs = np.zeros(num_members)
-
         # Randomly populate first generation
         population = Population(
             bounds               = self.bounds,
@@ -235,7 +232,7 @@ class GeneticAlgorithm:
 
         # Calculate the costs of the first generation
         t0 = time.time()
-        population.set_costs_with_lambda()
+        population.set_costs_with_lambda(verbose=False)
         t1 = time.time()
         print(f"Time taken to calculate costs for g={g}: {t1 - t0} seconds")
 

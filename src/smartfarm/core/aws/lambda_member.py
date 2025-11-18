@@ -90,8 +90,9 @@ def member_get_cost_with_lambda(
     kP = ctx["kP"]
 
     # Unpack GA cost function weights
-    weight_height  = ctx["weight_height"]
-    weight_fruit_biomass  = ctx["weight_fruit_biomass"]
+    weight_fruit_biomass = ctx["weight_fruit_biomass"]
+    weight_irrigation    = ctx["weight_irrigation"]
+    weight_fertilizer    = ctx["weight_fertilizer"]
 
     # Build hourly control series from design variables and input disturbances
     hourly_irrigation = np.zeros(simulation_hours)
@@ -180,6 +181,10 @@ def member_get_cost_with_lambda(
         c[t+1] = c[t] + dt * (ac_hat * c[t] * (1 - c[t]/max(kc_hat, 1e-9)))
         P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
 
-    cost = -(weight_fruit_biomass * P[-1]) 
+    profit = weight_fruit_biomass * P[-1]
+    expenses = (weight_irrigation * np.sum(irrigation)
+                + weight_fertilizer * np.sum(fertilizer))
+    revenue = profit - expenses
+    cost = -revenue # GA minimizes cost, but we want to maximize revenue
 
     return float(cost)

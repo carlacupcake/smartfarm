@@ -29,7 +29,8 @@
     "kN": 20,
     "kc": 1000,
     "kP": 0.25,
-    "weight_height": 1.0,
+    "weight_irrigation": 1.0,
+    "weight_fertilizer": 1.0,
     "weight_fruit_biomass": 1.0
   }
 }
