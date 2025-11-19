@@ -155,10 +155,10 @@ def member_get_cost_with_lambda(
         cumulative_fertilizer[t+1] = FC
 
         # Nutrient factors (bounded, nonnegative)
-        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.5)
-        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.01)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.5)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.5)
+        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.7)
+        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.7)
+        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=1.0)
+        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.9)
 
         # Growth rates (FIX: use parentheses in fractional powers)
         ah_hat = ah * (nuF * nuT * nuR)**(1/3)
