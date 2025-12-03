@@ -1,14 +1,19 @@
-"""ga_bounds.py."""
+# ga_bounds.py
 import numpy as np
 from pydantic import BaseModel, Field
 
 
 class DesignSpaceBounds(BaseModel):
     """
-    DesignSpaceBounds class to hold lower and upper bounds for design variables.
+    Container for the admissible ranges of the genetic algorithm’s design
+    variables. Each member of the population must choose values within these
+    lower and upper bounds during optimization.
 
-    TODO add doc string
+    The bounds are stored as NumPy arrays of equal length, with each index
+    corresponding to a specific decision variable (e.g., irrigation frequency,
+    irrigation amount, fertilizer frequency, fertilizer amount).
     """
+
     lower_bounds: np.ndarray = Field(
         default_factory=np.ndarray,
         description="Lower bounds for properties of materials considered in the optimization."

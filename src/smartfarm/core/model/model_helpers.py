@@ -4,9 +4,28 @@ import matplotlib.pyplot as plt
 from core.model.model_growth_rates import ModelGrowthRates
 from core.model.model_carrying_capacities import ModelCarryingCapacities
 
-def get_nutrient_factor(x, mu, sensitivity=0.5):
+def get_nutrient_factor(x, mu, sensitivity=0.7):
+    """
+    Compute a bounded nutrient factor based on a Gaussian-like curve
+    centered at `mu`. The `sensitivity` parameter controls how sharply the
+    factor penalizes deviations from the optimal value.
+
+    Args:
+        x (float or ndarray):
+            Current cumulative nutrient level normalized by the typical cumulative
+            value at that time point.
+        mu (float):
+            Optimal or “target” value at which the nutrient factor peaks (nu = 1).
+        sensitivity (float, optional):
+            Controls curvature of the response (0 → broad tolerance, 1 → sharp
+            sensitivity); must lie between 0 and 1.
+
+    Returns:
+        float or ndarray:
+            Nutrient factor `nu` ∈ (0, 1], representing how supportive the
+            current conditions are relative to the optimum.
+    """
     
-    # Sensitivity parameter between 0 and 1
     sigma_min = 0.1 * mu
     sigma_max = 100 * mu
     sigma = sigma_max**(1 - sensitivity) * sigma_min**(sensitivity)
@@ -22,6 +41,28 @@ def get_sim_inputs_from_hourly(
         simulation_hours,
         mode='copy' # 'copy' or 'split'
     ):
+    """
+    Expand an hourly time series into a per–time-step simulation array. Each
+    hour is either copied across all sub-steps (e.g. 1 inch over 5 steps -> 1, 1, 1, 1, 1)
+    or evenly split across them (e.g. 1 inch over 5 steps -> 0.2, 0.2, 0.2, 0.2, 0.2),
+    depending on the chosen mode.
+
+    Args:
+        hourly_array (array-like):
+            Hourly input values to be upsampled for the simulation horizon.
+        dt (float):
+            Simulation time-step size in hours (e.g., 0.1 → 10 steps per hour).
+        simulation_hours (int):
+            Total number of hours in the simulation window; truncates the input.
+        mode (str, optional):
+            `'copy'` repeats the hourly value at each sub-step; `'split'`
+            divides the hourly value evenly across sub-steps.
+
+    Returns:
+        ndarray:
+            A 1D array of length `simulation_hours / dt` containing the
+            interpolated per–time-step values.
+    """
 
     # Initialize the output array
     total_time_steps = int(simulation_hours / dt)
@@ -44,16 +85,74 @@ def get_sim_inputs_from_hourly(
 
     return simulation_array
 
-def plot_crop_growth_results(
-        hs: np.ndarray,
-        As: np.ndarray,
-        Ns: np.ndarray,
-        cs: np.ndarray,
-        Ps: np.ndarray,
-        dt: float = 1.0,
-        labels: list = None) -> None:
 
-    #time = np.arange(len(h))
+def logistic_step(y, a, k, dt, eps=1e-12):
+    """
+    Advance a logistic-growth state variable one time step using the closed-form
+    solution of the logistic ODE dy/dt = ay(1 − y/k). Small eps values prevent
+    division by zero or singularities.
+
+    Args:
+        y (float):
+            Current state value (height, biomass, etc.).
+        a (float):
+            Growth-rate parameter in the logistic equation.
+        k (float):
+            Carrying capacity; values below `eps` are clipped.
+        dt (float):
+            Time-step size.
+        eps (float, optional):
+            Minimum allowed value for `y` and `k` to maintain numerical stability.
+
+    Returns:
+        float:
+            The analytically updated state value at time t + dt.
+    """
+
+    k = max(k, eps)
+    y = max(y, eps)
+    exp_term = np.exp(-a * dt)
+    return k / (1.0 + (k / y - 1.0) * exp_term)
+
+
+def plot_crop_growth_results(
+        hs: list[np.ndarray],
+        As: list[np.ndarray],
+        Ns: list[np.ndarray],
+        cs: list[np.ndarray],
+        Ps: list[np.ndarray],
+        dt: float = 1.0,
+        labels: list[str] = None) -> None:
+    """
+    Plot time-series trajectories of key crop-growth variables—plant height,
+    leaf area, leaf count, spikelet count, and fruit biomass—for one or more
+    simulated scenarios.
+
+    Args:
+        hs (list[np.ndarray]):
+            List of plant-height trajectories, where each element is a 1D
+            NumPy array for a single simulation scenario.
+        As (list[np.ndarray]):
+            List of leaf-area trajectories.
+        Ns (list[np.ndarray]):
+            List of leaf-count trajectories.
+        cs (list[np.ndarray]):
+            List of spikelet-count trajectories.
+        Ps (list[np.ndarray]):
+            List of fruit-biomass trajectories.
+        dt (float, optional):
+            Time step (in hours) between samples in each trajectory; used to
+            construct the time axis. Defaults to 1.0.
+        labels (list[str], optional):
+            List of labels corresponding to each trajectory set; used in legend
+            entries. Must be the same length as the input lists.
+
+    Returns:
+        None:
+            Displays a Matplotlib figure with five stacked subplots showing
+            the evolution of all growth variables over time.
+    """
+
     fig, axs = plt.subplots(5, 1, figsize=(10, 15))
     time = np.arange(0, len(hs[0])) * dt
 
@@ -106,14 +205,39 @@ def plot_crop_growth_results(
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
+
 def plot_nutrient_factor_evolution(
-        nuWs: np.ndarray,
-        nuFs: np.ndarray,
-        nuTs: np.ndarray,
-        nuRs: np.ndarray,
+        nuWs: list[np.ndarray],
+        nuFs: list[np.ndarray],
+        nuTs: list[np.ndarray],
+        nuRs: list[np.ndarray],
         dt: float = 1.0,
-        labels: list = None
+        labels: list[str] = None
     ) -> None:
+    """
+    Plot the evolution of nutrient-response factors—water, fertilizer,
+    temperature, and radiation—for one or more simulated scenarios over time.
+
+    Args:
+        nuWs (list[np.ndarray]):
+            List of water nutrient-factor trajectories, each a 1D NumPy array.
+        nuFs (list[np.ndarray]):
+            List of fertilizer nutrient-factor trajectories.
+        nuTs (list[np.ndarray]):
+            List of temperature nutrient-factor trajectories.
+        nuRs (list[np.ndarray]):
+            List of radiation nutrient-factor trajectories.
+        dt (float, optional):
+            Time step (in hours) used to construct the time axis. Defaults to 1.0.
+        labels (list[str], optional):
+            Labels for each scenario, used in plot legends. Must match the number
+            of trajectories in each input list.
+
+    Returns:
+        None:
+            Displays a Matplotlib figure with four stacked subplots showing the
+            evolution of all nutrient factors across the simulation horizon.
+    """
 
     fig, axs = plt.subplots(4, 1, figsize=(10, 15))
     time = np.arange(0, len(nuWs[0])) * dt
@@ -162,16 +286,46 @@ def plot_nutrient_factor_evolution(
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
+
 def plot_growth_rate_evolution(
         growth_rates: ModelGrowthRates,
-        ah_hats: np.ndarray,
-        aA_hats: np.ndarray,
-        aN_hats: np.ndarray,
-        ac_hats: np.ndarray,
-        aP_hats: np.ndarray,
+        ah_hats: list[np.ndarray],
+        aA_hats: list[np.ndarray],
+        aN_hats: list[np.ndarray],
+        ac_hats: list[np.ndarray],
+        aP_hats: list[np.ndarray],
         dt: float = 1.0,
-        labels: list = None
+        labels: list[str] = None
     ) -> None:
+    """
+    Plot the time evolution of adjusted logistic growth-rate coefficients for
+    plant height, leaf area, leaf count, spikelet count, and fruit biomass
+    across one or more simulated scenarios.
+
+    Args:
+        growth_rates (ModelGrowthRates):
+            Baseline (unadjusted) growth-rate parameters, used to draw reference
+            horizontal lines in each subplot.
+        ah_hats (list[np.ndarray]):
+            Adjusted height growth-rate trajectories for each scenario.
+        aA_hats (list[np.ndarray]):
+            Adjusted leaf-area growth-rate trajectories.
+        aN_hats (list[np.ndarray]):
+            Adjusted leaf-count growth-rate trajectories.
+        ac_hats (list[np.ndarray]):
+            Adjusted spikelet-count growth-rate trajectories.
+        aP_hats (list[np.ndarray]):
+            Adjusted fruit-biomass growth-rate trajectories.
+        dt (float, optional):
+            Time step (in hours) used for constructing the time axis. Defaults to 1.0.
+        labels (list[str], optional):
+            Labels corresponding to each scenario, used for legends.
+
+    Returns:
+        None:
+            Displays a Matplotlib figure with five stacked subplots showing
+            adjusted growth-rate trajectories relative to their baseline values.
+    """
 
     fig, axs = plt.subplots(5, 1, figsize=(10, 15))
     time = np.arange(0, len(ah_hats[0])) * dt
@@ -230,16 +384,49 @@ def plot_growth_rate_evolution(
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
+
 def plot_carrying_capacity_evolution(
         carrying_capacities: ModelCarryingCapacities,
-        kh_hats: np.ndarray,
-        kA_hats: np.ndarray,
-        kN_hats: np.ndarray,
-        kc_hats: np.ndarray,
-        kP_hats: np.ndarray,
+        kh_hats: list[np.ndarray],
+        kA_hats: list[np.ndarray],
+        kN_hats: list[np.ndarray],
+        kc_hats: list[np.ndarray],
+        kP_hats: list[np.ndarray],
         dt: float = 1.0,
-        labels: list = None
+        labels: list[str] = None
     ) -> None:
+    """
+    Plot the time evolution of adjusted carrying-capacity parameters for
+    plant height, leaf area, leaf count, spikelet count, and fruit biomass
+    across one or more simulated scenarios.
+
+    Args:
+        carrying_capacities (ModelCarryingCapacities):
+            Baseline carrying-capacity parameters used to draw reference lines
+            in each subplot.
+        kh_hats (list[np.ndarray]):
+            Adjusted height carrying-capacity trajectories for each scenario.
+        kA_hats (list[np.ndarray]):
+            Adjusted leaf-area carrying-capacity trajectories.
+        kN_hats (list[np.ndarray]):
+            Adjusted leaf-count carrying-capacity trajectories.
+        kc_hats (list[np.ndarray]):
+            Adjusted spikelet-count carrying-capacity trajectories.
+        kP_hats (list[np.ndarray]):
+            Adjusted fruit-biomass carrying-capacity trajectories.
+        dt (float, optional):
+            Time step (in hours) used for constructing the time axis.
+            Defaults to 1.0.
+        labels (list[str], optional):
+            Scenario labels for use in plot legends. Must match the number of
+            trajectories in each list.
+
+    Returns:
+        None:
+            Displays a Matplotlib figure with five stacked subplots showing the
+            evolution of all carrying-capacity parameters relative to their
+            baseline values.
+    """
 
     fig, axs = plt.subplots(5, 1, figsize=(10, 15))
     time = np.arange(0, len(kh_hats[0])) * dt

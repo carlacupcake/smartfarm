@@ -1,4 +1,4 @@
-"""model_typical_disturbances.py."""
+# model_typical_disturbances.py
 from pydantic import BaseModel, Field, PositiveFloat
 
 

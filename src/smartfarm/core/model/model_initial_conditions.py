@@ -1,4 +1,4 @@
-"""model_initial_conditions.py."""
+# model_initial_conditions.py
 from pydantic import BaseModel, Field, PositiveFloat
 
 class ModelInitialConditions(BaseModel):

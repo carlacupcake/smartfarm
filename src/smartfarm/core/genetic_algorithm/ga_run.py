@@ -1,4 +1,4 @@
-"""ga_run.py."""
+# ga_run.py
 import numpy as np
 
 from .ga_bounds import DesignSpaceBounds
@@ -17,6 +17,15 @@ from ..model.model_typical_disturbances import ModelTypicalDisturbances
 import time # temporary
 
 class GeneticAlgorithm:
+    """
+    Orchestrates the full genetic algorithm workflow for optimizing
+    irrigation–fertilization schedules. 
+    
+    This class bundles the design-space bounds, model dynamics,
+    disturbance inputs, and GA hyperparameters, and provides methods 
+    to evolve a population across generations using either local or 
+    Lambda-based cost evaluation.
+    """
 
     def __init__(
         self,
@@ -52,11 +61,15 @@ class GeneticAlgorithm:
         alongside optimization results.
 
         Args:
-            TODO
+            None:
+                All configuration (population sizes, bounds, model parameters,
+                number of generations, and cost-function definitions) is taken
+                from the instance attributes stored in `self`.
 
-        Returns
-        -------
-            GeneticAlgorithmResult
+        Returns:
+            GeneticAlgorithmResult:
+                An object containing the final optimized population, the best cost
+                in each generation, and the average parent costs across generations.
         """
 
         # Unpack necessary attributes from self
@@ -175,7 +188,23 @@ class GeneticAlgorithm:
 
     def run_with_lambda(self) -> GeneticAlgorithmResult:
         """
-        TODO: docstring
+        Execute the Genetic Algorithm (GA) using AWS Lambda for cost evaluation.
+
+        This method mirrors the standard `run()` procedure—initializing a population,
+        breeding across generations, and tracking best/average costs—but delegates
+        all cost computations to remote Lambda calls for scalable parallel evaluation.
+
+        Args:
+            None:
+                All configuration (population sizes, bounds, model parameters,
+                number of generations, and cost-function definitions) is taken
+                from attributes stored in `self`.
+
+        Returns:
+            GeneticAlgorithmResult:
+                Contains the final evolved population, the best cost in each
+                generation, and the average cost among selected parent members
+                across generations.
         """
 
         # Unpack necessary attributes from self

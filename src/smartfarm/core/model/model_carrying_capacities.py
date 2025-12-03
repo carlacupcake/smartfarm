@@ -1,4 +1,4 @@
-"""model_carrying_capacities.py."""
+# model_carrying_capacities.py
 from pydantic import BaseModel, Field, PositiveFloat
 
 

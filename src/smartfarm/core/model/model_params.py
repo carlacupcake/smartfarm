@@ -1,4 +1,4 @@
-"""model_params.py."""
+# model_params.py
 import math
 from typing import Optional
 from pydantic import BaseModel, Field, PositiveFloat, PositiveInt, model_validator

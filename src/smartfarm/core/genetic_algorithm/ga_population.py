@@ -1,4 +1,4 @@
-"""ga_population.py."""
+# ga_population.py
 import boto3
 import json
 import numpy as np
@@ -92,7 +92,7 @@ class Population:
             upper_bounds (ndarray, optional)
             start_member (int, optional): index of the first member to update in the population
 
-        Returns
+        Returns:
             self (Population)
         """
 
@@ -244,8 +244,18 @@ class Population:
     def set_order_by_costs(self, sorted_indices: np.ndarray) -> "Population":
         """
         Reorder population values (and costs) in-place based on sorted cost indices.
+        
+        Args:
+            sorted_indices (np.ndarray):
+                A 1D array of integer indices indicating the desired ordering of
+                population members, typically produced by `np.argsort(self.costs)`.
+
+        Returns:
+            Population:
+                The population instance with `values` and `costs` reordered
+                according to the provided index sequence.
         """
-        # Ensure indices are 1D integer array
+
         sorted_indices = np.asarray(sorted_indices).ravel().astype(int)
 
         self.values = self.values[sorted_indices, :]

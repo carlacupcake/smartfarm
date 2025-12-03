@@ -1,4 +1,4 @@
-"""model_growth_rates.py."""
+# model_growth_rates.py
 from pydantic import BaseModel, Field, PositiveFloat
 
 
