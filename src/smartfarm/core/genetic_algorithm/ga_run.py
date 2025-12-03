@@ -127,45 +127,29 @@ class GeneticAlgorithm:
             # Select top parents from population to be breeders
             for p in range(0, num_parents, 2):
                 phi1, phi2 = np.random.rand(2)
-                kid1 = phi1 * population.values[p, :] + (1-phi1) * population.values[p+1, :]
-                kid2 = phi2 * population.values[p, :] + (1-phi2) * population.values[p+1, :]
+                parent1 = population.values[p, :]
+                parent2 = population.values[p+1, :]
 
-                # Append offspring to population, overwriting old population members
-                population.values[num_parents+p,   :] = kid1
-                population.values[num_parents+p+1, :] = kid2
+                kid1 = phi1 * parent1 + (1 - phi1) * parent2
+                kid2 = phi2 * parent1 + (1 - phi2) * parent2
 
-                # Cast offspring to members and evaluate costs
-                kid1 = Member(
-                    ga_params            = self.ga_params,
-                    carrying_capacities  = self.carrying_capacities,
-                    disturbances         = self.disturbances,
-                    growth_rates         = self.growth_rates,
-                    initial_conditions   = self.initial_conditions,
-                    model_params         = self.model_params,
-                    typical_disturbances = self.typical_disturbances,
-                    values               = kid1)
-                kid2 = Member(
-                    ga_params            = self.ga_params,
-                    carrying_capacities  = self.carrying_capacities,
-                    disturbances         = self.disturbances,
-                    growth_rates         = self.growth_rates,
-                    initial_conditions   = self.initial_conditions,
-                    model_params         = self.model_params,
-                    typical_disturbances = self.typical_disturbances,
-                    values               = kid2)
-                costs[num_parents+p]   = kid1.get_cost()
-                costs[num_parents+p+1] = kid2.get_cost()
+                # Place kids in the population
+                population.values[num_parents + p,   :] = kid1
+                population.values[num_parents + p+1, :] = kid2
 
-            # Randomly generate new members to fill the rest of the population
+            # Fill the rest of the population with random members
             parents_plus_kids = num_parents + num_kids
             population.set_random_values(
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
-                start_member=parents_plus_kids
+                start_member=parents_plus_kids,
             )
 
-            # Calculate the costs of the gth generation
+            # Evaluate the costs of the gth generation with Lambda
+            t0 = time.time()
             population.set_costs()
+            t1 = time.time()
+            print(f"Time to evaluate generation {g}: {t1 - t0:.2f} s")
 
             # Sort the costs for the gth generation
             [sorted_costs, sorted_indices] = population.sort_costs()
@@ -287,9 +271,8 @@ class GeneticAlgorithm:
             sorted_costs, sorted_indices = population.sort_costs()
             all_costs[g, :] = sorted_costs.reshape(1, num_members)
 
-            lowest_costs[g] = np.min(sorted_costs)
+            lowest_costs[g] = sorted_costs[0]
             avg_parent_costs[g] = np.mean(sorted_costs[0:num_parents])
-
             population.set_order_by_costs(sorted_indices)
 
             g = g + 1

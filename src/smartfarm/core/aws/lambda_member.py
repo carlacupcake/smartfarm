@@ -1,6 +1,8 @@
 # lambda_member.py
 import numpy as np
 
+print(">>> LOADED lambda_member.py <<<")
+
 def get_nutrient_factor(x, mu, sensitivity=0.5):
     
     # Sensitivity parameter between 0 and 1
@@ -46,6 +48,8 @@ def member_get_cost_with_lambda(
         member_dict: dict,
         ctx: dict
     ) -> float:
+
+    print(">>> INSIDE member_get_cost_with_lambda <<<")
 
     # Design variables (same order as bounds)
     irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [
@@ -157,8 +161,8 @@ def member_get_cost_with_lambda(
         # Nutrient factors (bounded, nonnegative)
         nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.7)
         nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=1.0)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.9)
+        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.7)
+        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.7)
 
         # Growth rates (FIX: use parentheses in fractional powers)
         ah_hat = ah * (nuF * nuT * nuR)**(1/3)
@@ -182,9 +186,9 @@ def member_get_cost_with_lambda(
         P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
 
     profit = weight_fruit_biomass * P[-1]
-    expenses = (weight_irrigation * np.sum(irrigation)
-                + weight_fertilizer * np.sum(fertilizer))
+    expenses = (weight_irrigation * np.sum(hourly_irrigation)
+                + weight_fertilizer * np.sum(hourly_fertilizer))
     revenue = profit - expenses
     cost = -revenue # GA minimizes cost, but we want to maximize revenue
-
+    
     return float(cost)

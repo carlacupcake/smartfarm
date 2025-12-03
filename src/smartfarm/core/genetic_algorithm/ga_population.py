@@ -27,7 +27,7 @@ class Population:
     """
 
     _LAMBDA_FUNCTION_NAME = "smartfarm-ga-eval"
-    _LAMBDA_REGION_NAME   = "us-west-2"
+    _LAMBDA_REGION_NAME   = "us-west-1"
 
     def __init__(
         self,
@@ -61,23 +61,21 @@ class Population:
             self.costs = np.zeros((num_members, 1))
 
 
-    def get_unique_designs(self) -> "Population":
+    def get_unique_designs(self):
         """
-        Retrieves the unique designs from the population based on their costs.
+        Retrieves the unique designs from the population based on their member values.
 
         Returns:
-            list: A list containing three elements:
-            - unique_values (ndarray), unique population members corresponding to unique_costs.
-            - unique_eff_props (ndarray), effective properties corresponding to unique_costs.
-            - unique_costs (ndarray)
+            list: [unique_values (ndarray), unique_costs (ndarray)]
         """
+        # Make sure costs are up to date
         self.set_costs()
-        final_costs = self.costs
-        rounded_costs = np.round(final_costs, decimals=3)
 
-        # Obtain unique members and costs
-        [unique_costs, unique_indices] = np.unique(rounded_costs, return_index=True)
-        unique_values = self.values[unique_indices]
+        unique_values, unique_indices = np.unique(self.values, axis=0, return_index=True)
+
+        # Grab the corresponding costs
+        unique_costs = self.costs[unique_indices]
+
         return [unique_values, unique_costs]
 
 
