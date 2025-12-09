@@ -22,7 +22,7 @@ On the function page:
 6. In the "Runtime settings" section, make sure:
    - Handler = `lambda_handler.lambda_handler`
 7. In the "Layers" section, click "Add a layer".
-   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-2`...it may be different in other regions).
+   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-1`...it may be different in other regions).
    - Click "Add".
 8. Go to the "Configuration" tab.
    - Set "Memory" to 1024 MB.

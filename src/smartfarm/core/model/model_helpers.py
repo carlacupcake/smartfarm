@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from core.model.model_growth_rates import ModelGrowthRates
 from core.model.model_carrying_capacities import ModelCarryingCapacities
 
+
 def get_nutrient_factor(x, mu, sensitivity=0.7):
     """
     Compute a bounded nutrient factor based on a Gaussian-like curve
@@ -25,12 +26,20 @@ def get_nutrient_factor(x, mu, sensitivity=0.7):
             Nutrient factor `nu` ∈ (0, 1], representing how supportive the
             current conditions are relative to the optimum.
     """
-    
+
     sigma_min = 0.1 * mu
     sigma_max = 100 * mu
-    sigma = sigma_max**(1 - sensitivity) * sigma_min**(sensitivity)
+    sigma = 1/4 * sigma_min * sigma_max * mu**2 *(1 - sensitivity**2)
     exp_arg = -(x - mu)**2/(2*sigma**2)
     nu = np.exp(exp_arg)
+    
+    return nu
+
+
+def get_nutrient_factor_abs(x, mu, sensitivity=1.0):
+
+    nu = np.clip(sensitivity * np.abs(x/mu) + (1 - sensitivity), 0, 1)
+    #nu = np.clip(sensitivity * (1 - np.sqrt((x-mu)**2/mu**2)) + (1 - sensitivity), 0.1, 1)
     
     return nu
         
@@ -86,7 +95,7 @@ def get_sim_inputs_from_hourly(
     return simulation_array
 
 
-def logistic_step(y, a, k, dt, eps=1e-12):
+def logistic_step(x, a, k, dt, eps=1e-12):
     """
     Advance a logistic-growth state variable one time step using the closed-form
     solution of the logistic ODE dy/dt = ay(1 − y/k). Small eps values prevent
@@ -110,9 +119,9 @@ def logistic_step(y, a, k, dt, eps=1e-12):
     """
 
     k = max(k, eps)
-    y = max(y, eps)
+    x = max(x, eps)
     exp_term = np.exp(-a * dt)
-    return k / (1.0 + (k / y - 1.0) * exp_term)
+    return k / (1.0 + (k / x - 1.0) * exp_term)
 
 
 def plot_crop_growth_results(

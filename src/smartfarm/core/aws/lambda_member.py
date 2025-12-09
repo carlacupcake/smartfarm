@@ -27,7 +27,7 @@ def get_nutrient_factor(x, mu, sensitivity=0.7):
 
     sigma_min = 0.1 * mu
     sigma_max = 100 * mu
-    sigma = sigma_max**(1 - sensitivity) * sigma_min**(sensitivity)
+    sigma = 1/4 * sigma_min * sigma_max * mu**2 *(1 - sensitivity**2)
     exp_arg = -(x - mu)**2/(2*sigma**2)
     nu = np.exp(exp_arg)
     
@@ -85,14 +85,14 @@ def get_sim_inputs_from_hourly(
     return simulation_array
 
 
-def logistic_step(y, a, k, dt, eps=1e-12):
+def logistic_step(x, a, k, dt, eps=1e-12):
     """
     Advance a logistic-growth state variable one time step using the closed-form
     solution of the logistic ODE dy/dt = ay(1 − y/k). Small eps values prevent
     division by zero or singularities.
 
     Args:
-        y (float):
+        x (float):
             Current state value (height, biomass, etc.).
         a (float):
             Growth-rate parameter in the logistic equation.
@@ -109,9 +109,9 @@ def logistic_step(y, a, k, dt, eps=1e-12):
     """
 
     k = max(k, eps)
-    y = max(y, eps)
+    x = max(x, eps)
     exp_term = np.exp(-a * dt)
-    return k / (1.0 + (k / y - 1.0) * exp_term)
+    return k / (1.0 + (k / x - 1.0) * exp_term)
 
 
 def get_cost_with_lambda(
@@ -250,10 +250,10 @@ def get_cost_with_lambda(
         cumulative_fertilizer[t+1] = FC
 
         # Nutrient factors (bounded, nonnegative)
-        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.7)
+        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.95)
 
         # Growth rates
         ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
@@ -428,10 +428,10 @@ def get_closed_form_cost_with_lambda(
         cumulative_fertilizer[t+1] = FC
 
         # Nutrient factors (bounded, nonnegative)
-        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.7)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.7)
+        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.95)
+        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.95)
 
         # Growth rates (FIX: use parentheses in fractional powers)
         ah_hat = ah * (nuF * nuT * nuR)**(1/3)

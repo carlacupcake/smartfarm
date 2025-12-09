@@ -1,0 +1,72 @@
+{
+    "1": {
+        "irrigation_frequency": 139.009047,
+        "irrigation_amount": 0.00144190202,
+        "fertilizer_frequency": 2144.49018,
+        "fertilizer_amount": 0.00998529365,
+        "revenue": 1094.061
+    },
+    "2": {
+        "irrigation_frequency": 284.65078,
+        "irrigation_amount": 0.00436994136,
+        "fertilizer_frequency": 1098.5977,
+        "fertilizer_amount": 0.00348957219,
+        "revenue": 1093.763
+    },
+    "3": {
+        "irrigation_frequency": 188.090889,
+        "irrigation_amount": 0.00147400064,
+        "fertilizer_frequency": 1624.5603,
+        "fertilizer_amount": 0.1102623,
+        "revenue": 1092.963
+    },
+    "4": {
+        "irrigation_frequency": 297.396316,
+        "irrigation_amount": 0.00367697816,
+        "fertilizer_frequency": 1763.23136,
+        "fertilizer_amount": 0.00329880556,
+        "revenue": 1094.013
+    },
+    "5": {
+        "irrigation_frequency": 329.139244,
+        "irrigation_amount": 0.00433611537,
+        "fertilizer_frequency": 422.880301,
+        "fertilizer_amount": 0.0143131633,
+        "revenue": 1093.393
+    },
+    "6": {
+        "irrigation_frequency": 287.830347,
+        "irrigation_amount": 0.00161252292,
+        "fertilizer_frequency": 1491.11543,
+        "fertilizer_amount": 0.0248745684,
+        "revenue": 1094.129
+    },
+    "7": {
+        "irrigation_frequency": 256.908572,
+        "irrigation_amount": 0.00212647159,
+        "fertilizer_frequency": 840.673289,
+        "fertilizer_amount": 0.0205533017,
+        "revenue": 1093.774
+    },
+    "8": {
+        "irrigation_frequency": 313.624317,
+        "irrigation_amount": 0.00381317242,
+        "fertilizer_frequency": 1500.32167,
+        "fertilizer_amount": 0.020548568,
+        "revenue": 1093.774
+    },
+    "9": {
+        "irrigation_frequency": 230.104281,
+        "irrigation_amount": 0.00327741636,
+        "fertilizer_frequency": 1927.3213,
+        "fertilizer_amount": 0.0189770231,
+        "revenue": 1093.704
+    },
+    "10": {
+        "irrigation_frequency": 230.104281,
+        "irrigation_amount": 0.00327741636,
+        "fertilizer_frequency": 1927.3213,
+        "fertilizer_amount": 0.0189770231,
+        "revenue": 1093.704
+    }
+}
