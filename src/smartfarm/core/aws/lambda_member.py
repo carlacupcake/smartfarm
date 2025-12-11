@@ -1,38 +1,61 @@
 # lambda_member.py
+import mpmath as mp
 import numpy as np
 
-print(">>> LOADED lambda_member.py <<<")
+#print(">>> LOADED lambda_member.py <<<")
 
-def get_nutrient_factor(x, mu, sensitivity=0.7):
+def gaussian_kernel(
+        mu: float,
+        sigma_steps: float,
+        length: int
+    ) -> np.ndarray:
     """
-    Compute a bounded nutrient factor based on a Gaussian-like curve
-    centered at `mu`. The `sensitivity` parameter controls how sharply the
-    factor penalizes deviations from the optimal value.
+    Construct a normalized discrete Gaussian kernel for modeling delayed
+    nutrient absorption (temporal spreading) of an input signal.
 
     Args:
-        x (float or ndarray):
-            Current cumulative nutrient level normalized by the typical cumulative
-            value at that time point.
         mu (float):
-            Optimal or “target” value at which the nutrient factor peaks (nu = 1).
-        sensitivity (float, optional):
-            Controls curvature of the response (0 → broad tolerance, 1 → sharp
-            sensitivity); must lie between 0 and 1.
+            Center of the Gaussian in index units (e.g., time steps).
+        sigma_steps (float):
+            Standard deviation of the Gaussian in time steps, controlling how
+            broadly the influence spreads across the kernel.
+        length (int):
+            Total number of discrete samples in the kernel.
 
     Returns:
-        float or ndarray:
-            Nutrient factor `nu` ∈ (0, 1], representing how supportive the
-            current conditions are relative to the optimum.
+        np.ndarray:
+            A 1D array of length `length` containing non-negative values that
+            sum to one, suitable for convolution or delayed-response modeling.
     """
+    k = np.arange(length)
+    g = np.exp(-0.5 * ((k - mu) / sigma_steps)**2)
+    g /= g.sum() # normalize so area ~ 1; scale by instantaneous disturbance/control input later
+    return g
 
-    sigma_min = 0.1 * mu
-    sigma_max = 100 * mu
-    sigma = 1/4 * sigma_min * sigma_max * mu**2 *(1 - sensitivity**2)
-    exp_arg = -(x - mu)**2/(2*sigma**2)
-    nu = np.exp(exp_arg)
-    
-    return nu
-        
+
+def get_mu_from_sigma(
+        sigma_dt: float # standard deviation of the Gaussian in time steps
+    ) -> float:
+    """
+    Compute the value of `mu` that satisfies a target Gaussian tail probability.
+    This routine solves for `mu` such that the error function `erf(mu/(sqrt(2)*sigma))`
+    equals 0.95, meaning it returns the point where approximately 95% of a
+    zero-mean Gaussian lies between -mu and mu.
+
+    Args:
+        sigma (float):
+            Standard deviation of the Gaussian distribution used in the
+            implicit equation. Must be positive.
+
+    Returns:
+        mu (float):
+            The solved value of `mu` for which `erf(mu/(sqrt(2)*sigma)) = 0.95`,
+            computed using numerical root finding.
+    """
+    MU_FACTOR_95 = 1.959963984540054 # precomputed constant: sqrt(2) * erfinv(0.95)
+    mu = MU_FACTOR_95 * sigma_dt
+    return mu
+
 
 def get_sim_inputs_from_hourly(
         hourly_array,
@@ -116,7 +139,7 @@ def logistic_step(x, a, k, dt, eps=1e-12):
 
 def get_cost_with_lambda(
         member_dict: dict,
-        ctx: dict
+        enriched_ctx: dict
     ) -> float:
     """
     Evaluate a member’s cost inside an AWS Lambda environment by running the
@@ -129,7 +152,7 @@ def get_cost_with_lambda(
             `"values"` in the order
             [irrigation_frequency, irrigation_amount,
              fertilizer_frequency, fertilizer_amount].
-        ctx (dict):
+        enriched_ctx (dict):
             Dictionary providing all model parameters, disturbances,
             growth-rate values, carrying capacities, and cost-function weights
             required to run the simulation.
@@ -140,7 +163,7 @@ def get_cost_with_lambda(
             biomass minus weighted irrigation and fertilizer usage.
     """
 
-    print(">>> INSIDE member_get_cost_with_lambda <<<")
+    #print(">>> INSIDE get_cost_with_lambda <<<")
 
     # Design variables (same order as bounds)
     irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [
@@ -148,316 +171,139 @@ def get_cost_with_lambda(
     ]
 
     # Unpack model parameters
-    dt               = ctx["dt"]
-    total_time_steps = ctx["total_time_steps"]
-    simulation_hours = ctx["simulation_hours"]
-
-    # Unpack input disturbances
-    hourly_precipitation = np.array(ctx["hourly_precipitation"], dtype=float)
-    hourly_temperature   = np.array(ctx["hourly_temperature"],   dtype=float)
-    hourly_radiation     = np.array(ctx["hourly_radiation"],     dtype=float)
+    dt               = enriched_ctx["dt"]
+    total_time_steps = enriched_ctx["total_time_steps"]
+    simulation_hours = enriched_ctx["simulation_hours"]
+    closed_form      = enriched_ctx.get("closed_form", True)
 
     # Unpack typical disturbances
-    W_typ = ctx["W_typ"]
-    F_typ = ctx["F_typ"]
-    T_typ = ctx["T_typ"]
-    R_typ = ctx["R_typ"]
+    W_typ = enriched_ctx["W_typ"]
+    F_typ = enriched_ctx["F_typ"]
+    T_typ = enriched_ctx["T_typ"]
+    R_typ = enriched_ctx["R_typ"]
 
     # Unpack initial conditions
-    h0 = ctx["h0"]
-    A0 = ctx["A0"]
-    N0 = ctx["N0"]
-    c0 = ctx["c0"]
-    P0 = ctx["P0"]
+    h = enriched_ctx["h0"]
+    A = enriched_ctx["A0"]
+    N = enriched_ctx["N0"]
+    c = enriched_ctx["c0"]
+    P = enriched_ctx["P0"]
 
     # Unpack growth rates
-    ah = ctx["ah"]
-    aA = ctx["aA"]
-    aN = ctx["aN"]
-    ac = ctx["ac"]
-    aP = ctx["aP"]
+    ah = enriched_ctx["ah"]
+    aA = enriched_ctx["aA"]
+    aN = enriched_ctx["aN"]
+    ac = enriched_ctx["ac"]
+    aP = enriched_ctx["aP"]
 
     # Unpack carrying capacities
-    kh = ctx["kh"]
-    kA = ctx["kA"]
-    kN = ctx["kN"]
-    kc = ctx["kc"]
-    kP = ctx["kP"]
+    kh = enriched_ctx["kh"]
+    kA = enriched_ctx["kA"]
+    kN = enriched_ctx["kN"]
+    kc = enriched_ctx["kc"]
+    kP = enriched_ctx["kP"]
 
     # Unpack GA cost function weights
-    weight_fruit_biomass = ctx["weight_fruit_biomass"]
-    weight_irrigation    = ctx["weight_irrigation"]
-    weight_fertilizer    = ctx["weight_fertilizer"]
+    weight_fruit_biomass = enriched_ctx["weight_fruit_biomass"]
+    weight_irrigation    = enriched_ctx["weight_irrigation"]
+    weight_fertilizer    = enriched_ctx["weight_fertilizer"]
 
     # Build hourly control series from design variables and input disturbances
     hourly_irrigation = np.zeros(simulation_hours)
     step_if = max(1, int(np.ceil(irrigation_frequency)))
     hourly_irrigation[::step_if] = irrigation_amount
-    irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours)
+    irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours, mode='split')
 
     hourly_fertilizer = np.zeros(simulation_hours)
     step_ff = max(1, int(np.ceil(fertilizer_frequency)))
     hourly_fertilizer[::step_ff] = fertilizer_amount
-    fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours)
+    fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours, mode='split')
 
-    precipitation = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_precipitation,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'split')
-    temperature = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_temperature,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'copy')
-    radiation = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_radiation,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'copy')
+    precipitation = np.asarray(enriched_ctx["precipitation"])
+    temperature   = np.asarray(enriched_ctx["temperature"])
+    radiation     = np.asarray(enriched_ctx["radiation"])
 
-    # Initialize storage for state variables
-    h = np.full(total_time_steps, h0)
-    A = np.full(total_time_steps, A0)
-    N = np.full(total_time_steps, N0)
-    c = np.full(total_time_steps, c0)
-    P = np.full(total_time_steps, P0)
+    # Convolve input disturbances with Gaussian kernels to model delayed absorption/metalysis
+    kernel_W = enriched_ctx["kernel_W"]
+    kernel_F = enriched_ctx["kernel_F"]
+    kernel_T = enriched_ctx["kernel_T"]
+    kernel_R = enriched_ctx["kernel_R"]
 
-    # Initialize storage of cumulative water and fertilizer values
-    cumulative_radiation   = np.zeros(total_time_steps)
-    cumulative_temperature = np.zeros(total_time_steps)
-    cumulative_water       = np.zeros(total_time_steps)
-    cumulative_fertilizer  = np.zeros(total_time_steps)
+    delayed_water       = np.convolve(irrigation + precipitation, kernel_W, mode="full")[:total_time_steps]
+    delayed_fertilizer  = np.convolve(fertilizer,  kernel_F, mode="full")[:total_time_steps]
+    delayed_temperature = np.convolve(temperature, kernel_T, mode="full")[:total_time_steps]
+    delayed_radiation   = np.convolve(radiation,   kernel_R, mode="full")[:total_time_steps]
+
+    # Calculate the cumulative values over time from the delayed values
+    cumulative_water       = np.cumsum(delayed_water)
+    cumulative_fertilizer  = np.cumsum(delayed_fertilizer)
+    cumulative_temperature = np.cumsum(delayed_temperature)
+    cumulative_radiation   = np.cumsum(delayed_radiation)
+
+    # Calculate the differences between the expected and actual cumulative values
+    t_idx_0_to_N = np.asarray(enriched_ctx["t_idx_0_to_N"]) # 0..N-1
+    t_idx_1_to_N = np.asarray(enriched_ctx["t_idx_1_to_N"]) # 1..N
+    delta_Ws = np.abs((W_typ * t_idx_0_to_N - cumulative_water)       / (W_typ * t_idx_1_to_N))
+    delta_Fs = np.abs((F_typ * t_idx_0_to_N - cumulative_fertilizer)  / (F_typ * t_idx_1_to_N))
+    delta_Ts = np.abs((T_typ * t_idx_0_to_N - cumulative_temperature) / (T_typ * t_idx_1_to_N))
+    delta_Rs = np.abs((R_typ * t_idx_0_to_N - cumulative_radiation)   / (R_typ * t_idx_1_to_N))
+
+    # Calculate the cumulative deltas over time
+    delta_cumulative_water       = np.cumsum(delta_Ws) / t_idx_1_to_N
+    delta_cumulative_fertilizer  = np.cumsum(delta_Fs) / t_idx_1_to_N
+    delta_cumulative_temperature = np.cumsum(delta_Ts) / t_idx_1_to_N
+    delta_cumulative_radiation   = np.cumsum(delta_Rs) / t_idx_1_to_N
+
+    # Then use the cumulative deltas to calculate the nutrient factors for each time step
+    nuW = np.clip(1 - np.abs(delta_cumulative_water), 0, 1)
+    nuF = np.clip(1 - np.abs(delta_cumulative_fertilizer), 0, 1)
+    nuT = np.clip(1 - np.abs(delta_cumulative_temperature), 0, 1)
+    nuR = np.clip(1 - np.abs(delta_cumulative_radiation), 0, 1)
+
+    # Calculate the instantaneous adjusted growth rates and carrying capacities
+    ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 2 * ah)
+    aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 2 * aA)
+    aN_hat = np.clip(aN, 0, 2 * aN) * np.ones(total_time_steps)
+    ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 2 * ac)
+    aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 2 * aP)
+
+    kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 2 * kh)
+    kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 2 * kA)
+    kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 2 * kN) * np.ones(total_time_steps)
+    kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 2 * kc)
+    kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 2 * kP)
 
     # Run the season simulation for the given member
     for t in range(total_time_steps - 1):
-        S = precipitation[t] 
-        T = temperature[t]
-        R = radiation[t]
-        W = irrigation[t]
-        F = fertilizer[t]
-
-        RC = cumulative_radiation[t] + R
-        cumulative_radiation[t+1] = RC
-
-        TC = cumulative_temperature[t] + T
-        cumulative_temperature[t+1] = TC
-
-        WC = cumulative_water[t] + W + S
-        cumulative_water[t+1] = WC
-
-        FC = cumulative_fertilizer[t] + F
-        cumulative_fertilizer[t+1] = FC
-
-        # Nutrient factors (bounded, nonnegative)
-        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.95)
-
-        # Growth rates
-        ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
-        aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 10 * aA)
-        aN_hat = np.clip(aN, 0, 10 * aN)
-        ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 10 * ac)
-        aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 10 * aP)
-
-        # Carrying capacities
-        kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 10 * kh)
-        kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 10 * kA)
-        kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 10 * kN)
-        kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 10 * kc)
-        kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 10 * kP)
 
         # Logistic-style updates
-        h[t+1] = h[t] + dt * (ah_hat * h[t] * (1 - h[t]/max(kh_hat, 1e-9)))
-        A[t+1] = A[t] + dt * (aA_hat * A[t] * (1 - A[t]/max(kA_hat, 1e-9)))
-        N[t+1] = N[t] + dt * (aN_hat * N[t] * (1 - N[t]/max(kN_hat, 1e-9)))
-        c[t+1] = c[t] + dt * (ac_hat * c[t] * (1 - c[t]/max(kc_hat, 1e-9)))
-        P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
+        if closed_form:
+            h = logistic_step(h, ah_hat[t], kh_hat[t], dt)
+            A = logistic_step(A, aA_hat[t], kA_hat[t], dt)
+            N = logistic_step(N, aN_hat[t], kN_hat[t], dt)
+            c = logistic_step(c, ac_hat[t], kc_hat[t], dt)
+            P = logistic_step(P, aP_hat[t], kP_hat[t], dt)
 
-        # Enforce non-negativity explicitly
-        h[t+1] = max(h[t+1], 0.0)
-        A[t+1] = max(A[t+1], 0.0)
-        N[t+1] = max(N[t+1], 0.0)
-        c[t+1] = max(c[t+1], 0.0)
-        P[t+1] = max(P[t+1], 0.0)
+        else:
+            # Forward Euler integration
+            h = h + dt * (ah_hat[t] * h * (1 - h/max(kh_hat[t], 1e-9)))
+            A = A + dt * (aA_hat[t] * A * (1 - A/max(kA_hat[t], 1e-9)))
+            N = N + dt * (aN_hat[t] * N * (1 - N/max(kN_hat[t], 1e-9)))
+            c = c + dt * (ac_hat[t] * c * (1 - c/max(kc_hat[t], 1e-9)))
+            P = P + dt * (aP_hat[t] * P * (1 - P/max(kP_hat[t], 1e-9)))
 
-    profit = weight_fruit_biomass * P[-1]
+            # Enforce non-negativity explicitly
+            h = max(h, 0.0)
+            A = max(A, 0.0)
+            N = max(N, 0.0)
+            c = max(c, 0.0)
+            P = max(P, 0.0)
+
+    # Combined objective (negative because GA minimizes)
+    profit = weight_fruit_biomass * P
     expenses = (weight_irrigation * np.sum(hourly_irrigation)
                 + weight_fertilizer * np.sum(hourly_fertilizer))
     revenue = profit - expenses
     cost = -revenue # GA minimizes cost, but we want to maximize revenue
-    
-    return float(cost)
 
-
-def get_closed_form_cost_with_lambda(
-        member_dict: dict,
-        ctx: dict
-    ) -> float:
-    """
-    Evaluate a member’s cost inside an AWS Lambda environment by running the
-    same closed-form plant-growth simulation as `get_closed_form_cost`, using only the
-    dictionaries provided by the Lambda handler.
-
-    Args:
-        member_dict (dict):
-            Dictionary containing the member’s design variables under the key
-            `"values"` in the order
-            [irrigation_frequency, irrigation_amount,
-             fertilizer_frequency, fertilizer_amount].
-        ctx (dict):
-            Dictionary providing all model parameters, disturbances,
-            growth-rate values, carrying capacities, and cost-function weights
-            required to run the simulation.
-
-    Returns:
-        float:
-            The cost value (negative net revenue) computed from final fruit
-            biomass minus weighted irrigation and fertilizer usage.
-    """
-
-    print(">>> INSIDE member_get_cost_with_lambda <<<")
-
-    # Design variables (same order as bounds)
-    irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [
-        float(x) for x in member_dict["values"]
-    ]
-
-    # Unpack model parameters
-    dt               = ctx["dt"]
-    total_time_steps = ctx["total_time_steps"]
-    simulation_hours = ctx["simulation_hours"]
-
-    # Unpack input disturbances
-    hourly_precipitation = np.array(ctx["hourly_precipitation"], dtype=float)
-    hourly_temperature   = np.array(ctx["hourly_temperature"],   dtype=float)
-    hourly_radiation     = np.array(ctx["hourly_radiation"],     dtype=float)
-
-    # Unpack typical disturbances
-    W_typ = ctx["W_typ"]
-    F_typ = ctx["F_typ"]
-    T_typ = ctx["T_typ"]
-    R_typ = ctx["R_typ"]
-
-    # Unpack initial conditions
-    h0 = ctx["h0"]
-    A0 = ctx["A0"]
-    N0 = ctx["N0"]
-    c0 = ctx["c0"]
-    P0 = ctx["P0"]
-
-    # Unpack growth rates
-    ah = ctx["ah"]
-    aA = ctx["aA"]
-    aN = ctx["aN"]
-    ac = ctx["ac"]
-    aP = ctx["aP"]
-
-    # Unpack carrying capacities
-    kh = ctx["kh"]
-    kA = ctx["kA"]
-    kN = ctx["kN"]
-    kc = ctx["kc"]
-    kP = ctx["kP"]
-
-    # Unpack GA cost function weights
-    weight_fruit_biomass = ctx["weight_fruit_biomass"]
-    weight_irrigation    = ctx["weight_irrigation"]
-    weight_fertilizer    = ctx["weight_fertilizer"]
-
-    # Build hourly control series from design variables and input disturbances
-    hourly_irrigation = np.zeros(simulation_hours)
-    step_if = max(1, int(np.ceil(irrigation_frequency)))
-    hourly_irrigation[::step_if] = irrigation_amount
-    irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours)
-
-    hourly_fertilizer = np.zeros(simulation_hours)
-    step_ff = max(1, int(np.ceil(fertilizer_frequency)))
-    hourly_fertilizer[::step_ff] = fertilizer_amount
-    fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours)
-
-    precipitation = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_precipitation,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'split')
-    temperature = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_temperature,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'copy')
-    radiation = get_sim_inputs_from_hourly(
-        hourly_array     = hourly_radiation,
-        dt               = dt,
-        simulation_hours = simulation_hours,
-        mode             = 'copy')
-
-    # Initialize storage for state variables
-    h = np.full(total_time_steps, h0)
-    A = np.full(total_time_steps, A0)
-    N = np.full(total_time_steps, N0)
-    c = np.full(total_time_steps, c0)
-    P = np.full(total_time_steps, P0)
-
-    # Initialize storage of cumulative water and fertilizer values
-    cumulative_radiation   = np.zeros(total_time_steps)
-    cumulative_temperature = np.zeros(total_time_steps)
-    cumulative_water       = np.zeros(total_time_steps)
-    cumulative_fertilizer  = np.zeros(total_time_steps)
-
-    # Run the season simulation for the given member
-    for t in range(total_time_steps - 1):
-        S = precipitation[t] 
-        T = temperature[t]
-        R = radiation[t]
-        W = irrigation[t]
-        F = fertilizer[t]
-
-        RC = cumulative_radiation[t] + R
-        cumulative_radiation[t+1] = RC
-
-        TC = cumulative_temperature[t] + T
-        cumulative_temperature[t+1] = TC
-
-        WC = cumulative_water[t] + W + S
-        cumulative_water[t+1] = WC
-
-        FC = cumulative_fertilizer[t] + F
-        cumulative_fertilizer[t+1] = FC
-
-        # Nutrient factors (bounded, nonnegative)
-        nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.95)
-        nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.95)
-
-        # Growth rates (FIX: use parentheses in fractional powers)
-        ah_hat = ah * (nuF * nuT * nuR)**(1/3)
-        aA_hat = aA * (nuF * nuT * nuR)**(1/3)
-        aN_hat = aN
-        ac_hat = ac * ( (1/nuT) * (1/nuR) )**(1/2)
-        aP_hat = aP * (nuT * nuR)**(1/2)
-
-        # Carrying capacities
-        kh_hat = kh * (nuF * nuT * nuR)**(1/3)
-        kA_hat = kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5)
-        kN_hat = kN * (nuT * nuR)**(1/2)
-        kc_hat = kc * (nuW * (1/nuT) * (1/nuR))**(1/3)
-        kP_hat = kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7)
-
-        # Logistic-style updates
-        h[t+1] = logistic_step(h[t], ah_hat, kh_hat, dt)
-        A[t+1] = logistic_step(A[t], aA_hat, kA_hat, dt)
-        N[t+1] = logistic_step(N[t], aN_hat, kN_hat, dt)
-        c[t+1] = logistic_step(c[t], ac_hat, kc_hat, dt)
-        P[t+1] = logistic_step(P[t], aP_hat, kP_hat, dt)
-
-    profit = weight_fruit_biomass * P[-1]
-    expenses = (weight_irrigation * np.sum(hourly_irrigation)
-                + weight_fertilizer * np.sum(hourly_fertilizer))
-    revenue = profit - expenses
-    cost = -revenue # GA minimizes cost, but we want to maximize revenue
-    
     return float(cost)

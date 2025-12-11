@@ -5,7 +5,7 @@ import numpy as np
 from typing import Optional
 
 from .ga_params import GeneticAlgorithmParams
-from ..model.model_helpers import get_nutrient_factor, get_nutrient_factor_abs, get_sim_inputs_from_hourly, logistic_step
+from ..model.model_helpers import gaussian_kernel, get_mu_from_sigma, get_sim_inputs_from_hourly, logistic_step
 
 from ..model.model_carrying_capacities import ModelCarryingCapacities
 from ..model.model_disturbances import ModelDisturbances
@@ -13,6 +13,8 @@ from ..model.model_growth_rates import ModelGrowthRates
 from ..model.model_initial_conditions import ModelInitialConditions
 from ..model.model_params import ModelParams
 from ..model.model_typical_disturbances import ModelTypicalDisturbances
+from ..model.model_sensitivities import ModelSensitivities
+
 
 class Member:
     """
@@ -29,6 +31,7 @@ class Member:
         initial_conditions:   ModelInitialConditions,
         model_params:         ModelParams,
         typical_disturbances: ModelTypicalDisturbances,
+        sensitivities:        ModelSensitivities,
         values:               Optional[np.ndarray] = None,
     ):
 
@@ -39,8 +42,8 @@ class Member:
         self.initial_conditions   = initial_conditions
         self.model_params         = model_params
         self.typical_disturbances = typical_disturbances
-        self.values = values
-
+        self.sensitivities        = sensitivities
+        self.values               = values
 
     def get_cost(self) -> float:
         """
@@ -53,401 +56,36 @@ class Member:
             - fertilizer frequency
             - fertilizer amount
 
-        These controls are converted to hourly irrigation and fertilization
+        These controls are translated into hourly irrigation and fertilization
         schedules, combined with exogenous disturbances (precipitation,
         temperature, radiation), and used to drive a coupled logistic-style
-        growth model for plant height, leaf area, leaf count, stress metric,
-        and fruit biomass. The system is integrated in time using a
-        forward-Euler scheme with time step `dt`.
+        growth model for height, leaf area, leaf count, flower spikelet count, and
+        fruit biomass. The system may be integrated either via a closed-form
+        logistic update or using Forward Euler time stepping.
 
-        The final fruit biomass and total irrigation/fertilizer use are then
-        converted into a scalar objective: net revenue (profit minus input
-        costs). The cost returned by this function is the negative of that
-        net revenue so that the genetic algorithm can be formulated as a
-        minimization problem.
-
-        Args:
-            None explicitly. This method uses the member’s internal state:
-                - self.values: design variables
-                - self.model_params: time-stepping and horizon settings
-                - self.disturbances: precipitation, temperature, radiation
-                - self.typical_disturbances: typical/normalized disturbance scales
-                - self.initial_conditions: initial plant state
-                - self.growth_rates: base logistic growth rates
-                - self.carrying_capacities: base carrying capacities
-                - self.ga_params: economic weights for revenue and costs
-
-        Returns:
-            cost (float): Objective value for this member, defined as the
-                negative net revenue (weighted final fruit biomass minus
-                weighted irrigation and fertilizer usage).
-        """
-
-        # Unpack in the same order as bounds: [irrig_freq, irrig_amt, fert_freq, fert_amt]
-        irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [
-            float(x) for x in self.values
-        ]
-
-        # Unpack model parameters
-        dt = self.model_params.dt
-        total_time_steps = self.model_params.total_time_steps
-        simulation_hours = self.model_params.simulation_hours
-
-        # Unpack disturbances
-        hourly_precipitation = self.disturbances.precipitation
-        hourly_temperature   = self.disturbances.temperature
-        hourly_radiation     = self.disturbances.radiation
-
-        # Unpack typical disturbances
-        W_typ = self.typical_disturbances.typical_water
-        F_typ = self.typical_disturbances.typical_fertilizer
-        T_typ = self.typical_disturbances.typical_temperature
-        R_typ = self.typical_disturbances.typical_radiation
-
-        # Unpack initial conditions
-        h0 = self.initial_conditions.h0
-        A0 = self.initial_conditions.A0
-        N0 = self.initial_conditions.N0
-        c0 = self.initial_conditions.c0
-        P0 = self.initial_conditions.P0
-
-        # Unpack growth rates
-        ah = self.growth_rates.ah
-        aA = self.growth_rates.aA
-        aN = self.growth_rates.aN
-        ac = self.growth_rates.ac
-        aP = self.growth_rates.aP
-
-        # Unpack carrying capacities
-        kh = self.carrying_capacities.kh
-        kA = self.carrying_capacities.kA
-        kN = self.carrying_capacities.kN
-        kc = self.carrying_capacities.kc
-        kP = self.carrying_capacities.kP
-
-        # Build hourly control series from design variables and input disturbances
-        hourly_irrigation = np.zeros(simulation_hours)
-        step_if = max(1, int(np.ceil(irrigation_frequency)))
-        hourly_irrigation[::step_if] = irrigation_amount
-        irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours)
-
-        hourly_fertilizer = np.zeros(simulation_hours)
-        step_ff = max(1, int(np.ceil(fertilizer_frequency)))
-        hourly_fertilizer[::step_ff] = fertilizer_amount
-        fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours)
-
-        precipitation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_precipitation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'split')
-        temperature = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_temperature,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-        radiation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_radiation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-
-        # Initialize storage for state variables
-        h = np.full(total_time_steps, h0)
-        A = np.full(total_time_steps, A0)
-        N = np.full(total_time_steps, N0)
-        c = np.full(total_time_steps, c0)
-        P = np.full(total_time_steps, P0)
-
-        # Initialize storage of cumulative water and fertilizer values
-        cumulative_radiation   = np.zeros(total_time_steps)
-        cumulative_temperature = np.zeros(total_time_steps)
-        cumulative_water       = np.zeros(total_time_steps)
-        cumulative_fertilizer  = np.zeros(total_time_steps)
-
-        # Run the season simulation for the given member
-        for t in range(total_time_steps - 1):
-            S = precipitation[t] 
-            T = temperature[t]
-            R = radiation[t]
-            W = irrigation[t]
-            F = fertilizer[t]
-
-            RC = cumulative_radiation[t] + R
-            cumulative_radiation[t+1] = RC
-
-            TC = cumulative_temperature[t] + T
-            cumulative_temperature[t+1] = TC
-
-            WC = cumulative_water[t] + W + S
-            cumulative_water[t+1] = WC
-
-            FC = cumulative_fertilizer[t] + F
-            cumulative_fertilizer[t+1] = FC
-
-            # Nutrient factors (bounded, nonnegative)
-            nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.9)
-            nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.9)
-            nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.9)
-            nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.9)
-
-            # Growth rates
-            ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
-            aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 10 * aA)
-            aN_hat = np.clip(aN, 0, 10 * aN)
-            ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 10 * ac)
-            aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 10 * aP)
-
-            # Carrying capacities
-            kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 10 * kh)
-            kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 10 * kA)
-            kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 10 * kN)
-            kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 10 * kc)
-            kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 10 * kP)
-
-            # Logistic-style updates
-            h[t+1] = h[t] + dt * (ah_hat * h[t] * (1 - h[t]/max(kh_hat, 1e-9)))
-            A[t+1] = A[t] + dt * (aA_hat * A[t] * (1 - A[t]/max(kA_hat, 1e-9)))
-            N[t+1] = N[t] + dt * (aN_hat * N[t] * (1 - N[t]/max(kN_hat, 1e-9)))
-            c[t+1] = c[t] + dt * (ac_hat * c[t] * (1 - c[t]/max(kc_hat, 1e-9)))
-            P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
-
-            # Enforce non-negativity explicitly
-            h[t+1] = max(h[t+1], 0.0)
-            A[t+1] = max(A[t+1], 0.0)
-            N[t+1] = max(N[t+1], 0.0)
-            c[t+1] = max(c[t+1], 0.0)
-            P[t+1] = max(P[t+1], 0.0)
-
-        # Combined objective (negative because GA minimizes)
-        profit = self.ga_params.weight_fruit_biomass * P[-1]
-        expenses = (self.ga_params.weight_irrigation * np.sum(hourly_irrigation)
-                    + self.ga_params.weight_fertilizer * np.sum(hourly_fertilizer))
-        revenue = profit - expenses
-        cost = -revenue # GA minimizes cost, but we want to maximize revenue
-        
-        return float(cost)
-    
-
-    def get_closed_form_cost(self) -> float:
-        """
-        Compute the cost for this member using the same plant-growth
-        season model as `get_cost`, but replacing the Forward Euler integration
-        with the analytic closed-form solution of the logistic equation at each
-        time step.
+        The final fruit biomass and total irrigation/fertilizer application are
+        converted into a scalar objective: net revenue. The returned cost is
+        the negative of net revenue so that the genetic algorithm minimizes cost
+        while maximizing profit.
 
         Args:
-            None explicitly. This method relies on internal fields, including:
-            - self.values (decision variables),
-            - model parameters,
-            - disturbances,
-            - initial conditions,
-            - growth rates and carrying capacities,
-            - GA economic weights.
+            None: all inputs are stored as member attributes.
 
         Returns:
-            cost (float): Negative net revenue, computed from final fruit biomass
-            minus weighted irrigation and fertilizer usage.
+            float:
+                Scalar objective cost, defined as the negative net revenue for
+                this simulated growth season.
         """
 
-        # Unpack in the same order as bounds: [irrig_freq, irrig_amt, fert_freq, fert_amt]
-        irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [
-            float(x) for x in self.values
-        ]
-
-        # Unpack model parameters
-        dt = self.model_params.dt
-        total_time_steps = self.model_params.total_time_steps
-        simulation_hours = self.model_params.simulation_hours
-
-        # Unpack disturbances
-        hourly_precipitation = self.disturbances.precipitation
-        hourly_temperature   = self.disturbances.temperature
-        hourly_radiation     = self.disturbances.radiation
-
-        # Unpack typical disturbances
-        W_typ = self.typical_disturbances.typical_water
-        F_typ = self.typical_disturbances.typical_fertilizer
-        T_typ = self.typical_disturbances.typical_temperature
-        R_typ = self.typical_disturbances.typical_radiation
-
-        # Unpack initial conditions
-        h0 = self.initial_conditions.h0
-        A0 = self.initial_conditions.A0
-        N0 = self.initial_conditions.N0
-        c0 = self.initial_conditions.c0
-        P0 = self.initial_conditions.P0
-
-        # Unpack growth rates
-        ah = self.growth_rates.ah
-        aA = self.growth_rates.aA
-        aN = self.growth_rates.aN
-        ac = self.growth_rates.ac
-        aP = self.growth_rates.aP
-
-        # Unpack carrying capacities
-        kh = self.carrying_capacities.kh
-        kA = self.carrying_capacities.kA
-        kN = self.carrying_capacities.kN
-        kc = self.carrying_capacities.kc
-        kP = self.carrying_capacities.kP
-
-        # Build hourly control series from design variables and input disturbances
-        hourly_irrigation = np.zeros(simulation_hours)
-        step_if = max(1, int(np.ceil(irrigation_frequency)))
-        hourly_irrigation[::step_if] = irrigation_amount
-        irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours)
-
-        hourly_fertilizer = np.zeros(simulation_hours)
-        step_ff = max(1, int(np.ceil(fertilizer_frequency)))
-        hourly_fertilizer[::step_ff] = fertilizer_amount
-        fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours)
-
-        precipitation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_precipitation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'split')
-        temperature = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_temperature,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-        radiation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_radiation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-
-        # Initialize storage for state variables
-        h = np.full(total_time_steps, h0)
-        A = np.full(total_time_steps, A0)
-        N = np.full(total_time_steps, N0)
-        c = np.full(total_time_steps, c0)
-        P = np.full(total_time_steps, P0)
-
-        # Initialize storage of cumulative water and fertilizer values
-        cumulative_radiation   = np.zeros(total_time_steps)
-        cumulative_temperature = np.zeros(total_time_steps)
-        cumulative_water       = np.zeros(total_time_steps)
-        cumulative_fertilizer  = np.zeros(total_time_steps)
-
-        # Run the season simulation for the given member
-        for t in range(total_time_steps - 1):
-            S = precipitation[t] 
-            T = temperature[t]
-            R = radiation[t]
-            W = irrigation[t]
-            F = fertilizer[t]
-
-            RC = cumulative_radiation[t] + R
-            cumulative_radiation[t+1] = RC
-
-            TC = cumulative_temperature[t] + T
-            cumulative_temperature[t+1] = TC
-
-            WC = cumulative_water[t] + W + S
-            cumulative_water[t+1] = WC
-
-            FC = cumulative_fertilizer[t] + F
-            cumulative_fertilizer[t+1] = FC
-
-            # Nutrient factors (bounded, nonnegative)
-            nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=0.8)
-            nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=0.8)
-            nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=0.8)
-            nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=0.8)
-
-            # Growth rates
-            ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
-            aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 10 * aA)
-            aN_hat = np.clip(aN, 0, 10 * aN)
-            ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 10 * ac)
-            aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 10 * aP)
-
-            # Carrying capacities
-            kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 10 * kh)
-            kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 10 * kA)
-            kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 10 * kN)
-            kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 10 * kc)
-            kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 10 * kP)
-
-            # Logistic-style updates
-            h[t+1] = logistic_step(h[t], ah_hat, kh_hat, dt)
-            A[t+1] = logistic_step(A[t], aA_hat, kA_hat, dt)
-            N[t+1] = logistic_step(N[t], aN_hat, kN_hat, dt)
-            c[t+1] = logistic_step(c[t], ac_hat, kc_hat, dt)
-            P[t+1] = logistic_step(P[t], aP_hat, kP_hat, dt)
-
-        # Combined objective (negative because GA minimizes)
-        profit = self.ga_params.weight_fruit_biomass * P[-1]
-        expenses = (self.ga_params.weight_irrigation * np.sum(hourly_irrigation)
-                    + self.ga_params.weight_fertilizer * np.sum(hourly_fertilizer))
-        revenue = profit - expenses
-        cost = -revenue # GA minimizes cost, but we want to maximize revenue
-        
-        return float(cost)
-    
-
-    def get_cost_verbose(
-            self,
-            nuW_sens = 0.95,
-            nuF_sens = 0.95,
-            nuT_sens = 0.95,
-            nuR_sens = 0.95
-        ) -> float:
-        """
-        Compute the cost for this member using the same plant-growth
-        season model as `get_cost`, but return additional internal state for
-        debugging and analysis purposes.
-
-        Args:
-            nuW_sens (float, optional):
-                Sensitivity parameter for the water-based nutrient factor.
-            nuF_sens (float, optional):
-                Sensitivity parameter for the fertilizer-based nutrient factor.
-            nuT_sens (float, optional):
-                Sensitivity parameter for the temperature-based nutrient factor.
-            nuR_sens (float, optional):
-                Sensitivity parameter for the radiation-based nutrient factor.
-                These allow debugging how each environmental driver influences
-                growth-rate and carrying-capacity adjustments.
-
-        Returns:
-            A tuple containing the full simulated internal state across all
-            time steps. The elements are, in order:
-
-                h (ndarray):
-                    Plant height trajectory.
-                A (ndarray):
-                    Leaf area trajectory.
-                N (ndarray):
-                    Leaf count trajectory.
-                c (ndarray):
-                    Flower spikelet trajectory.
-                P (ndarray):
-                    Fruit biomass trajectory.
-
-                nuW_values, nuF_values, nuT_values, nuR_values (ndarray):
-                    Time series of nutrient-factor values for water, fertilizer,
-                    temperature, and radiation.
-
-                ah_hat_values, aA_hat_values, aN_hat_values,
-                ac_hat_values, aP_hat_values (ndarray):
-                    Adjusted growth-rates at each time step.
-
-                kh_hat_values, kA_hat_values, kN_hat_values,
-                kc_hat_values, kP_hat_values (ndarray):
-                    Adjusted carrying capacities at each time step.
-        """
-
-        # Unpack in the same order as bounds: [irrig_freq, irrig_amt, fert_freq, fert_amt]
+        # Unpack in the same order as bounds
         irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [float(x) for x in self.values]
 
         # Unpack model parameters
         dt = self.model_params.dt
         total_time_steps = self.model_params.total_time_steps
         simulation_hours = self.model_params.simulation_hours
+        closed_form      = self.model_params.closed_form
+        verbose          = self.model_params.verbose
 
         # Unpack disturbances
         hourly_precipitation = self.disturbances.precipitation
@@ -481,233 +119,13 @@ class Member:
         kc = self.carrying_capacities.kc
         kP = self.carrying_capacities.kP
 
-        # Build hourly control series from design variables and input disturbances
-        hourly_irrigation = np.zeros(simulation_hours)
-        step_if = max(1, int(np.ceil(irrigation_frequency)))
-        hourly_irrigation[::step_if] = irrigation_amount
-        irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours)
+        # Unpack sensitivities
+        sigma_W = self.sensitivities.sigma_W
+        sigma_F = self.sensitivities.sigma_F
+        sigma_T = self.sensitivities.sigma_T
+        sigma_R = self.sensitivities.sigma_R
 
-        hourly_fertilizer = np.zeros(simulation_hours)
-        step_ff = max(1, int(np.ceil(fertilizer_frequency)))
-        hourly_fertilizer[::step_ff] = fertilizer_amount
-        fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours)
-
-        precipitation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_precipitation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'split')
-        temperature = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_temperature,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-        radiation = get_sim_inputs_from_hourly(
-            hourly_array     = hourly_radiation,
-            dt               = dt,
-            simulation_hours = simulation_hours,
-            mode             = 'copy')
-
-        # Initialize storage for state variables
-        h = np.full(total_time_steps, h0)
-        A = np.full(total_time_steps, A0)
-        N = np.full(total_time_steps, N0)
-        c = np.full(total_time_steps, c0)
-        P = np.full(total_time_steps, P0)
-
-        # Initialize storage of nutrient factors
-        nuW_values = np.zeros(total_time_steps)
-        nuF_values = np.zeros(total_time_steps)
-        nuT_values = np.zeros(total_time_steps)
-        nuR_values = np.zeros(total_time_steps)
-
-        # Intialize storage of adjusted growth rates
-        ah_hat_values = np.zeros(total_time_steps)
-        aA_hat_values = np.zeros(total_time_steps)
-        aN_hat_values = np.zeros(total_time_steps)
-        ac_hat_values = np.zeros(total_time_steps)
-        aP_hat_values = np.zeros(total_time_steps)
-
-        # Initialize storage of adjusted carrying capacities
-        kh_hat_values = np.zeros(total_time_steps)
-        kA_hat_values = np.zeros(total_time_steps)
-        kN_hat_values = np.zeros(total_time_steps)
-        kc_hat_values = np.zeros(total_time_steps)
-        kP_hat_values = np.zeros(total_time_steps)
-
-        # Initialize storage of cumulative water and fertilizer values
-        cumulative_radiation   = np.zeros(total_time_steps)
-        cumulative_temperature = np.zeros(total_time_steps)
-        cumulative_water       = np.zeros(total_time_steps)
-        cumulative_fertilizer  = np.zeros(total_time_steps)
-
-        # Run the season simulation for the given member
-        for t in range(total_time_steps - 1):
-            S = precipitation[t] 
-            T = temperature[t]
-            R = radiation[t]
-            W = irrigation[t]
-            F = fertilizer[t]
-
-            RC = cumulative_radiation[t] + R
-            cumulative_radiation[t+1] = RC
-
-            TC = cumulative_temperature[t] + T
-            cumulative_temperature[t+1] = TC
-
-            WC = cumulative_water[t] + W + S
-            cumulative_water[t+1] = WC
-
-            FC = cumulative_fertilizer[t] + F
-            cumulative_fertilizer[t+1] = FC
-
-            # Nutrient factors (bounded, nonnegative)
-            nuW = get_nutrient_factor(x=WC/(W_typ * (t+1)), mu=1, sensitivity=nuW_sens)
-            nuF = get_nutrient_factor(x=FC/(F_typ * (t+1)), mu=1, sensitivity=nuF_sens)
-            nuT = get_nutrient_factor(x=TC/(T_typ * (t+1)), mu=1, sensitivity=nuT_sens)
-            nuR = get_nutrient_factor(x=RC/(R_typ * (t+1)), mu=1, sensitivity=nuR_sens)
-
-            nuW_values[t] = nuW
-            nuF_values[t] = nuF
-            nuT_values[t] = nuT
-            nuR_values[t] = nuR
-
-            # Growth rates
-            ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
-            aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 10 * aA)
-            aN_hat = np.clip(aN, 0, 10 * aN)
-            ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 10 * ac)
-            aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 10 * aP)
-
-            ah_hat_values[t] = ah_hat
-            aA_hat_values[t] = aA_hat
-            aN_hat_values[t] = aN_hat
-            ac_hat_values[t] = ac_hat
-            aP_hat_values[t] = aP_hat
-
-            # Carrying capacities
-            kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 10 * kh)
-            kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 10 * kA)
-            kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 10 * kN)
-            kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 10 * kc)
-            kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 10 * kP)
-
-            kh_hat_values[t] = kh_hat
-            kA_hat_values[t] = kA_hat
-            kN_hat_values[t] = kN_hat
-            kc_hat_values[t] = kc_hat
-            kP_hat_values[t] = kP_hat
-
-            # Logistic-style updates
-            h[t+1] = h[t] + dt * (ah_hat * h[t] * (1 - h[t]/max(kh_hat, 1e-9)))
-            A[t+1] = A[t] + dt * (aA_hat * A[t] * (1 - A[t]/max(kA_hat, 1e-9)))
-            N[t+1] = N[t] + dt * (aN_hat * N[t] * (1 - N[t]/max(kN_hat, 1e-9)))
-            c[t+1] = c[t] + dt * (ac_hat * c[t] * (1 - c[t]/max(kc_hat, 1e-9)))
-            P[t+1] = P[t] + dt * (aP_hat * P[t] * (1 - P[t]/max(kP_hat, 1e-9)))
-
-            # Enforce non-negativity explicitly
-            h[t+1] = max(h[t+1], 0.0)
-            A[t+1] = max(A[t+1], 0.0)
-            N[t+1] = max(N[t+1], 0.0)
-            c[t+1] = max(c[t+1], 0.0)
-            P[t+1] = max(P[t+1], 0.0)
-
-        return h, A, N, c, P, nuW_values, nuF_values, nuT_values, nuR_values, ah_hat_values, aA_hat_values, aN_hat_values, ac_hat_values, aP_hat_values, kh_hat_values, kA_hat_values, kN_hat_values, kc_hat_values, kP_hat_values
-    
-
-    def get_closed_form_cost_verbose(
-            self,
-            sigma_W = 10,
-            sigma_F = 500,
-            sigma_T = 30,
-            sigma_R = 30 
-        ) -> float:
-        """
-        Compute the cost for this member using the same plant-growth
-        season model as `get_closed_form_cost`, but return additional internal 
-        state for debugging and analysis purposes.
-
-        Args:
-            nuW_sens (float, optional):
-                Sensitivity parameter for the water-based nutrient factor.
-            nuF_sens (float, optional):
-                Sensitivity parameter for the fertilizer-based nutrient factor.
-            nuT_sens (float, optional):
-                Sensitivity parameter for the temperature-based nutrient factor.
-            nuR_sens (float, optional):
-                Sensitivity parameter for the radiation-based nutrient factor.
-                These allow debugging how each environmental driver influences
-                growth-rate and carrying-capacity adjustments.
-
-        Returns:
-            A tuple containing the full simulated internal state across all
-            time steps. The elements are, in order:
-
-                h (ndarray):
-                    Plant height trajectory.
-                A (ndarray):
-                    Leaf area trajectory.
-                N (ndarray):
-                    Leaf count trajectory.
-                c (ndarray):
-                    Flower spikelet trajectory.
-                P (ndarray):
-                    Fruit biomass trajectory.
-
-                nuW_values, nuF_values, nuT_values, nuR_values (ndarray):
-                    Time series of nutrient-factor values for water, fertilizer,
-                    temperature, and radiation.
-
-                ah_hat_values, aA_hat_values, aN_hat_values,
-                ac_hat_values, aP_hat_values (ndarray):
-                    Adjusted growth-rates at each time step.
-
-                kh_hat_values, kA_hat_values, kN_hat_values,
-                kc_hat_values, kP_hat_values (ndarray):
-                    Adjusted carrying capacities at each time step.
-        """
-
-        # Unpack in the same order as bounds: [irrig_freq, irrig_amt, fert_freq, fert_amt]
-        irrigation_frequency, irrigation_amount, fertilizer_frequency, fertilizer_amount = [float(x) for x in self.values]
-
-        # Unpack model parameters
-        dt = self.model_params.dt
-        total_time_steps = self.model_params.total_time_steps
-        simulation_hours = self.model_params.simulation_hours
-
-        # Unpack disturbances
-        hourly_precipitation = self.disturbances.precipitation
-        hourly_temperature   = self.disturbances.temperature
-        hourly_radiation     = self.disturbances.radiation
-
-        # Unpack typical disturbances
-        W_typ = self.typical_disturbances.typical_water
-        F_typ = self.typical_disturbances.typical_fertilizer
-        T_typ = self.typical_disturbances.typical_temperature
-        R_typ = self.typical_disturbances.typical_radiation
-
-        # Unpack initial conditions
-        h0 = self.initial_conditions.h0
-        A0 = self.initial_conditions.A0
-        N0 = self.initial_conditions.N0
-        c0 = self.initial_conditions.c0
-        P0 = self.initial_conditions.P0
-
-        # Unpack growth rates
-        ah = self.growth_rates.ah
-        aA = self.growth_rates.aA
-        aN = self.growth_rates.aN
-        ac = self.growth_rates.ac
-        aP = self.growth_rates.aP
-
-        # Unpack carrying capacities
-        kh = self.carrying_capacities.kh
-        kA = self.carrying_capacities.kA
-        kN = self.carrying_capacities.kN
-        kc = self.carrying_capacities.kc
-        kP = self.carrying_capacities.kP
-
-        # Build hourly control series from design variables and input disturbances
+        # Build control inputs and input disturbances by time step from hourly data
         hourly_irrigation = np.zeros(simulation_hours)
         step_if = max(1, int(np.ceil(irrigation_frequency)))
         hourly_irrigation[::step_if] = irrigation_amount
@@ -728,12 +146,10 @@ class Member:
             dt               = dt,
             simulation_hours = simulation_hours,
             mode             = 'split')
-            #mode             = 'copy')
         radiation = get_sim_inputs_from_hourly(
             hourly_array     = hourly_radiation,
             dt               = dt,
             simulation_hours = simulation_hours,
-            #mode             = 'copy')
             mode             = 'split')
 
         # Initialize storage for state variables
@@ -743,185 +159,130 @@ class Member:
         c = np.full(total_time_steps, c0)
         P = np.full(total_time_steps, P0)
 
-        # Initialize storage of nutrient factors
-        nuW_values = np.zeros(total_time_steps)
-        nuF_values = np.zeros(total_time_steps)
-        nuT_values = np.zeros(total_time_steps)
-        nuR_values = np.zeros(total_time_steps)
-
-        # Intialize storage of adjusted growth rates
-        ah_hat_values = np.zeros(total_time_steps)
-        aA_hat_values = np.zeros(total_time_steps)
-        aN_hat_values = np.zeros(total_time_steps)
-        ac_hat_values = np.zeros(total_time_steps)
-        aP_hat_values = np.zeros(total_time_steps)
-
-        # Initialize storage of adjusted carrying capacities
-        kh_hat_values = np.zeros(total_time_steps)
-        kA_hat_values = np.zeros(total_time_steps)
-        kN_hat_values = np.zeros(total_time_steps)
-        kc_hat_values = np.zeros(total_time_steps)
-        kP_hat_values = np.zeros(total_time_steps)
-
-        # Initialize storage of inputs and disturbances that take delayed absorption/metalysis into account
-        delayed_water       = np.zeros(total_time_steps)
-        delayed_fertilizer  = np.zeros(total_time_steps)
-        delayed_temperature = np.zeros(total_time_steps)
-        delayed_radiation   = np.zeros(total_time_steps)
-
-        # Initialize storage of cumulative water and fertilizer values
-        cumulative_radiation   = np.zeros(total_time_steps)
-        cumulative_temperature = np.zeros(total_time_steps)
-        cumulative_water       = np.zeros(total_time_steps)
-        cumulative_fertilizer  = np.zeros(total_time_steps)
-
-        # Initialize storage of deltas between expected and actual cumulative values
-        delta_cumulative_water       = np.zeros(total_time_steps)
-        delta_cumulative_fertilizer  = np.zeros(total_time_steps)
-        delta_cumulative_temperature = np.zeros(total_time_steps)
-        delta_cumulative_radiation   = np.zeros(total_time_steps)
-
-        # TEMP
-        delta_Ws = np.zeros(total_time_steps)
-        delta_Fs = np.zeros(total_time_steps)
-        delta_Ts = np.zeros(total_time_steps)
-        delta_Rs = np.zeros(total_time_steps)
-
         # Pre-calculate the mu values that correspond to 95% absorption for each sigma ("sensitivity")
-        def solve_for_mu(sigma, mu_guess=100):
-                f = lambda mu: mp.erf(mu/(np.sqrt(2) * sigma)) - 0.95
-                mu = mp.findroot(f, mu_guess)
-                return mu
+        mu_W = get_mu_from_sigma(sigma_W/dt)
+        mu_F = get_mu_from_sigma(sigma_F/dt)
+        mu_T = get_mu_from_sigma(sigma_T/dt)
+        mu_R = get_mu_from_sigma(sigma_R/dt)
 
-        mu_W = float(solve_for_mu(sigma_W/dt))
-        mu_F = float(solve_for_mu(sigma_F/dt))
-        mu_T = float(solve_for_mu(sigma_T/dt))
-        mu_R = float(solve_for_mu(sigma_R/dt))
+        # Convolve input disturbances with Gaussian kernels to model delayed absorption/metalysis
+        kernel_W = gaussian_kernel(mu_W, sigma_W/dt, total_time_steps)
+        kernel_F = gaussian_kernel(mu_F, sigma_F/dt, total_time_steps)
+        kernel_T = gaussian_kernel(mu_T, sigma_T/dt, total_time_steps)
+        kernel_R = gaussian_kernel(mu_R, sigma_R/dt, total_time_steps)
+
+        delayed_water       = np.convolve(irrigation + precipitation, kernel_W, mode="full")[:total_time_steps]
+        delayed_fertilizer  = np.convolve(fertilizer,  kernel_F, mode="full")[:total_time_steps]
+        delayed_temperature = np.convolve(temperature, kernel_T, mode="full")[:total_time_steps]
+        delayed_radiation   = np.convolve(radiation,   kernel_R, mode="full")[:total_time_steps]
+
+        # Calculate the cumulative values over time from the delayed values
+        cumulative_water       = np.cumsum(delayed_water)
+        cumulative_fertilizer  = np.cumsum(delayed_fertilizer)
+        cumulative_temperature = np.cumsum(delayed_temperature)
+        cumulative_radiation   = np.cumsum(delayed_radiation)
+
+        # Calculate the differences between the expected and actual cumulative values
+        delta_Ws = np.abs((W_typ * np.arange(total_time_steps) - cumulative_water)       / (W_typ * np.arange(1, total_time_steps + 1)))
+        delta_Fs = np.abs((F_typ * np.arange(total_time_steps) - cumulative_fertilizer)  / (F_typ * np.arange(1, total_time_steps + 1)))
+        delta_Ts = np.abs((T_typ * np.arange(total_time_steps) - cumulative_temperature) / (T_typ * np.arange(1, total_time_steps + 1)))
+        delta_Rs = np.abs((R_typ * np.arange(total_time_steps) - cumulative_radiation)   / (R_typ * np.arange(1, total_time_steps + 1)))
+
+        # Calculate the cumulative deltas over time
+        delta_cumulative_water       = np.cumsum(delta_Ws) / np.arange(1, total_time_steps + 1)
+        delta_cumulative_fertilizer  = np.cumsum(delta_Fs) / np.arange(1, total_time_steps + 1)
+        delta_cumulative_temperature = np.cumsum(delta_Ts) / np.arange(1, total_time_steps + 1)
+        delta_cumulative_radiation   = np.cumsum(delta_Rs) / np.arange(1, total_time_steps + 1)
+
+        # Then use the cumulative deltas to calculate the nutrient factors for each time step
+        nuW = np.clip(1 - np.abs(delta_cumulative_water), 0, 1)
+        nuF = np.clip(1 - np.abs(delta_cumulative_fertilizer), 0, 1)
+        nuT = np.clip(1 - np.abs(delta_cumulative_temperature), 0, 1)
+        nuR = np.clip(1 - np.abs(delta_cumulative_radiation), 0, 1)
+
+        # Calculate the instantaneous adjusted growth rates and carrying capacities
+        ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 2 * ah)
+        aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 2 * aA)
+        aN_hat = np.clip(aN, 0, 2 * aN) * np.ones(total_time_steps)
+        ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 2 * ac)
+        aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 2 * aP)
+
+        kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 2 * kh)
+        kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 2 * kA)
+        kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 2 * kN) * np.ones(total_time_steps)
+        kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 2 * kc)
+        kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 2 * kP)
 
         # Run the season simulation for the given member
         for t in range(total_time_steps - 1):
-        #for t in range(10):
-            S = precipitation[t] 
-            T = temperature[t]
-            R = radiation[t]
-            W = irrigation[t]
-            F = fertilizer[t]
-
-            # Update future radiation, temperature, water, fertilizer based on delayed absorption/metalysis
-            f = lambda x, mu, sigma, area: area / (np.sqrt(2 * np.pi) * sigma) * np.exp(-0.5 * ((x - mu) / sigma)**2)
-
-            time = np.linspace(0, total_time_steps - t, total_time_steps - t)
-            delayed_water[t:]       = delayed_water[t:]       + f(time, mu_W, sigma_W/dt, W + S)
-            delayed_fertilizer[t:]  = delayed_fertilizer[t:]  + f(time, mu_F, sigma_F/dt, F)
-            delayed_temperature[t:] = delayed_temperature[t:] + f(time, mu_T, sigma_T/dt, T)
-            delayed_radiation[t:]   = delayed_radiation[t:]   + f(time, mu_R, sigma_R/dt, R)
-
-            # Update cumulative values
-            cumulative_water[t+1]       = cumulative_water[t]       + delayed_water[t]
-            cumulative_fertilizer[t+1]  = cumulative_fertilizer[t]  + delayed_fertilizer[t]
-            cumulative_temperature[t+1] = cumulative_temperature[t] + delayed_temperature[t]
-            cumulative_radiation[t+1]   = cumulative_radiation[t]   + delayed_radiation[t]
-
-            # Calculate the differences in cumulative values and expectation
-            delta_W = (W_typ * (t+1) - cumulative_water[t+1])/ (W_typ * (t+1))
-            delta_F = (F_typ * (t+1) - cumulative_fertilizer[t+1]) / (F_typ * (t+1))
-            delta_T = (T_typ * (t+1) - cumulative_temperature[t+1]) / (T_typ * (t+1))
-            delta_R = (R_typ * (t+1) - cumulative_radiation[t+1]) / (R_typ * (t+1))
-
-            delta_Ws[t+1] = delta_W
-            delta_Fs[t+1] = delta_F
-            delta_Ts[t+1] = delta_T
-            delta_Rs[t+1] = delta_R
-
-            # Update the cumulative deltas
-            delta_cumulative_water[t+1]       = (delta_cumulative_water[t]       + delta_W)/2
-            delta_cumulative_fertilizer[t+1]  = (delta_cumulative_fertilizer[t]  + delta_F)/2
-            delta_cumulative_temperature[t+1] = (delta_cumulative_temperature[t] + delta_T)/2
-            delta_cumulative_radiation[t+1]   = (delta_cumulative_radiation[t]   + delta_R)/2
-
-            # Nutrient factors (bounded, nonnegative)
-            nuW = np.abs(1 - delta_cumulative_water[t])
-            nuF = np.abs(1 - delta_cumulative_fertilizer[t])
-            nuT = np.abs(1 - delta_cumulative_temperature[t])
-            nuR = np.abs(1 - delta_cumulative_radiation[t])
-
-            nuW_values[t] = nuW
-            nuF_values[t] = nuF
-            nuT_values[t] = nuT
-            nuR_values[t] = nuR
-
-            # Growth rates
-            ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 10 * ah)
-            aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 10 * aA)
-            aN_hat = np.clip(aN, 0, 10 * aN)
-            ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 10 * ac)
-            aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 10 * aP)
-
-            ah_hat_values[t] = ah_hat
-            aA_hat_values[t] = aA_hat
-            aN_hat_values[t] = aN_hat
-            ac_hat_values[t] = ac_hat
-            aP_hat_values[t] = aP_hat
-
-            # Carrying capacities
-            kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 10 * kh)
-            kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 10 * kA)
-            kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 10 * kN)
-            kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 10 * kc)
-            kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 10 * kP)
-
-            kh_hat_values[t] = kh_hat
-            kA_hat_values[t] = kA_hat
-            kN_hat_values[t] = kN_hat
-            kc_hat_values[t] = kc_hat
-            kP_hat_values[t] = kP_hat
 
             # Logistic-style updates
-            h[t+1] = logistic_step(h[t], ah_hat, kh_hat, dt)
-            A[t+1] = logistic_step(A[t], aA_hat, kA_hat, dt)
-            N[t+1] = logistic_step(N[t], aN_hat, kN_hat, dt)
-            c[t+1] = logistic_step(c[t], ac_hat, kc_hat, dt)
-            P[t+1] = logistic_step(P[t], aP_hat, kP_hat, dt)
+            if closed_form:
+                h[t+1] = logistic_step(h[t], ah_hat[t], kh_hat[t], dt)
+                A[t+1] = logistic_step(A[t], aA_hat[t], kA_hat[t], dt)
+                N[t+1] = logistic_step(N[t], aN_hat[t], kN_hat[t], dt)
+                c[t+1] = logistic_step(c[t], ac_hat[t], kc_hat[t], dt)
+                P[t+1] = logistic_step(P[t], aP_hat[t], kP_hat[t], dt)
 
-        # Save all the data of interest to a csv for further analysis
-        df = pd.DataFrame({
-            'h': h.flatten(),
-            'A': A.flatten(),
-            'N': N.flatten(),
-            'c': c.flatten(),
-            'P': P.flatten(),
-            'delayed_water': delayed_water.flatten(),
-            'delayed_fertilizer': delayed_fertilizer.flatten(),
-            'delayed_temperature': delayed_temperature.flatten(),
-            'delayed_radiation': delayed_radiation.flatten(),
-            'cumulative_radiation': cumulative_radiation.flatten(),
-            'cumulative_temperature': cumulative_temperature.flatten(),
-            'cumulative_water': cumulative_water.flatten(),
-            'cumulative_fertilizer': cumulative_fertilizer.flatten(),
-            'delta_cumulative_water': delta_cumulative_water.flatten(),
-            'delta_cumulative_fertilizer': delta_cumulative_fertilizer.flatten(),
-            'delta_cumulative_temperature': delta_cumulative_temperature.flatten(),
-            'delta_cumulative_radiation': delta_cumulative_radiation.flatten(),
-            'delta_Ws': delta_Ws.flatten(),
-            'delta_Fs': delta_Fs.flatten(),
-            'delta_Ts': delta_Ts.flatten(),
-            'delta_Rs': delta_Rs.flatten(),
-            'nuW_values': nuW_values.flatten(),
-            'nuF_values': nuF_values.flatten(),
-            'nuT_values': nuT_values.flatten(),
-            'nuR_values': nuR_values.flatten(),
-            'ah_hat_values': ah_hat_values.flatten(),
-            'aA_hat_values': aA_hat_values.flatten(),
-            'aN_hat_values': aN_hat_values.flatten(),
-            'ac_hat_values': ac_hat_values.flatten(),
-            'aP_hat_values': aP_hat_values.flatten(),
-            'kh_hat_values': kh_hat_values.flatten(),
-            'kA_hat_values': kA_hat_values.flatten(),
-            'kN_hat_values': kN_hat_values.flatten(),
-            'kc_hat_values': kc_hat_values.flatten(),
-            'kP_hat_values': kP_hat_values.flatten(),
-        })
+            else:
+                # Forward Euler integration
+                h[t+1] = h[t] + dt * (ah_hat[t] * h[t] * (1 - h[t]/max(kh_hat[t], 1e-9)))
+                A[t+1] = A[t] + dt * (aA_hat[t] * A[t] * (1 - A[t]/max(kA_hat[t], 1e-9)))
+                N[t+1] = N[t] + dt * (aN_hat[t] * N[t] * (1 - N[t]/max(kN_hat[t], 1e-9)))
+                c[t+1] = c[t] + dt * (ac_hat[t] * c[t] * (1 - c[t]/max(kc_hat[t], 1e-9)))
+                P[t+1] = P[t] + dt * (aP_hat[t] * P[t] * (1 - P[t]/max(kP_hat[t], 1e-9)))
 
-        df.to_csv("output_get_closed_form_cost_verbose.csv", index=False)
+                # Enforce non-negativity explicitly
+                h[t+1] = max(h[t+1], 0.0)
+                A[t+1] = max(A[t+1], 0.0)
+                N[t+1] = max(N[t+1], 0.0)
+                c[t+1] = max(c[t+1], 0.0)
+                P[t+1] = max(P[t+1], 0.0)
 
-        return 
+        # Combined objective (negative because GA minimizes)
+        profit = self.ga_params.weight_fruit_biomass * P[-1]
+        expenses = (self.ga_params.weight_irrigation * np.sum(hourly_irrigation)
+                    + self.ga_params.weight_fertilizer * np.sum(hourly_fertilizer))
+        revenue = profit - expenses
+        cost = -revenue # GA minimizes cost, but we want to maximize revenue
+
+        # Save all the data of interest to a csv for further analysis if verbose is True
+        if verbose:
+
+            df = pd.DataFrame({
+                'h': h.flatten(),
+                'A': A.flatten(),
+                'N': N.flatten(),
+                'c': c.flatten(),
+                'P': P.flatten(),
+                'delayed_water':       delayed_water.flatten(),
+                'delayed_fertilizer':  delayed_fertilizer.flatten(),
+                'delayed_temperature': delayed_temperature.flatten(),
+                'delayed_radiation':   delayed_radiation.flatten(),
+                'cumulative_water':       cumulative_water.flatten(),
+                'cumulative_fertilizer':  cumulative_fertilizer.flatten(),
+                'cumulative_temperature': cumulative_temperature.flatten(),
+                'cumulative_radiation':   cumulative_radiation.flatten(),
+                'delta_cumulative_water':       delta_cumulative_water.flatten(),
+                'delta_cumulative_fertilizer':  delta_cumulative_fertilizer.flatten(),
+                'delta_cumulative_temperature': delta_cumulative_temperature.flatten(),
+                'delta_cumulative_radiation':   delta_cumulative_radiation.flatten(),
+                'nuW': nuW.flatten(),
+                'nuF': nuF.flatten(),
+                'nuT': nuT.flatten(),
+                'nuR': nuR.flatten(),
+                'ah_hat': ah_hat.flatten(),
+                'aA_hat': aA_hat.flatten(),
+                'aN_hat': aN_hat.flatten(),
+                'ac_hat': ac_hat.flatten(),
+                'aP_hat': aP_hat.flatten(),
+                'kh_hat': kh_hat.flatten(),
+                'kA_hat': kA_hat.flatten(),
+                'kN_hat': kN_hat.flatten(),
+                'kc_hat': kc_hat.flatten(),
+                'kP_hat': kP_hat.flatten(),
+            })
+
+            df.to_csv("output_get_cost.csv", index=False)
+
+        return float(cost)

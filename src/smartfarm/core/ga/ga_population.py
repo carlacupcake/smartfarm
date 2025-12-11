@@ -16,6 +16,7 @@ from ..model.model_growth_rates import ModelGrowthRates
 from ..model.model_initial_conditions import ModelInitialConditions
 from ..model.model_params import ModelParams
 from ..model.model_typical_disturbances import ModelTypicalDisturbances
+from ..model.model_sensitivities import ModelSensitivities
 
 
 class Population:
@@ -39,6 +40,7 @@ class Population:
         initial_conditions:   ModelInitialConditions,
         model_params:         ModelParams,
         typical_disturbances: ModelTypicalDisturbances,
+        sensitivities:        ModelSensitivities,
         values:               Optional[np.ndarray] = None,
         costs:                Optional[np.ndarray] = None) -> None:
 
@@ -51,6 +53,7 @@ class Population:
         self.initial_conditions   = initial_conditions
         self.model_params         = model_params
         self.typical_disturbances = typical_disturbances
+        self.model_sensitivities  = sensitivities
 
         self.values = values
         if self.values is None:
@@ -71,10 +74,17 @@ class Population:
         # Make sure costs are up to date
         self.set_costs_with_lambda(verbose=False)
 
-        unique_values, unique_indices = np.unique(self.values, axis=0, return_index=True)
+        tol_digits = 10  # adjust as needed
+        rounded_values = np.round(self.values, tol_digits)
+        unique_values, unique_indices = np.unique(rounded_values, axis=0, return_index=True)
 
         # Grab the corresponding costs
         unique_costs = self.costs[unique_indices]
+
+        # Sort the unique designs based on their costs
+        unique_indices = np.argsort(unique_costs, axis=0)
+        unique_values = unique_values[unique_indices]
+        unique_costs = unique_costs[unique_indices]
 
         return [unique_values, unique_costs]
 
@@ -125,9 +135,9 @@ class Population:
                 initial_conditions   = self.initial_conditions,
                 model_params         = self.model_params,
                 typical_disturbances = self.typical_disturbances,
+                sensitivities        = self.model_sensitivities,
                 values               = population_values[i, :])
-            #costs[i] = this_member.get_cost()
-            costs[i] = this_member.get_closed_form_cost()
+            costs[i] = this_member.get_cost()
 
         self.costs = costs
         return self
@@ -171,7 +181,7 @@ class Population:
         ]
 
         # Build shared context once
-        sim_context = self._build_sim_context_dict()
+        context = self._build_sim_context_dict()
 
         # Prepare batches as (start, end) index pairs
         batches = [
@@ -185,8 +195,8 @@ class Population:
             """Invoke Lambda for members[start:end] and return (start, end, costs_array)."""
             batch = member_dicts[start:end]
             payload = {
-                "members":     batch,
-                "sim_context": sim_context,
+                "members": batch,
+                "context": context,
             }
 
             t0 = time.time()
@@ -302,13 +312,16 @@ class Population:
         initial_conditions   = self.initial_conditions
         growth_rates         = self.growth_rates
         carrying_capacities  = self.carrying_capacities
+        model_sensitivities  = self.model_sensitivities
         ga                   = self.ga_params
 
-        sim_context = {
+        context = {
+
             # Time stepping / horizon
             "dt": float(model_params.dt),
             "total_time_steps": int(model_params.total_time_steps),
             "simulation_hours": int(model_params.simulation_hours),
+            "closed_form":      bool(model_params.closed_form),
 
             # Disturbances (hourly)
             "hourly_precipitation": np.asarray(disturbances.precipitation, dtype=float).tolist(),
@@ -342,10 +355,16 @@ class Population:
             "kc": float(carrying_capacities.kc),
             "kP": float(carrying_capacities.kP),
 
+            # Nutrient absorption/metalysis sensitivities (sigmas)
+            "sigma_W": float(model_sensitivities.sigma_W),
+            "sigma_F": float(model_sensitivities.sigma_F),
+            "sigma_T": float(model_sensitivities.sigma_T),
+            "sigma_R": float(model_sensitivities.sigma_R),
+
             # GA weights used in the cost
             "weight_fruit_biomass":  float(getattr(ga, "weight_fruit_biomass", 1.0)),
             "weight_irrigation":     float(getattr(ga, "weight_irrigation",    1.0)),
             "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),
         }
 
-        return sim_context
+        return context

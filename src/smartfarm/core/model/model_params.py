@@ -19,6 +19,15 @@ class ModelParams(BaseModel):
         default=2900,
         description="Total number of hours to simulate per model run."
     )
+    closed_form: bool = Field(
+        default=True,
+        description="Whether to use closed-form solutions " \
+                    "(as opposed to Forward Euler integration) for growth calculations."
+    )
+    verbose: bool = Field(
+        default=False,
+        description="Whether to save internal variables to csv for further analysis."
+    )
         
     @model_validator(mode='after')
     def _compute_total_time_steps(self):

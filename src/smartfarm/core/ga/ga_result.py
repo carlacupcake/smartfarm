@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from .ga_params import GeneticAlgorithmParams
 from .ga_population import Population
 
+from core.plotting.plotting import setup_plotting_styles
+
 
 class GeneticAlgorithmResult():
     """
@@ -44,10 +46,11 @@ class GeneticAlgorithmResult():
         Returns:
             table_of_best_designs (ndarray)
         """
-
         [unique_values, unique_costs] = self.final_population.get_unique_designs()
-        table_of_best_designs = np.hstack((unique_values[0:rows, :],
-                                           unique_costs[0:rows].reshape(-1, 1)))
+        table_of_best_designs = np.hstack((
+            unique_values[0:rows, :],
+            unique_costs[0:rows].reshape(-1, 1)
+        ))
         return table_of_best_designs
 
 
@@ -62,29 +65,32 @@ class GeneticAlgorithmResult():
         Returns:
             matplotlib.figure.Figure
         """
-
+        setup_plotting_styles()
         # Get data: expected shape (rows, 4)
         table_data = self.get_table_of_best_designs(rows)
 
         headers = [
             "Irrigation Frequency (1/hr)",
-            "Irrigation Amount (inches/irrigation)",
+            "Irrigation Amount (in)",
             "Fertilizer Frequency (1/hr)",
-            "Fertilizer Amount (lb/fertilization)",
+            "Fertilizer Amount (lb)",
+            r"Cost (-Revenue) in \$"
         ]
 
         # Create figure and axis
         # Height scales a bit with number of rows so it doesn't get cramped
-        fig, ax = plt.subplots(figsize=(10, 0.4 * rows + 1))
+        fig, ax = plt.subplots(figsize=(12, 0.4 * rows + 1))
 
         ax.axis("off")
         ax.axis("tight")
+        ax.set_title("Optimal Properties Recommended by Genetic Algorithm")
 
         # Matplotlib's table expects rows, not columns
         table = ax.table(
             cellText=table_data,
             colLabels=headers,
             loc="center",
+            bbox=[0, 0, 1, 1]
         )
 
         # Some basic formatting
@@ -92,14 +98,7 @@ class GeneticAlgorithmResult():
         table.set_fontsize(10)
         table.auto_set_column_width(col=list(range(len(headers))))
 
-        ax.set_title(
-            "Optimal Properties Recommended by Genetic Algorithm",
-            pad=20,
-            fontsize=14,
-        )
-
-        fig.tight_layout()
-        return fig
+        return
 
 
     def plot_optimization_results(self):
@@ -110,23 +109,19 @@ class GeneticAlgorithmResult():
         Returns:
             matplotlib.figure.Figure
         """
+        _, _, tight_layout_rect = setup_plotting_styles()
+        fig, ax = plt.subplots(figsize=(9, 4))
 
-        gens = list(range(self.ga_params.num_generations))
+        gs = list(range(self.ga_params.num_generations))
+        ax.plot(gs, self.avg_parent_costs, label="Avg. of top 10 performers")
+        ax.plot(gs, self.lowest_costs,     label="Best costs")
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        
+        ax.set_xlabel("Generation")
+        ax.set_ylabel(r"Cost (-Revenue) in \$")
+        ax.set_title("Convergence of Genetic Algorithm")
+        ax.legend(fontsize=12, loc="upper right", framealpha=0.5)
 
-        ax.plot(gens, self.avg_parent_costs, label="Avg. of top 10 performers")
-        ax.plot(gens, self.lowest_costs, label="Best costs")
+        fig.tight_layout(rect=tight_layout_rect)
 
-        ax.set_title("Convergence of Genetic Algorithm", fontsize=16, pad=15)
-        ax.set_xlabel("Generation", fontsize=13)
-        ax.set_ylabel("Cost", fontsize=13)
-
-        ax.legend(
-            fontsize=12,
-            loc="upper right",
-            framealpha=0.5
-        )
-
-        fig.tight_layout()
         return

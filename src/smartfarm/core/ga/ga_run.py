@@ -12,6 +12,7 @@ from ..model.model_growth_rates import ModelGrowthRates
 from ..model.model_initial_conditions import ModelInitialConditions
 from ..model.model_params import ModelParams
 from ..model.model_typical_disturbances import ModelTypicalDisturbances
+from ..model.model_sensitivities import ModelSensitivities
 
 import time # temporary
 
@@ -36,6 +37,7 @@ class GeneticAlgorithm:
         initial_conditions:   ModelInitialConditions,
         model_params:         ModelParams,
         typical_disturbances: ModelTypicalDisturbances,
+        sensitivities:        ModelSensitivities,
         gen_counter:          bool = True):
 
         self.bounds               = bounds
@@ -46,6 +48,7 @@ class GeneticAlgorithm:
         self.initial_conditions   = initial_conditions
         self.model_params         = model_params
         self.typical_disturbances = typical_disturbances
+        self.model_sensitivities  = sensitivities
         self.gen_counter          = gen_counter
 
 
@@ -99,7 +102,8 @@ class GeneticAlgorithm:
             growth_rates         = self.growth_rates,
             initial_conditions   = self.initial_conditions,
             model_params         = self.model_params,
-            typical_disturbances = self.typical_disturbances
+            typical_disturbances = self.typical_disturbances,
+            sensitivities        = self.model_sensitivities
         )
         population.set_random_values(
             lower_bounds=lower_bounds,
@@ -112,7 +116,6 @@ class GeneticAlgorithm:
 
         # Sort the costs of the first generation
         [sorted_costs, sorted_indices] = population.sort_costs()
-        all_costs[g, :] = sorted_costs.reshape(1, num_members)
 
         # Store the cost of the best performer and average cost of the parents
         lowest_costs[g] = np.min(sorted_costs)
@@ -123,6 +126,9 @@ class GeneticAlgorithm:
 
         # Update the generation counter
         g = g + 1
+
+        # Initialize the stagnation counter
+        stagnation_counter = 0
 
         # Perform all later generations
         while g < num_generations:
@@ -135,7 +141,15 @@ class GeneticAlgorithm:
 
             # Select top parents from population to be breeders
             for p in range(0, num_parents, 2):
-                phi1, phi2 = np.random.rand(2)
+
+                if stagnation_counter > 10:
+                    a = -1
+                    b = 2
+                    phi1, phi2 = (b-a) * np.random.rand(2) + a # introduce mutation
+                    stagnation_counter = 0                     # reset counter
+                else:
+                    phi1, phi2 = np.random.rand(2)
+
                 parent1 = population.values[p, :]
                 parent2 = population.values[p+1, :]
 
@@ -169,6 +183,10 @@ class GeneticAlgorithm:
 
             # Update population based on sorted indices
             population.set_order_by_costs(sorted_indices)
+
+            # Update the stagnation counter
+            if np.abs(lowest_costs[g] - lowest_costs[g-1]) < 0.01:
+                stagnation_counter = stagnation_counter + 1
 
             # Update the generation counter
             g = g + 1
@@ -205,14 +223,10 @@ class GeneticAlgorithm:
         # Unpack necessary attributes from self
         num_parents     = self.ga_params.num_parents
         num_kids        = self.ga_params.num_kids
-        num_members     = self.ga_params.num_members
         num_generations = self.ga_params.num_generations
 
         lower_bounds = self.bounds.lower_bounds
         upper_bounds = self.bounds.upper_bounds
-
-        # Initialize arrays to store the cost and original indices of each generation
-        all_costs = np.ones((num_generations, num_members))
 
         # Initialize arrays to store best performer and parent avg
         lowest_costs = np.zeros(num_generations)     # best cost
@@ -230,7 +244,8 @@ class GeneticAlgorithm:
             growth_rates         = self.growth_rates,
             initial_conditions   = self.initial_conditions,
             model_params         = self.model_params,
-            typical_disturbances = self.typical_disturbances
+            typical_disturbances = self.typical_disturbances,
+            sensitivities        = self.model_sensitivities
         )
         population.set_random_values(
             lower_bounds=lower_bounds,
@@ -246,7 +261,6 @@ class GeneticAlgorithm:
 
         # Sort the costs of the first generation
         [sorted_costs, sorted_indices] = population.sort_costs()
-        all_costs[g, :] = sorted_costs.reshape(1, num_members)
 
         # Store the cost of the best performer and average cost of the parents
         lowest_costs[g] = np.min(sorted_costs)
@@ -258,6 +272,9 @@ class GeneticAlgorithm:
         # Update the generation counter
         g = g + 1
 
+        # Initialize the stagnation counter
+        stagnation_counter = 0
+
         # Perform all later generations
         while g < num_generations:
 
@@ -266,7 +283,14 @@ class GeneticAlgorithm:
 
             # Breed parents to create offspring
             for p in range(0, num_parents, 2):
-                phi1, phi2 = np.random.rand(2)
+
+                if stagnation_counter > 10:
+                    a = -1
+                    b = 2
+                    phi1, phi2 = (b-a) * np.random.rand(2) + a # introduce mutation
+                    stagnation_counter = 0                     # reset counter
+                else:
+                    phi1, phi2 = np.random.rand(2)
                 parent1 = population.values[p, :]
                 parent2 = population.values[p+1, :]
 
@@ -300,6 +324,10 @@ class GeneticAlgorithm:
 
             # Update population based on sorted indices
             population.set_order_by_costs(sorted_indices)
+
+            # Update the stagnation counter
+            if np.abs(lowest_costs[g] - lowest_costs[g-1]) < 0.01:
+                stagnation_counter = stagnation_counter + 1
 
             # Update the generation counter
             g = g + 1

@@ -3,10 +3,12 @@
     { "values": [336, 0.1, 720, 100] },
     { "values": [300, 0.15, 650, 75] }
   ],
-  "sim_context": {
-    "dt": 0.1,
+  "context": {
+    "dt":               0.1,
     "total_time_steps": 40,
     "simulation_hours": 4,
+    "closed_form":      true,
+    "verbose":          false,
     "hourly_precipitation": [0, 0, 0, 0],
     "hourly_temperature": [25, 25, 25, 25],
     "hourly_radiation": [1000, 1000, 1000, 1000],
@@ -29,8 +31,25 @@
     "kN": 20,
     "kc": 1000,
     "kP": 0.25,
-    "weight_irrigation": 1.0,
-    "weight_fertilizer": 1.0,
+    "sigma_W": 30,
+    "sigma_F": 300,
+    "sigma_T": 30,
+    "sigma_R": 30,
+    "mu_W": 0.1,
+    "mu_F": 0.112,
+    "mu_T": 21.8,
+    "mu_R": 500,
+    "kernel_W": [0, 0, 0, 0],
+    "kernel_F": [0, 0, 0, 0],
+    "kernel_T": [0, 0, 0, 0],
+    "kernel_R": [0, 0, 0, 0],
+    "precipitation": [0, 0, 0, 0],
+    "temperature":   [0, 0, 0, 0],
+    "radiation":     [0, 0, 0, 0],
+    "t_idx_0_to_N": [0, 0, 0, 0],
+    "t_idx_1_to_N": [0, 0, 0, 0],
+    "weight_irrigation":    1.0,
+    "weight_fertilizer":    1.0,
     "weight_fruit_biomass": 1.0
   }
 }

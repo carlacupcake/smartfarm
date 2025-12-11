@@ -24,7 +24,16 @@ On the function page:
 7. In the "Layers" section, click "Add a layer".
    - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-1`...it may be different in other regions).
    - Click "Add".
-8. Go to the "Configuration" tab.
+8. (Optional) Now, go to Lambda itself (not the specific Lambda function we are creating).
+   - Go to "Layers" and click "Create layer".
+   - Name the layer `mpmath-layer` and upload the zip `core/aws/mpmath-layer/mpmath-layer.zip`.
+   - For compatible runtimes, explicitly select Python 3.10.
+   - Click "Create".
+9. (Optional) Navigate back to the Lambda function `smartfarm-ga-eval`.
+   - In "Code > Layers", click "Add a layer".
+   - Select "Custom layers" and then the `mpmath-layer` you just created.
+   - Click "Add".
+10. Go to the "Configuration" tab.
    - Set "Memory" to 1024 MB.
    - Set "Timeout" to 1 minute.
    - Save.

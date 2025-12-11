@@ -1,55 +1,74 @@
 # model_helpers.py
-import numpy as np
 import matplotlib.pyplot as plt
+import mpmath as mp
+import numpy as np
 from core.model.model_growth_rates import ModelGrowthRates
 from core.model.model_carrying_capacities import ModelCarryingCapacities
 
 
-def get_nutrient_factor(x, mu, sensitivity=0.7):
+def gaussian_kernel(
+        mu: float,
+        sigma_steps: float,
+        length: int
+    ) -> np.ndarray:
     """
-    Compute a bounded nutrient factor based on a Gaussian-like curve
-    centered at `mu`. The `sensitivity` parameter controls how sharply the
-    factor penalizes deviations from the optimal value.
+    Construct a normalized discrete Gaussian kernel for modeling delayed
+    nutrient absorption (temporal spreading) of an input signal.
 
     Args:
-        x (float or ndarray):
-            Current cumulative nutrient level normalized by the typical cumulative
-            value at that time point.
         mu (float):
-            Optimal or “target” value at which the nutrient factor peaks (nu = 1).
-        sensitivity (float, optional):
-            Controls curvature of the response (0 → broad tolerance, 1 → sharp
-            sensitivity); must lie between 0 and 1.
+            Center of the Gaussian in index units (e.g., time steps).
+        sigma_steps (float):
+            Standard deviation of the Gaussian in time steps, controlling how
+            broadly the influence spreads across the kernel.
+        length (int):
+            Total number of discrete samples in the kernel.
 
     Returns:
-        float or ndarray:
-            Nutrient factor `nu` ∈ (0, 1], representing how supportive the
-            current conditions are relative to the optimum.
+        np.ndarray:
+            A 1D array of length `length` containing non-negative values that
+            sum to one, suitable for convolution or delayed-response modeling.
     """
-
-    sigma_min = 0.1 * mu
-    sigma_max = 100 * mu
-    sigma = 1/4 * sigma_min * sigma_max * mu**2 *(1 - sensitivity**2)
-    exp_arg = -(x - mu)**2/(2*sigma**2)
-    nu = np.exp(exp_arg)
-    
-    return nu
+    k = np.arange(length)
+    g = np.exp(-0.5 * ((k - mu) / sigma_steps)**2)
+    g /= g.sum() # normalize so area ~ 1; scale by instantaneous disturbance/control input later
+    return g
 
 
-def get_nutrient_factor_abs(x, mu, sensitivity=1.0):
+def get_mu_from_sigma(
+        sigma:    float,        # standard deviation of the Gaussian
+        mu_guess: float = 100.0 # initial guess for mu for the root-finder
+    ) -> float:
+    """
+    Compute the value of `mu` that satisfies a target Gaussian tail probability.
+    This routine solves for `mu` such that the error function `erf(mu/(sqrt(2)*sigma))`
+    equals 0.95, meaning it returns the point where approximately 95% of a
+    zero-mean Gaussian lies between -mu and mu.
 
-    nu = np.clip(sensitivity * np.abs(x/mu) + (1 - sensitivity), 0, 1)
-    #nu = np.clip(sensitivity * (1 - np.sqrt((x-mu)**2/mu**2)) + (1 - sensitivity), 0.1, 1)
-    
-    return nu
+    Args:
+        sigma (float):
+            Standard deviation of the Gaussian distribution used in the
+            implicit equation. Must be positive.
+        mu_guess (float, optional):
+            Initial estimate supplied to the root-finding algorithm. A good
+            starting point can speed convergence, especially for large `sigma`.
+
+    Returns:
+        float:
+            The solved value of `mu` for which `erf(mu/(sqrt(2)*sigma)) = 0.95`,
+            computed using numerical root finding.
+    """
+    f = lambda mu: mp.erf(mu/(np.sqrt(2) * sigma)) - 0.95
+    mu = float(mp.findroot(f, mu_guess))
+    return mu
         
 
 def get_sim_inputs_from_hourly(
-        hourly_array,
-        dt,
-        simulation_hours,
-        mode='copy' # 'copy' or 'split'
-    ):
+        hourly_array:     np.ndarray,
+        dt:               float,
+        simulation_hours: int,
+        mode: str = 'copy' # 'copy' or 'split'
+    ) -> np.ndarray:
     """
     Expand an hourly time series into a per–time-step simulation array. Each
     hour is either copied across all sub-steps (e.g. 1 inch over 5 steps -> 1, 1, 1, 1, 1)
@@ -95,7 +114,13 @@ def get_sim_inputs_from_hourly(
     return simulation_array
 
 
-def logistic_step(x, a, k, dt, eps=1e-12):
+def logistic_step(
+        x:   float, # evaluation point
+        a:   float, # growth rate
+        k:   float, # carrying capacity
+        dt:  float, # time step size
+        eps: float = 1e-12 # small value to prevent numerical issues
+    ) -> float:
     """
     Advance a logistic-growth state variable one time step using the closed-form
     solution of the logistic ODE dy/dt = ay(1 − y/k). Small eps values prevent
