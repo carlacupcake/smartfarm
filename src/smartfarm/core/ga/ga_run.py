@@ -38,7 +38,8 @@ class GeneticAlgorithm:
         model_params:         ModelParams,
         typical_disturbances: ModelTypicalDisturbances,
         sensitivities:        ModelSensitivities,
-        gen_counter:          bool = True):
+        gen_counter:          bool = True
+    ):
 
         self.bounds               = bounds
         self.ga_params            = ga_params

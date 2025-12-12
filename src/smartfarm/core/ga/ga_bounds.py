@@ -16,11 +16,11 @@ class DesignSpaceBounds(BaseModel):
 
     lower_bounds: np.ndarray = Field(
         default_factory=np.ndarray,
-        description="Lower bounds for properties of materials considered in the optimization."
+        description="Lower bounds for irrigation/fertilizer frequency/amount considered in the optimization."
     )
     upper_bounds: np.ndarray = Field(
         default_factory=np.ndarray,
-        description="Upper bounds for properties of materials considered in the optimization."
+        description="Upper bounds for irrigation/fertilizer frequency/amount considered in the optimization."
     )
 
     class Config:

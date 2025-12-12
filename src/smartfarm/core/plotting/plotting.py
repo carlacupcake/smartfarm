@@ -1,6 +1,7 @@
 # model_helpers.py
 import matplotlib.pyplot as plt
 import numpy as np
+from typing import Optional
 
 from core.model.model_disturbances import ModelDisturbances
 from core.model.model_growth_rates import ModelGrowthRates
@@ -36,8 +37,9 @@ def setup_plotting_styles() -> None:
 
 def plot_hourly_inputs(
         input_disturbances: ModelDisturbances,
-        hourly_irrigation:  np.ndarray,
-        hourly_fertilizer:  np.ndarray) -> None:
+        hourly_irrigation:  Optional[np.ndarray] = None,
+        hourly_fertilizer:  Optional[np.ndarray] = None
+    ) -> None:
     """
     Plot the time-series trajectories of all input disturbances and control
     inputs for a single simulation scenario.
@@ -57,7 +59,10 @@ def plot_hourly_inputs(
     """
     # Setup plotting styles and parameters
     _, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
-    num_subplots = 5
+    if hourly_irrigation is None:
+        num_subplots = 3
+    else:
+        num_subplots = 5
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
     time = np.arange(len(input_disturbances.precipitation))
 
@@ -73,25 +78,31 @@ def plot_hourly_inputs(
     axs[1].set_ylabel('Radiation (W)')
     axs[1].set_title('Solar Radiation vs. Time')
 
-    # Fruit Biomass
+    # Temperature
     axs[2].plot(time, input_disturbances.temperature)
     axs[2].set_xlabel('Time (hr)')
     axs[2].set_ylabel(r'Temperature (\textdegree C)')
     axs[2].set_title('Temperature vs. Time')
 
     # Irrigation Events
-    axs[3].plot(time, hourly_irrigation)
-    axs[3].set_xlabel('Time (hr)')
-    axs[3].set_ylabel('Irrigation (in)')
-    axs[3].set_title('Irrigation vs. Time')
+    if hourly_irrigation is not None:
+        axs[3].plot(time, hourly_irrigation)
+        axs[3].set_xlabel('Time (hr)')
+        axs[3].set_ylabel('Irrigation (in)')
+        axs[3].set_title('Irrigation vs. Time')
 
     # Fertilizer Events
-    axs[4].plot(time, hourly_fertilizer)
-    axs[4].set_xlabel('Time (hr)')
-    axs[4].set_ylabel('Fertilizer (lbs)')
-    axs[4].set_title('Fertilizer vs. Time')
+    if hourly_fertilizer is not None:
+        axs[4].plot(time, hourly_fertilizer)
+        axs[4].set_xlabel('Time (hr)')
+        axs[4].set_ylabel('Fertilizer (lbs)')
+        axs[4].set_title('Fertilizer vs. Time')
 
-    fig.suptitle(f'Hourly Disturbances and Control Inputs', y=suptitle_y_position)
+    if hourly_irrigation is None:
+        fig.suptitle(f'Hourly Disturbances', y=suptitle_y_position)
+    else:
+        fig.suptitle(f'Hourly Disturbances and Control Inputs', y=suptitle_y_position)
+
     plt.tight_layout(rect=tight_layout_rect)
     plt.show()
 

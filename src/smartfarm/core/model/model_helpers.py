@@ -61,6 +61,28 @@ def get_mu_from_sigma(
     f = lambda mu: mp.erf(mu/(np.sqrt(2) * sigma)) - 0.95
     mu = float(mp.findroot(f, mu_guess))
     return mu
+
+
+def compute_fir_horizon(
+    kernel:         np.ndarray,
+    mass_threshold: float = 0.95
+    ) -> int:
+    """
+    Return the smallest L such that the first L taps of `kernel`
+    contain at least `mass_threshold` of the total kernel mass.
+
+    TODO
+    """
+    k = np.asarray(kernel, dtype=float)
+    total = np.sum(k)
+    if abs(total) < 1e-12:
+        # Degenerate kernel; just fall back to full length
+        return len(k)
+    cum = np.cumsum(k) / total
+    idx = np.where(cum >= mass_threshold)[0]
+    if idx.size == 0:
+        return len(k)
+    return int(idx[0] + 1)  # +1 because length = index+1
         
 
 def get_sim_inputs_from_hourly(

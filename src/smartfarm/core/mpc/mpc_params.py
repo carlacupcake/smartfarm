@@ -1,6 +1,6 @@
 # ga_params.py
-from typing import Annotated
-from pydantic import BaseModel, Field, PositiveInt
+from typing import Annotated, Any, Dict, Optional
+from pydantic import BaseModel, Field, PositiveInt, PositiveFloat
 
 
 class MPCParams(BaseModel):
@@ -11,8 +11,8 @@ class MPCParams(BaseModel):
     for optimization.
     """
 
-    horizon: PositiveInt = Field(
-        default=24,
+    hourly_horizon: PositiveFloat = Field(
+        default=1.0,
         description="Number of hours in the model predictive control horizon."
     )
     weight_irrigation: Annotated[float, Field(strict=True, ge=0)] = Field(
@@ -29,4 +29,17 @@ class MPCParams(BaseModel):
         default=4450, # $4/bushel, 1 bushel is ~25.5 kg so $0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
         description="Economic reward per unit of fruit biomass produced \
             (in $ per kg-acre-plant basis); drives the GA to maximize harvest value."
+    )
+    solver: str = Field(
+        default="ipopt",
+        description="Name of the optimization solver to use in MPC."
+    )
+    solver_options: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Optional dictionary of solver options to pass to the \
+            optimization solver used in MPC."
+    )
+    reoptimization_interval: PositiveInt = Field(
+        default=1,
+        description="Number of time steps between re-optimizations in MPC."
     )
