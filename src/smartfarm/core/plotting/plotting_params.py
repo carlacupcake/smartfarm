@@ -1,6 +1,6 @@
 # plotting_params.py
 import matplotlib.pyplot as plt
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 class PlottingParams(BaseModel):
     """
