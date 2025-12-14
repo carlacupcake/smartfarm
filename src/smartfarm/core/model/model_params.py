@@ -12,7 +12,7 @@ class ModelParams(BaseModel):
         description="Size of each time step in hours."
     )
     total_time_steps: PositiveInt = Field(
-        default=29000,
+        default=None,
         description="Total number of time steps in the simulation."
     )
     simulation_hours: PositiveInt | None = Field(

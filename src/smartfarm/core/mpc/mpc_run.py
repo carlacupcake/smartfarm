@@ -79,32 +79,13 @@ class MPC:
         self
     ) -> Dict[str, np.ndarray]:
         """
-        Run receding-horizon MPC over the full growing season.
-
-        This does NOT hard-code the plant update; instead it calls
-        self.single_time_step(x, u, d, extra_state), which you can implement
-        as a wrapper around your existing forward simulation logic.
-
-        Args:
-            total_steps:
-                Total number of real time steps in the season.
-
-            full_forecast:
-                Dict with full-length disturbance arrays of length total_steps:
-                    "precip", "temperature", "radiation"
-
-            x0:
-                Initial state vector [h0, A0, N0, c0, P0]. If None, uses
-                values from self.initial_conditions.
-
-            C0:
-                Initial cumulative vector [Cw0, Cf0, Ct0, Cr0]. If None, starts
-                from zeros.
+        Run receding-horizon, move-blocked MPC over the full growing season.
 
         Returns:
             trajectories:
                 Dict containing time series for states and controls:
                     "h", "A", "N", "c", "P", "uW", "uF"
+                and optional logs.
         """
         # Unpack model parameters
         total_time_steps = self.model_params.total_time_steps
@@ -126,12 +107,9 @@ class MPC:
         P = np.full(total_time_steps, P0)
 
         # Set initial conditions for the MPC loop
-        x0 = np.array([h0, A0, N0, c0, P0])
-        C0 = np.zeros(4)
-
-        x = x0.copy()
-        C = C0.copy()
-        extra_state = None  # whatever your single_time_step needs
+        x = np.array([h0, A0, N0, c0, P0])
+        C = np.zeros(4)
+        extra_state = None
 
         # Initialize storage for control inputs
         irrigation = np.zeros(total_time_steps)
@@ -159,12 +137,12 @@ class MPC:
             mode             = 'split')
 
         # Initialize plan & index
-        uW_plan = None
-        uF_plan = None
+        irrigation_plan = None
+        fertilizer_plan = None
         plan_idx = 0
 
-        uW_guess = self.bounds.irrigation_amount_guess
-        uF_guess = self.bounds.fertilizer_amount_guess
+        irrigation_guess = self.bounds.irrigation_amount_guess
+        fertilizer_guess = self.bounds.fertilizer_amount_guess
 
         for k in range(total_time_steps - 1):
 
@@ -172,8 +150,8 @@ class MPC:
 
             # Decide whether to re-optimize
             need_new_plan = (
-                uW_plan is None or
-                plan_idx >= len(uW_plan) or
+                irrigation_plan is None or
+                plan_idx >= len(irrigation_plan) or
                 (k % self.mpc_params.reoptimization_interval == 0)
             )
 
@@ -199,25 +177,30 @@ class MPC:
                 }
 
                 try:
-                    uW_plan, uF_plan = self.solve_cftoc(
+                    irrigation_plan, fertilizer_plan = self.solve_cftoc(
                         x0=x,
                         C0=C,
                         forecast=forecast,
-                        u_prev=(uW_guess, uF_guess),
+                        u_prev=(irrigation_guess, fertilizer_guess),
                     )
                     # Warm start for the NEXT horizon
-                    uW_guess = uW_plan
-                    uF_guess = uF_plan
+                    irrigation_lower_bound, irrigation_upper_bound = self.bounds.irrigation_bounds
+                    fertilizer_lower_bound, fertilizer_upper_bound = self.bounds.fertilizer_bounds
+
+                    # First element of the new plan as guess for next CFTOC
+                    irrigation_guess = float(np.clip(irrigation_plan[0], irrigation_lower_bound, irrigation_upper_bound))
+                    fertilizer_guess = float(np.clip(fertilizer_plan[0], fertilizer_lower_bound, fertilizer_upper_bound))
+
                     plan_idx = 0
                 except RuntimeError as e:
                     print(f"[MPC] CFTOC failed at step {k}: {e}")
-                    # fallback: hold last control or set to zero
-                    uW_plan = np.zeros(horizon)
-                    uF_plan = np.zeros(horizon)
+                    # Fallback: set controls to zero
+                    irrigation_plan = np.zeros(horizon)
+                    fertilizer_plan = np.zeros(horizon)
                     plan_idx = 0
 
-            # Apply next element of the current plan
-            u_k = np.array([uW_plan[plan_idx], uF_plan[plan_idx]])
+            # Apply next element of the current plan 
+            u_k = np.array([irrigation_plan[plan_idx], fertilizer_plan[plan_idx]])
             plan_idx += 1
 
             d_k = {
@@ -235,8 +218,8 @@ class MPC:
             )
 
             # Store applied controls
-            irrigation[k] = u_k[0]#optimal_irrigation_inputs[0]
-            fertilizer[k] = u_k[1]#optimal_fertilizer_inputs[0]
+            irrigation[k] = u_k[0]
+            fertilizer[k] = u_k[1]
 
             # Store next state
             h[k + 1] = x[0]
@@ -254,8 +237,8 @@ class MPC:
         N_out = N[:n_steps+1]
         c_out = c[:n_steps+1]
         P_out = P[:n_steps+1]
-        uW_out = irrigation[:n_steps]
-        uF_out = fertilizer[:n_steps]
+        irrigation_out = irrigation[:n_steps]
+        fertilizer_out = fertilizer[:n_steps]
 
         # Extract logs from extra_state (if we ever ran single_time_step)
         log_dict = {}
@@ -269,11 +252,9 @@ class MPC:
             "N":  N_out,
             "c":  c_out,
             "P":  P_out,
-            "uW": uW_out,
-            "uF": uF_out,
+            "irrigation": irrigation_out,
+            "fertilizer": fertilizer_out,
         }
-
-        # Merge logs under a sub-dict or flatten, your choice:
         result["logs"] = log_dict
 
         return result
@@ -281,45 +262,43 @@ class MPC:
 
     def solve_cftoc(
         self,
-        x0: np.ndarray,
-        C0: np.ndarray,
+        x0:       np.ndarray,
+        C0:       np.ndarray,
         forecast: Dict[str, np.ndarray],
-        u_prev: Optional[np.ndarray] = None,
+        u_prev:   Optional[np.ndarray] = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Solve the nonlinear CFTOC over the horizon [0, ..., N-1] using Pyomo.
+        Solve the nonlinear CFTOC over the horizon using Pyomo.
 
         Args:
             x0:
                 Current plant state at the beginning of the horizon:
-                    x0 = [h0, A0, N0, c0, P0]
-
+                    x = [h, A, N, c, P]
             C0:
                 Current cumulative states at the beginning of the horizon:
-                    C0 = [Cw0, Cf0, Ct0, Cr0]
+                    C = [cumulative_water, cumulative_fertilizer,
+                         cumulative_temperature, cumulative_radiation]
                 These approximate the cumulative delayed water/fertilizer/
                 temperature/radiation up to the present.
-
             forecast:
                 Dictionary of disturbance forecasts over the horizon:
-                    forecast["precip"]      : ndarray of length N
-                    forecast["temperature"] : ndarray of length N
-                    forecast["radiation"]   : ndarray of length N
-
+                    forecast["precip"]      : ndarray of length horizon
+                    forecast["temperature"] : ndarray of length horizon
+                    forecast["radiation"]   : ndarray of length horizon
             u_prev:
-                Optional previous control [uweight_fruit_biomassrev, uF_prev] used at the last
-                real time step. This is useful if you want to penalize changes
-                in control (smoothing).
+                Optional previous control used at the last real time step. 
+                This is useful for penalize changes in control (smoothing).
 
         Returns:
-            (optimal_irrigation_inputs, optimal_fertilizer_inputs):
-                Two ndarrays of length N with the optimal control sequence over
-                the horizon. In closed-loop MPC you typically apply only
-                optimal_irrigation_inputs[0], optimal_fertilizer_inputs[0] to the plant.
+            (irrigation_plan, fertilizer_plan):
+                Two ndarrays of horizon length (in time steps, not hours) with the optimal 
+                control sequence.
         """
         # Unpack model parameters
         dt      = self.model_params.dt
         horizon = int(self.mpc_params.hourly_horizon * (1 / dt))  # convert hours to time steps
+        model.alpha   = pyo.Param(initialize=self.sensitivities.alpha, mutable=False)
+        model.epsilon = pyo.Param(initialize=self.model_params.epsilon, mutable=False)
 
         # Unpack growth rates
         ah = self.growth_rates.ah
@@ -382,16 +361,16 @@ class MPC:
         model.delayed_radiation   = pyo.Var(model.uk)
 
         # Per-step deviation of actual cumulative values from expectation
-        model.delta_water       = pyo.Var(model.uk)
-        model.delta_fertilizer  = pyo.Var(model.uk)
-        model.delta_temperature = pyo.Var(model.uk)
-        model.delta_radiation   = pyo.Var(model.uk)
+        model.cumulative_average_water       = pyo.Var(model.uk)
+        model.cumulative_average_fertilizer  = pyo.Var(model.uk)
+        model.cumulative_average_temperature = pyo.Var(model.uk)
+        model.cumulative_average_radiation   = pyo.Var(model.uk)
 
         # Cumulative-average deviations
-        model.delta_cumulative_water       = pyo.Var(model.uk)
-        model.delta_cumulative_fertilizer  = pyo.Var(model.uk)
-        model.delta_cumulative_temperature = pyo.Var(model.uk)
-        model.delta_cumulative_radiation   = pyo.Var(model.uk)
+        model.cumulative_divergence_water       = pyo.Var(model.uk)
+        model.cumulative_divergence_fertilizer  = pyo.Var(model.uk)
+        model.cumulative_divergence_temperature = pyo.Var(model.uk)
+        model.cumulative_divergence_radiation   = pyo.Var(model.uk)
 
         # Initial conditions (states & augmented states)
         x0 = np.asarray(x0).flatten()
@@ -409,11 +388,15 @@ class MPC:
         model.cumulative_radiation[0].fix(float(C0[3]))
 
         # Initial guesses for controls
+        irrigation_lower_bound, irrigation_upper_bound = self.bounds.irrigation_bounds
+        fertilizer_lower_bound, fertilizer_upper_bound = self.bounds.fertilizer_bounds
         if u_prev is not None:
             u_prev = np.asarray(u_prev).flatten()
+            uW0 = float(np.clip(u_prev[0], irrigation_lower_bound, irrigation_upper_bound))
+            uF0 = float(np.clip(u_prev[1], fertilizer_lower_bound, fertilizer_upper_bound))
             for k in model.uk:
-                model.uW[k].value = float(u_prev[0])
-                model.uF[k].value = float(u_prev[1])
+                model.uW[k].value = uW0
+                model.uF[k].value = uF0
         else:
             for k in model.uk:
                 model.uW[k].value = self.bounds.irrigation_amount_guess
@@ -473,98 +456,91 @@ class MPC:
             return model.cumulative_radiation[k + 1] == model.cumulative_radiation[k] + model.delayed_radiation[k]
         model.cumulative_radiation_update = pyo.Constraint(model.uk, rule=cumulative_radiation_update_rule)
 
-        # Per-step deviation constraints
-        eps = 1e-9  # to avoid divide-by-zero errors
-        def delta_water_rule(model, k):
+        # Cumulative average updates
+        def cumulative_average_water_rule(model, k):
             k_idx = k  # matches np.arange indexing
             num   = W_typ * k_idx - model.cumulative_water[k]
-            denom = W_typ * (k_idx + 1) + eps
-            return model.delta_water[k] == pyo.sqrt((num / denom) ** 2 + eps)
-        model.delta_water_con = pyo.Constraint(model.uk, rule=delta_water_rule)
+            denom = W_typ * (k_idx + 1) + model.epsilon
+            return model.cumulative_average_water[k] == pyo.sqrt((num / denom) ** 2 + model.epsilon)
+        model.cumulative_average_water_constraint = pyo.Constraint(model.uk, rule=cumulative_average_water_rule)
 
-        def delta_fertilizer_rule(model, k):
+        def cumulative_average_fertilizer_rule(model, k):
             k_idx = k
             num   = F_typ * k_idx - model.cumulative_fertilizer[k]
-            denom = F_typ * (k_idx + 1) + eps
-            return model.delta_fertilizer[k] == pyo.sqrt((num / denom) ** 2 + eps)
-        model.delta_fertilizer_con = pyo.Constraint(model.uk, rule=delta_fertilizer_rule)
+            denom = F_typ * (k_idx + 1) + model.epsilon
+            return model.cumulative_average_fertilizer[k] == pyo.sqrt((num / denom) ** 2 + model.epsilon)
+        model.cumulative_average_fertilizer_constraint = pyo.Constraint(model.uk, rule=cumulative_average_fertilizer_rule)
 
-        def delta_temperature_rule(model, k):
+        def cumulative_average_temperature_rule(model, k):
             k_idx = k
             num   = T_typ * k_idx - model.cumulative_temperature[k]
-            denom = T_typ * (k_idx + 1) + eps
-            return model.delta_temperature[k] == pyo.sqrt((num / denom) ** 2 + eps)
-        model.delta_temperature_con = pyo.Constraint(model.uk, rule=delta_temperature_rule)
+            denom = T_typ * (k_idx + 1) + model.epsilon
+            return model.cumulative_average_temperature[k] == pyo.sqrt((num / denom) ** 2 + model.epsilon)
+        model.cumulative_average_temperature_constraint = pyo.Constraint(model.uk, rule=cumulative_average_temperature_rule)
 
-        def delta_radiation_rule(model, k):
+        def cumulative_average_radiation_rule(model, k):
             k_idx = k
             num   = R_typ * k_idx - model.cumulative_radiation[k]
-            denom = R_typ * (k_idx + 1) + eps
-            return model.delta_radiation[k] == pyo.sqrt((num / denom) ** 2 + eps)
-        model.delta_radiation_con = pyo.Constraint(model.uk, rule=delta_radiation_rule)
+            denom = R_typ * (k_idx + 1) + model.epsilon
+            return model.cumulative_average_radiation[k] == pyo.sqrt((num / denom) ** 2 + model.epsilon)
+        model.cumulative_average_radiation_constraint = pyo.Constraint(model.uk, rule=cumulative_average_radiation_rule)
 
-        # Cumulative-average deviation constraints
-        def delta_cumulative_water_rule(model, k):
+        # Cumulative divergence updates
+        def cumulative_divergence_water_rule(model, k):
             if k == 0:
-                return model.delta_cumulative_water[0] == model.delta_water[0]
-            return model.delta_cumulative_water[k] == (
-                k * model.delta_cumulative_water[k-1] + model.delta_water[k]
+                return model.cumulative_divergence_water[0] == model.cumulative_average_water[0]
+            return model.cumulative_divergence_water[k] == (
+                k * model.cumulative_divergence_water[k-1] + model.cumulative_average_water[k]
             ) / (k + 1)
-        model.delta_cumulative_water_con = pyo.Constraint(model.uk, rule=delta_cumulative_water_rule)
+        model.cumulative_divergence_water_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_water_rule)
 
-        def delta_cumulative_fertilizer_rule(model, k):
+        def cumulative_divergence_fertilizer_rule(model, k):
             if k == 0:
-                return model.delta_cumulative_fertilizer[0] == model.delta_fertilizer[0]
-            return model.delta_cumulative_fertilizer[k] == (
-                k * model.delta_cumulative_fertilizer[k-1] + model.delta_fertilizer[k]
+                return model.cumulative_divergence_fertilizer[0] == model.cumulative_average_fertilizer[0]
+            return model.cumulative_divergence_fertilizer[k] == (
+                k * model.cumulative_divergence_fertilizer[k-1] + model.cumulative_average_fertilizer[k]
             ) / (k + 1)
-        model.delta_cumulative_fertilizer_con = pyo.Constraint(model.uk, rule=delta_cumulative_fertilizer_rule)
+        model.cumulative_divergence_fertilizer_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_fertilizer_rule)
 
-        def delta_cumulative_temperature_rule(model, k):
+        def cumulative_divergence_temperature_rule(model, k):
             if k == 0:
-                return model.delta_cumulative_temperature[0] == model.delta_temperature[0]
-            return model.delta_cumulative_temperature[k] == (
-                k * model.delta_cumulative_temperature[k-1] + model.delta_temperature[k]
+                return model.cumulative_divergence_temperature[0] == model.cumulative_average_temperature[0]
+            return model.cumulative_divergence_temperature[k] == (
+                k * model.cumulative_divergence_temperature[k-1] + model.cumulative_average_temperature[k]
             ) / (k + 1)
-        model.delta_cumulative_temperature_con = pyo.Constraint(model.uk, rule=delta_cumulative_temperature_rule)
+        model.cumulative_divergence_temperature_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_temperature_rule)
 
-        def delta_cumulative_radiation_rule(model, k):
+        def cumulative_divergence_radiation_rule(model, k):
             if k == 0:
-                return model.delta_cumulative_radiation[0] == model.delta_radiation[0]
-            return model.delta_cumulative_radiation[k] == (
-                k * model.delta_cumulative_radiation[k-1] + model.delta_radiation[k]
+                return model.cumulative_divergence_radiation[0] == model.cumulative_average_radiation[0]
+            return model.cumulative_divergence_radiation[k] == (
+                k * model.cumulative_divergence_radiation[k-1] + model.cumulative_average_radiation[k]
             ) / (k + 1)
-        model.delta_cumulative_radiation_con = pyo.Constraint(model.uk, rule=delta_cumulative_radiation_rule)
+        model.cumulative_divergence_radiation_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_radiation_rule)
 
-        # Nutrient factor constraints (linear dependence on cumulative-average deviation)
-        # nu = 1 - abs(delta_cumulative)
-        # abs already baked into delta_cumulative_* through sqrt
-        def nuW_expr_rule(model, k):
-            # maps [0, ∞) -> (0, 1]
-            return 1.0 / (1.0 + model.delta_cumulative_water[k] + eps)
+        # Nutrient factor updates
+        def nuW_rule(model, k):
+            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_water[k])
+        model.nuW = pyo.Expression(model.uk, rule=nuW_rule)
 
-        def nuF_expr_rule(model, k):
-            return 1.0 / (1.0 + model.delta_cumulative_fertilizer[k] + eps)
-
-        def nuT_expr_rule(model, k):
-            return 1.0 / (1.0 + model.delta_cumulative_temperature[k] + eps)
-
-        def nuR_expr_rule(model, k):
-            return 1.0 / (1.0 + model.delta_cumulative_radiation[k] + eps)
-
-        model.nuW = pyo.Expression(model.uk, rule=nuW_expr_rule)
-        model.nuF = pyo.Expression(model.uk, rule=nuF_expr_rule)
-        model.nuT = pyo.Expression(model.uk, rule=nuT_expr_rule)
-        model.nuR = pyo.Expression(model.uk, rule=nuR_expr_rule)
+        def nuF_rule(model, k):
+            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_fertilizer[k])
+        model.nuF = pyo.Expression(model.uk, rule=nuF_rule)
+        
+        def nuT_rule(model, k):
+            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_temperature[k])
+        model.nuT = pyo.Expression(model.uk, rule=nuT_rule)
+        
+        def nuR_rule(model, k):
+            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_radiation[k])
+        model.nuR = pyo.Expression(model.uk, rule=nuR_rule)
 
         # Plant dynamics (Forward Euler logistic-like update)
-        eps_pow = 1e-6  # small positive number to avoid pow'(0, frac)
-
         def plant_height_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_kh = model.nuF[k] * model.nuT[k] * model.nuR[k] + eps_pow
+            nu_kh = model.nuF[k] * model.nuT[k] * model.nuR[k] + model.epsilon
 
             ah_hat = ah * (nu_kh) ** (1.0 / 3.0)
             kh_hat = kh * (nu_kh) ** (1.0 / 3.0)
@@ -578,8 +554,8 @@ class MPC:
             if k == horizon:
                 return pyo.Constraint.Skip
             
-            nu_aA = model.nuF[k] * model.nuT[k] * model.nuR[k] + eps_pow
-            nu_kA = model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + eps_pow
+            nu_aA = model.nuF[k] * model.nuT[k] * model.nuR[k] + model.epsilon
+            nu_kA = model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + model.epsilon
 
             aA_hat = aA * (nu_aA) ** (1.0 / 3.0)
             kA_hat = kA * (nu_kA) ** (1.0 / 5.0)
@@ -602,8 +578,8 @@ class MPC:
             if k == horizon:
                 return pyo.Constraint.Skip
             
-            nu_ac = (1.0 / (model.nuT[k] + 1e-9)) * (1.0 / (model.nuR[k] + 1e-9)) + eps_pow
-            nu_kc = model.nuW[k] * nu_ac + eps_pow
+            nu_ac = (1.0 / (model.nuT[k] + 1e-9)) * (1.0 / (model.nuR[k] + 1e-9)) + model.epsilon
+            nu_kc = model.nuW[k] * nu_ac + model.epsilon
 
             ac_hat = ac * (nu_ac) ** 0.5
             kc_hat = kc * (nu_kc) ** (1.0 / 3.0)
@@ -617,21 +593,21 @@ class MPC:
             if k == horizon:
                 return pyo.Constraint.Skip
             
-            nu_aP = model.nuT[k] * model.nuR[k] + eps_pow
+            nu_aP = model.nuT[k] * model.nuR[k] + model.epsilon
             aP_hat = aP * (nu_aP) ** 0.5
 
-            nu_kh = model.nuF[k] * model.nuT[k] * model.nuR[k] + eps_pow
+            nu_kh = model.nuF[k] * model.nuT[k] * model.nuR[k] + model.epsilon
             kh_hat = kh * (nu_kh) ** (1.0 / 3.0)
 
-            nu_kA = model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + eps_pow
+            nu_kA = model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + model.epsilon
             kA_hat = kA * (nu_kA) ** (1.0 / 5.0)
 
-            nu_kc = model.nuW[k] * (1.0 / (model.nuT[k] + 1e-9)) * (1.0 / (model.nuR[k] + 1e-9)) + eps_pow
+            nu_kc = model.nuW[k] * (1.0 / (model.nuT[k] + 1e-9)) * (1.0 / (model.nuR[k] + 1e-9)) + model.epsilon
             kc_hat = kc * (nu_kc) ** (1.0 / 3.0)
 
             phi_full = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k]
                         * (kh_hat / (kh + 1e-9)) * (kA_hat / (kA + 1e-9)) * (kc_hat / (kc + 1e-9)))
-            phi_full_shift = phi_full + eps_pow
+            phi_full_shift = phi_full + model.epsilon
 
             kP_hat = kP * (phi_full_shift) ** (1.0 / 4.0)
 
@@ -640,95 +616,106 @@ class MPC:
             )
         model.fruit_biomass_dynamics_constraint = pyo.Constraint(model.xk, rule=fruit_biomass_dynamics_rule)
 
-        # Objective: final fruit minus resource usage
+        # Objective (not exactly in dollars in order to keep scaling reasonable)
         def objective_rule(model):
-            stage_cost = sum(
-                self.mpc_params.weight_irrigation * model.uW[k] + self.mpc_params.weight_fertilizer * model.uF[k]
-                for k in model.uk
-            )
-            terminal_reward = -self.mpc_params.weight_fruit_biomass * model.P[horizon]  # negative because we minimize
+            stage_cost = 0.0
+
+            for k in model.uk:
+                # 1) Resource usage penalty
+                stage_cost += (
+                    self.mpc_params.weight_irrigation * model.uW[k] +
+                    self.mpc_params.weight_fertilizer * (model.uF[k])**2 # so that fertilizer sparing (and sparsing) is more encouraged
+                )
+
+                # 2) Penalize cumulative-average deviations from typical profiles
+                stage_cost += (
+                    self.mpc_params.weight_cumulative_average_water       * model.cumulative_divergence_water[k]**2 +
+                    self.mpc_params.weight_cumulative_average_fertilizer  * model.cumulative_divergence_fertilizer[k]**2 +
+                    self.mpc_params.weight_cumulative_average_temperature * model.cumulative_divergence_temperature[k]**2 +
+                    self.mpc_params.weight_cumulative_average_radiation   * model.cumulative_divergence_radiation[k]**2
+                )
+
+            # 3) Terminal reward on fruit at the end of the horizon
+            terminal_reward = -self.mpc_params.weight_fruit_biomass * model.P[horizon]
+
             return stage_cost + terminal_reward
+
         model.obj = pyo.Objective(rule=objective_rule, sense=pyo.minimize)
 
         # Solve
         solver_name = self.mpc_params.solver  # e.g. "ipopt"
         solver = pyo.SolverFactory(solver_name)
-
-        # Handle case where solver_options is None
-        solver_options = self.mpc_params.solver_options or {}
+        solver_options = self.mpc_params.solver_options or {} # handle case where solver_options is None
 
         for k, v in solver_options.items():
             solver.options[k] = v
 
-        # IMPORTANT: don't auto-load solutions
         results = solver.solve(model, tee=False, load_solutions=False)
 
         status = results.solver.status
         term   = results.solver.termination_condition
         print(f"[CFTOC] Solver status: {status}, termination: {term}")
 
-        '''
-        # Try to load partial solution if it exists
-        try:
-            model.solutions.load_from(results)
-        except Exception as e:
-            print("[CFTOC] Could not load solution:", e)
-
-        # Now inspect constraint residuals
-        print("=== Max constraint violation (by component) ===")
-        for cname, comp in model.component_map(pyo.Constraint, active=True).items():
-            max_viol = 0.0
-            worst_idx = None
-
-            for idx in comp:
-                con = comp[idx]
-                if con.body is None:
-                    continue
-                val = pyo.value(con.body)
-                if con.has_ub():
-                    ub_viol = max(0.0, val - pyo.value(con.upper))
-                else:
-                    ub_viol = 0.0
-                if con.has_lb():
-                    lb_viol = max(0.0, pyo.value(con.lower) - val)
-                else:
-                    lb_viol = 0.0
-
-                viol = max(ub_viol, lb_viol)
-                if viol > max_viol:
-                    max_viol = viol
-                    worst_idx = idx
-
-            print(f"  {cname}: max violation={max_viol} at index={worst_idx}")
-
-        # Decide if we trust the solution
+        # Decide if we trust this solution
         good_status = (
-            status == SolverStatus.ok and
-            term in (
+            status == SolverStatus.ok
+            and term in (
                 TerminationCondition.optimal,
                 TerminationCondition.locallyOptimal,
-                TerminationCondition.feasible,           # if you want to accept "good but not perfect"
-                TerminationCondition.maxIterations,      # optional: accept best iterate when max_iter hit
+                TerminationCondition.feasible,
+                TerminationCondition.maxIterations,
             )
         )
 
+        irrigation_lower_bound, irrigation_upper_bound = self.bounds.irrigation_bounds
+        fertilizer_lower_bound, fertilizer_upper_bound = self.bounds.fertilizer_bounds
+
         if not good_status:
-            # You can either:
-            #  (a) raise a *clean* error with more context, or
-            #  (b) return a fallback (e.g., zeros) so MPC keeps going.
-            raise RuntimeError(
-                f"CFTOC solve failed: status={status}, termination={term}"
-            )
-        '''
+            print("[CFTOC] WARNING: bad solver status, using fallback control plan.")
+
+            # Fallback: hold last control or use nominal guess
+            if u_prev is not None:
+                u_prev = np.asarray(u_prev).flatten()
+                uW0 = float(np.clip(u_prev[0], irrigation_lower_bound, irrigation_upper_bound))
+                uF0 = float(np.clip(u_prev[1], fertilizer_lower_bound, fertilizer_upper_bound))
+            else:
+                # Use nominal guesses
+                uW0 = float(self.bounds.irrigation_amount_guess)
+                uF0 = float(self.bounds.fertilizer_amount_guess)
+
+            irrigation_plan = np.full(horizon, uW0)
+            fertilizer_plan = np.full(horizon, uF0)
+            return irrigation_plan, fertilizer_plan
 
         # Only load solution when status is OK
-        model.solutions.load_from(results)
+        try:
+            model.solutions.load_from(results)
+        except Exception as e:
+            print("[CFTOC] ERROR loading solution despite good status, falling back:", e)
 
-        # Extract optimal control sequences
-        optimal_irrigation_inputs = np.array([pyo.value(model.uW[k]) for k in model.uk])
-        optimal_fertilizer_inputs = np.array([pyo.value(model.uF[k]) for k in model.uk])
+            if u_prev is not None:
+                u_prev = np.asarray(u_prev).flatten()
+                uW0 = float(np.clip(u_prev[0], irrigation_lower_bound, irrigation_upper_bound))
+                uF0 = float(np.clip(u_prev[1], fertilizer_lower_bound, fertilizer_upper_bound))
+            else:
+                uW0 = float(self.bounds.irrigation_amount_guess)
+                uF0 = float(self.bounds.fertilizer_amount_guess)
 
-        return optimal_irrigation_inputs, optimal_fertilizer_inputs
+            irrigation_plan = np.full(horizon, uW0)
+            fertilizer_plan = np.full(horizon, uF0)
+            return irrigation_plan, fertilizer_plan
+
+        # Extract optimal controls and clamp to bounds
+        irrigation_plan = np.array([
+            max(irrigation_lower_bound, min(pyo.value(model.uW[k]), irrigation_upper_bound))
+            for k in model.uk
+        ])
+        fertilizer_plan = np.array([
+            max(fertilizer_lower_bound, min(pyo.value(model.uF[k]), fertilizer_upper_bound))
+            for k in model.uk
+        ])
+
+        return irrigation_plan, fertilizer_plan
 
 
     def single_time_step(
@@ -745,10 +732,8 @@ class MPC:
         Args:
             x:
                 Current state vector [h, A, N, c, P] at step k.
-
             u:
                 Control vector [uW, uF] at step k.
-
             d:
                 Dict with disturbances at step k:
                     {
@@ -756,33 +741,18 @@ class MPC:
                         "temperature":   float,
                         "radiation":     float
                     }
-
             C:
                 Cumulative delayed vector [Cw, Cf, Ct, Cr] at step k.
-
             extra_state:
-                Dict containing FIR histories and nutrient-history:
-                    {
-                        "water_history":       np.ndarray,
-                        "fertilizer_history":  np.ndarray,
-                        "temperature_history": np.ndarray,
-                        "radiation_history":   np.ndarray,
-                        "step": int,
-                        "delta_cumulative_water": float,
-                        "delta_cumulative_fertilizer": float,
-                        "delta_cumulative_temperature": float,
-                        "delta_cumulative_radiation": float,
-                    }
-                On the very first call, this can be None; we’ll initialize.
+                Dict containing FIR histories and nutrient-history.
+                On the very first call, this can be None.
 
         Returns:
-            x_next:
+            x (next):
                 Next state vector [h, A, N, c, P].
-
-            C_next:
-                Next cumulative vector [Cw, Cf, Ct, Cr].
-
-            extra_state_next:
+            C (next):
+                Next cumulative vector.
+            extra_state (next):
                 Updated histories for use on the next step.
         """
 
@@ -839,7 +809,7 @@ class MPC:
         T = float(d["temperature"])
         R = float(d["radiation"])
 
-        # Initialize FIR histories and nutrient-history if needed
+        # Initialize histories if needed
         if extra_state is None:
             extra_state = {
                 "water_history":                np.zeros(fir_horizon_W),
@@ -848,26 +818,26 @@ class MPC:
                 "radiation_history":            np.zeros(fir_horizon_R),
                 "step":                         0,
                 "log": {
-                    "delayed_water":                [0.0],
-                    "delayed_fertilizer":           [0.0],
-                    "delayed_temperature":          [0.0],
-                    "delayed_radiation":            [0.0],
-                    "cumulative_water":             [0.0],
-                    "cumulative_fertilizer":        [0.0],
-                    "cumulative_temperature":       [0.0],
-                    "cumulative_radiation":         [0.0],
-                    "delta_W":                      [0.0],
-                    "delta_F":                      [0.0],
-                    "delta_T":                      [0.0],
-                    "delta_R":                      [0.0],
-                    "delta_cumulative_water":       [0.0],
-                    "delta_cumulative_fertilizer":  [0.0],
-                    "delta_cumulative_temperature": [0.0],
-                    "delta_cumulative_radiation":   [0.0],
-                    "nuW":                          [1.0],
-                    "nuF":                          [1.0],
-                    "nuT":                          [1.0],
-                    "nuR":                          [1.0],
+                    "delayed_water":                     [0.0],
+                    "delayed_fertilizer":                [0.0],
+                    "delayed_temperature":               [0.0],
+                    "delayed_radiation":                 [0.0],
+                    "cumulative_water":                  [0.0],
+                    "cumulative_fertilizer":             [0.0],
+                    "cumulative_temperature":            [0.0],
+                    "cumulative_radiation":              [0.0],
+                    "cumulative_average_water":          [0.0],
+                    "cumulative_average_fertilizer":     [0.0],
+                    "cumulative_average_temperature":    [0.0],
+                    "cumulative_average_radiation":      [0.0],
+                    "cumulative_divergence_water":       [0.0],
+                    "cumulative_divergence_fertilizer":  [0.0],
+                    "cumulative_divergence_temperature": [0.0],
+                    "cumulative_divergence_radiation":   [0.0],
+                    "nuW":                               [1.0],
+                    "nuF":                               [1.0],
+                    "nuT":                               [1.0],
+                    "nuR":                               [1.0],
                 }
             }
 
@@ -882,7 +852,7 @@ class MPC:
         temperature_history = np.roll(temperature_history, -1)
         radiation_history   = np.roll(radiation_history,   -1)
 
-        water_history[-1]       = W + S   # irrigation + precip
+        water_history[-1]       = W + S   # irrigation + precipitation
         fertilizer_history[-1]  = F
         temperature_history[-1] = T
         radiation_history[-1]   = R
@@ -918,43 +888,40 @@ class MPC:
         step = extra_state.get("step", 0) + 1
         extra_state["step"] = step
 
-        # Calculate the differences between the expected and actual cumulative values (avg. deviations)
-        eps = 1e-9
+        # Cumulative average deviations
         k_idx = step - 1  # to mirror np.arange starting at 0
+        cumulative_average_water       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
+        cumulative_average_fertilizer  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
+        cumulative_average_temperature = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
+        cumulative_average_radiation   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
 
-        delta_W = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + eps), eps)
-        delta_F = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + eps), eps)
-        delta_T = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + eps), eps)
-        delta_R = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + eps), eps)
+        extra_state["log"]["cumulative_average_water"].append(cumulative_average_water)
+        extra_state["log"]["cumulative_average_fertilizer"].append(cumulative_average_fertilizer)
+        extra_state["log"]["cumulative_average_temperature"].append(cumulative_average_temperature)
+        extra_state["log"]["cumulative_average_radiation"].append(cumulative_average_radiation)
 
-        extra_state["log"]["delta_W"].append(delta_W)
-        extra_state["log"]["delta_F"].append(delta_F)
-        extra_state["log"]["delta_T"].append(delta_T)
-        extra_state["log"]["delta_R"].append(delta_R)
+        # Previous cumulative divergences
+        prev_cumulative_divergence_water       = extra_state["log"]["cumulative_divergence_water"][-1]
+        prev_cumulative_divergence_fertilizer  = extra_state["log"]["cumulative_divergence_fertilizer"][-1]
+        prev_cumulative_divergence_temperature = extra_state["log"]["cumulative_divergence_temperature"][-1]
+        prev_cumulative_divergence_radiation   = extra_state["log"]["cumulative_divergence_radiation"][-1]
 
-        # Previous cumulative-average deltas
-        prev_delta_cumulative_water       = extra_state["log"]["delta_cumulative_water"][-1]
-        prev_delta_cumulative_fertilizer  = extra_state["log"]["delta_cumulative_fertilizer"][-1]
-        prev_delta_cumulative_temperature = extra_state["log"]["delta_cumulative_temperature"][-1]
-        prev_delta_cumulative_radiation   = extra_state["log"]["delta_cumulative_radiation"][-1]
+        # Recursive cumulative divergence update
+        cumulative_divergence_water       = (k_idx * prev_cumulative_divergence_water       + cumulative_average_water) / (k_idx + 1)
+        cumulative_divergence_fertilizer  = (k_idx * prev_cumulative_divergence_fertilizer  + cumulative_average_fertilizer) / (k_idx + 1)
+        cumulative_divergence_temperature = (k_idx * prev_cumulative_divergence_temperature + cumulative_average_temperature) / (k_idx + 1)
+        cumulative_divergence_radiation   = (k_idx * prev_cumulative_divergence_radiation   + cumulative_average_radiation) / (k_idx + 1)
 
-        # Recursive cumulative-average:
-        # delta_cum(k) = (k * delta_cum(k-1) + delta(k)) / (k+1)
-        delta_cumulative_water       = (k_idx * prev_delta_cumulative_water       + delta_W) / (k_idx + 1)
-        delta_cumulative_fertilizer  = (k_idx * prev_delta_cumulative_fertilizer  + delta_F) / (k_idx + 1)
-        delta_cumulative_temperature = (k_idx * prev_delta_cumulative_temperature + delta_T) / (k_idx + 1)
-        delta_cumulative_radiation   = (k_idx * prev_delta_cumulative_radiation   + delta_R) / (k_idx + 1)
+        extra_state["log"]["cumulative_divergence_water"].append(cumulative_divergence_water)
+        extra_state["log"]["cumulative_divergence_fertilizer"].append(cumulative_divergence_fertilizer)
+        extra_state["log"]["cumulative_divergence_temperature"].append(cumulative_divergence_temperature)
+        extra_state["log"]["cumulative_divergence_radiation"].append(cumulative_divergence_radiation)
 
-        extra_state["log"]["delta_cumulative_water"].append(delta_cumulative_water)
-        extra_state["log"]["delta_cumulative_fertilizer"].append(delta_cumulative_fertilizer)
-        extra_state["log"]["delta_cumulative_temperature"].append(delta_cumulative_temperature)
-        extra_state["log"]["delta_cumulative_radiation"].append(delta_cumulative_radiation)
-
-        # Nutrient factors: nu = clip(1 - |delta_cum|, 0, 1)
-        nuW = max(0.0, min(1.0 - abs(delta_cumulative_water), 1.0))
-        nuF = max(0.0, min(1.0 - abs(delta_cumulative_fertilizer), 1.0))
-        nuT = max(0.0, min(1.0 - abs(delta_cumulative_temperature), 1.0))
-        nuR = max(0.0, min(1.0 - abs(delta_cumulative_radiation), 1.0))
+        # Nutrient factors
+        nuW = np.exp(-self.sensitivities.alpha * cumulative_divergence_water)
+        nuF = np.exp(-self.sensitivities.alpha * cumulative_divergence_fertilizer)
+        nuT = np.exp(-self.sensitivities.alpha * cumulative_divergence_temperature)
+        nuR = np.exp(-self.sensitivities.alpha * cumulative_divergence_radiation)
 
         extra_state["log"]["nuW"].append(nuW)
         extra_state["log"]["nuF"].append(nuF)
@@ -999,4 +966,3 @@ class MPC:
         ])
 
         return x, C, extra_state
-

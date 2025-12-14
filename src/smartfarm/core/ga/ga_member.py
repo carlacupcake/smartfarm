@@ -45,7 +45,11 @@ class Member:
         self.sensitivities        = sensitivities
         self.values               = values
 
-    def get_cost(self) -> float:
+    def get_cost(
+            self,
+            irrigation: Optional[np.ndarray] = None,
+            fertilizer: Optional[np.ndarray] = None,
+            ) -> float:
         """
         Compute the objective cost for this member by simulating plant growth
         over a full season and evaluating net economic performance.
@@ -70,6 +74,7 @@ class Member:
 
         Args:
             None: all inputs are stored as member attributes.
+            TODO: Optionally override irrigation and fertilizer inputs.
 
         Returns:
             float:
@@ -126,15 +131,21 @@ class Member:
         sigma_R = self.sensitivities.sigma_R
 
         # Build control inputs and input disturbances by time step from hourly data
-        hourly_irrigation = np.zeros(simulation_hours)
-        step_if = max(1, int(np.ceil(irrigation_frequency)))
-        hourly_irrigation[::step_if] = irrigation_amount
-        irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours, mode='split')
+        if irrigation is not None:
+            irrigation = irrigation
+        else:
+            hourly_irrigation = np.zeros(simulation_hours)
+            step_if = max(1, int(np.ceil(irrigation_frequency)))
+            hourly_irrigation[::step_if] = irrigation_amount
+            irrigation = get_sim_inputs_from_hourly(hourly_irrigation, dt, simulation_hours, mode='split')
 
-        hourly_fertilizer = np.zeros(simulation_hours)
-        step_ff = max(1, int(np.ceil(fertilizer_frequency)))
-        hourly_fertilizer[::step_ff] = fertilizer_amount
-        fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours, mode='split')
+        if fertilizer is not None:
+            fertilizer = fertilizer
+        else:
+            hourly_fertilizer = np.zeros(simulation_hours)
+            step_ff = max(1, int(np.ceil(fertilizer_frequency)))
+            hourly_fertilizer[::step_ff] = fertilizer_amount
+            fertilizer = get_sim_inputs_from_hourly(hourly_fertilizer, dt, simulation_hours, mode='split')
 
         precipitation = get_sim_inputs_from_hourly(
             hourly_array     = hourly_precipitation,
@@ -183,22 +194,22 @@ class Member:
         cumulative_radiation   = np.cumsum(delayed_radiation)
 
         # Calculate the differences between the expected and actual cumulative values
-        delta_Ws = np.abs((W_typ * np.arange(total_time_steps) - cumulative_water)       / (W_typ * np.arange(1, total_time_steps + 1)))
-        delta_Fs = np.abs((F_typ * np.arange(total_time_steps) - cumulative_fertilizer)  / (F_typ * np.arange(1, total_time_steps + 1)))
-        delta_Ts = np.abs((T_typ * np.arange(total_time_steps) - cumulative_temperature) / (T_typ * np.arange(1, total_time_steps + 1)))
-        delta_Rs = np.abs((R_typ * np.arange(total_time_steps) - cumulative_radiation)   / (R_typ * np.arange(1, total_time_steps + 1)))
+        cumulative_average_water = np.abs((W_typ * np.arange(total_time_steps) - cumulative_water)       / (W_typ * np.arange(1, total_time_steps + 1)))
+        cumulative_average_fertilizer = np.abs((F_typ * np.arange(total_time_steps) - cumulative_fertilizer)  / (F_typ * np.arange(1, total_time_steps + 1)))
+        cumulative_average_temperature = np.abs((T_typ * np.arange(total_time_steps) - cumulative_temperature) / (T_typ * np.arange(1, total_time_steps + 1)))
+        cumulative_average_radiation = np.abs((R_typ * np.arange(total_time_steps) - cumulative_radiation)   / (R_typ * np.arange(1, total_time_steps + 1)))
 
         # Calculate the cumulative deltas over time
-        delta_cumulative_water       = np.cumsum(delta_Ws) / np.arange(1, total_time_steps + 1)
-        delta_cumulative_fertilizer  = np.cumsum(delta_Fs) / np.arange(1, total_time_steps + 1)
-        delta_cumulative_temperature = np.cumsum(delta_Ts) / np.arange(1, total_time_steps + 1)
-        delta_cumulative_radiation   = np.cumsum(delta_Rs) / np.arange(1, total_time_steps + 1)
+        cumulative_divergence_water       = np.cumsum(cumulative_average_water) / np.arange(1, total_time_steps + 1)
+        cumulative_divergence_fertilizer  = np.cumsum(cumulative_average_fertilizer) / np.arange(1, total_time_steps + 1)
+        cumulative_divergence_temperature = np.cumsum(cumulative_average_temperature) / np.arange(1, total_time_steps + 1)
+        cumulative_divergence_radiation   = np.cumsum(cumulative_average_radiation) / np.arange(1, total_time_steps + 1)
 
         # Then use the cumulative deltas to calculate the nutrient factors for each time step
-        nuW = np.clip(1 - np.abs(delta_cumulative_water), 0, 1)
-        nuF = np.clip(1 - np.abs(delta_cumulative_fertilizer), 0, 1)
-        nuT = np.clip(1 - np.abs(delta_cumulative_temperature), 0, 1)
-        nuR = np.clip(1 - np.abs(delta_cumulative_radiation), 0, 1)
+        nuW = np.exp(-self.sensitivities.alpha * cumulative_divergence_water)
+        nuF = np.exp(-self.sensitivities.alpha * cumulative_divergence_fertilizer)
+        nuT = np.exp(-self.sensitivities.alpha * cumulative_divergence_temperature)
+        nuR = np.exp(-self.sensitivities.alpha * cumulative_divergence_radiation)
 
         # Calculate the instantaneous adjusted growth rates and carrying capacities
         ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 2 * ah)
@@ -241,8 +252,8 @@ class Member:
 
         # Combined objective (negative because GA minimizes)
         profit = self.ga_params.weight_fruit_biomass * P[-1]
-        expenses = (self.ga_params.weight_irrigation * np.sum(hourly_irrigation)
-                    + self.ga_params.weight_fertilizer * np.sum(hourly_fertilizer))
+        expenses = (self.ga_params.weight_irrigation * np.sum(irrigation)
+                    + self.ga_params.weight_fertilizer * np.sum(fertilizer))
         revenue = profit - expenses
         cost = -revenue # GA minimizes cost, but we want to maximize revenue
 
@@ -263,10 +274,10 @@ class Member:
                 'cumulative_fertilizer':  cumulative_fertilizer.flatten(),
                 'cumulative_temperature': cumulative_temperature.flatten(),
                 'cumulative_radiation':   cumulative_radiation.flatten(),
-                'delta_cumulative_water':       delta_cumulative_water.flatten(),
-                'delta_cumulative_fertilizer':  delta_cumulative_fertilizer.flatten(),
-                'delta_cumulative_temperature': delta_cumulative_temperature.flatten(),
-                'delta_cumulative_radiation':   delta_cumulative_radiation.flatten(),
+                'cumulative_divergence_water':       cumulative_divergence_water.flatten(),
+                'cumulative_divergence_fertilizer':  cumulative_divergence_fertilizer.flatten(),
+                'cumulative_divergence_temperature': cumulative_divergence_temperature.flatten(),
+                'cumulative_divergence_radiation':   cumulative_divergence_radiation.flatten(),
                 'nuW': nuW.flatten(),
                 'nuF': nuF.flatten(),
                 'nuT': nuT.flatten(),
