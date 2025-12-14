@@ -1,8 +1,8 @@
-# lambda_member.py
+# ga_lambda_helpers.py
 import mpmath as mp
 import numpy as np
 
-#print(">>> LOADED lambda_member.py <<<")
+#print(">>> LOADED ga_lambda_helpers.py <<<")
 
 def gaussian_kernel(
         mu: float,

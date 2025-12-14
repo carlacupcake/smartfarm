@@ -28,7 +28,7 @@ class Population:
     """
 
     _LAMBDA_FUNCTION_NAME = "smartfarm-ga-eval"
-    _LAMBDA_REGION_NAME   = "us-west-1"
+    _LAMBDA_REGION_NAME   = "us-west-2"
 
     def __init__(
         self,

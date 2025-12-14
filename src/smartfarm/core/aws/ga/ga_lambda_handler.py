@@ -3,7 +3,7 @@ import json
 import numpy as np
 import os
 import time
-from lambda_member import gaussian_kernel, get_mu_from_sigma, get_cost_with_lambda, get_sim_inputs_from_hourly
+from smartfarm.core.aws.ga.ga_lambda_helpers import *
 
 PRICE_PER_GB_SECOND = 0.0000166667  # USD per GB-second (approx; region-specific)
 
