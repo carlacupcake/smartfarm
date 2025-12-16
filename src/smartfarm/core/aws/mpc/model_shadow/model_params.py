@@ -1,6 +1,8 @@
 # model_params.py
 import math
 from pydantic import BaseModel, Field, PositiveFloat, PositiveInt, model_validator
+from typing import Optional
+
 
 class ModelParams(BaseModel):
     """
@@ -15,7 +17,7 @@ class ModelParams(BaseModel):
         default=None,
         description="Total number of time steps in the simulation."
     )
-    simulation_hours: PositiveInt | None = Field(
+    simulation_hours: Optional[PositiveInt] = Field(
         default=2900,
         description="Total number of hours to simulate per model run."
     )

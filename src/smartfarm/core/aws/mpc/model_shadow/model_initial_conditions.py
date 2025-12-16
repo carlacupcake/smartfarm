@@ -1,6 +1,7 @@
 # model_initial_conditions.py
 from pydantic import BaseModel, Field, PositiveFloat
 
+
 class ModelInitialConditions(BaseModel):
     """
     Class to hold the initial conditions for the model.

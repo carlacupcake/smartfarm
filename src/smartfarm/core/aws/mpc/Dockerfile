@@ -1,0 +1,21 @@
+FROM condaforge/mambaforge:23.11.0-0
+
+# Create env with Python + Pyomo + Ipopt + friends
+RUN mamba install -y \
+        "python=3.11" \
+        "pandas" \
+        "pyomo" \
+        "ipopt" \
+        "numpy" \
+        "mpmath" \
+        "pydantic>=2,<3" \
+    && mamba clean -afy
+
+WORKDIR /app
+
+COPY io ./io
+COPY mpc_ec2_helpers.py mpc_ec2_run.py ./
+COPY mpc_shadow ./mpc_shadow
+COPY model_shadow ./model_shadow
+
+CMD ["python", "mpc_ec2_run.py"]

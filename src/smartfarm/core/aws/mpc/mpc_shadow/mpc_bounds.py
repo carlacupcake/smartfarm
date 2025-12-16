@@ -3,6 +3,7 @@ import numpy as np
 from pydantic import BaseModel, Field
 from typing import Optional, Tuple
 
+
 class ControlInputBounds(BaseModel):
     """
     TODO

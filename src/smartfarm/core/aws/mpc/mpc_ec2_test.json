@@ -1,0 +1,31 @@
+{
+  "weights": [
+    { 
+      "weight_irrigation":                     1.0,
+      "weight_fertilizer":                     1.0,
+      "weight_fruit_biomass":                  1.0,
+      "weight_cumulative_average_water":       1.0,
+      "weight_cumulative_average_fertilizer":  1.0,
+      "weight_cumulative_average_temperature": 1.0,
+      "weight_cumulative_average_radiation":   1.0
+    },
+    { 
+      "weight_irrigation":                     2.0,
+      "weight_fertilizer":                     2.0,
+      "weight_fruit_biomass":                  2.0,
+      "weight_cumulative_average_water":       2.0,
+      "weight_cumulative_average_fertilizer":  2.0,
+      "weight_cumulative_average_temperature": 2.0,
+      "weight_cumulative_average_radiation":   2.0
+    }
+  ],
+  "context": {
+      "dt": 1,
+      "total_time_steps": 12,
+      "simulation_hours": 12,
+      "closed_form":      false,
+      "precipitation":    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "temperature":      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "radiation":        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  }
+}

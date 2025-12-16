@@ -16,17 +16,17 @@ On the function page:
 2. At the top right of the "Code source" box, click "Upload from".
 3. Select ".zip file".
 4. Locally, from the directory `src/smartfarm/core/aws/`, zip the latest versions of
-   - `lambda_handler.py`
-   - `lambda_member.py`
+   - `ga_lambda_handler.py`
+   - `ga_lambda_helpers.py`
 5. Click "Deploy".
 6. In the "Runtime settings" section, make sure:
-   - Handler = `lambda_handler.lambda_handler`
+   - Handler = `ga_lambda_handler.lambda_handler`
 7. In the "Layers" section, click "Add a layer".
-   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-1`...it may be different in other regions).
+   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-2`...it may be different in other regions).
    - Click "Add".
 8. (Optional) Now, go to Lambda itself (not the specific Lambda function we are creating).
    - Go to "Layers" and click "Create layer".
-   - Name the layer `mpmath-layer` and upload the zip `core/aws/mpmath-layer/mpmath-layer.zip`.
+   - Name the layer `mpmath-layer` and upload the zip `core/python/mpmath-layer.zip`.
    - For compatible runtimes, explicitly select Python 3.10.
    - Click "Create".
 9. (Optional) Navigate back to the Lambda function `smartfarm-ga-eval`.
@@ -44,3 +44,31 @@ On the function page:
 3. Paste in the content from `src/smartfarm/core/aws/lambda_test.json`.
 4. Click "Test".
 5. You should see `{"statusCode": 200, "body": "{\"costs\": [1.0, 1.0]}"}` or similar.
+
+## Creating a Linux compatible layer
+1. Go to AWS CloudShell.
+2. Run `mkdir python`.
+3. Run `pip3 install --target python "mpmath"`. Or, replace `"mpmath"` with whatever library you need.
+4. Run `zip -r mpmath.zip python`.
+5. Download the zip file to `core/python`.
+
+## Running MPC weight sweep on EC2
+1. Go to `EC2 > Instances` and launch an Amazon Linux c3.4 large instance. Use the smartfarm-key and allow `ssh` traffic.
+2. From the directory `core/aws`, run `scp -i smartfarm-key.pem -r mpc <public-dns>:~/`.
+3. Then run `ssh -i "smartfarm-key.pem" ec2-user@<public-dns>`.
+4. In the EC2 instance, run the following series of commands:
+```
+sudo dnf update -y
+sudo dnf install -y docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+exit
+```
+5. Then run `ssh -i "smartfarm-key.pem" ec2-user@<public-dns>`, optionally followed by `docker run hello-world`.
+6. If docker gives a positive message, then run 
+```
+cd mpc
+docker build -t smartfarm-mpc .
+docker run --rm smartfarm-mpc
+```
+8. It may take >30 minutes to run.

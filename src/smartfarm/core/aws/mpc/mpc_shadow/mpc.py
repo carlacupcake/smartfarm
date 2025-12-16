@@ -4,14 +4,14 @@ import pyomo.environ as pyo
 from pyomo.opt import SolverStatus, TerminationCondition
 from typing import Optional, Dict, Tuple
 
-from ..model.model_helpers import *
-from ..model.model_carrying_capacities import ModelCarryingCapacities
-from ..model.model_disturbances import ModelDisturbances
-from ..model.model_growth_rates import ModelGrowthRates
-from ..model.model_initial_conditions import ModelInitialConditions
-from ..model.model_params import ModelParams
-from ..model.model_typical_disturbances import ModelTypicalDisturbances
-from ..model.model_sensitivities import ModelSensitivities
+from model_shadow.model_helpers import *
+from model_shadow.model_carrying_capacities import ModelCarryingCapacities
+from model_shadow.model_disturbances import ModelDisturbances
+from model_shadow.model_growth_rates import ModelGrowthRates
+from model_shadow.model_initial_conditions import ModelInitialConditions
+from model_shadow.model_params import ModelParams
+from model_shadow.model_typical_disturbances import ModelTypicalDisturbances
+from model_shadow.model_sensitivities import ModelSensitivities
 
 from .mpc_params import MPCParams
 from .mpc_bounds import ControlInputBounds
@@ -297,8 +297,6 @@ class MPC:
         # Unpack model parameters
         dt      = self.model_params.dt
         horizon = int(self.mpc_params.hourly_horizon * (1 / dt))  # convert hours to time steps
-        model.alpha   = pyo.Param(initialize=self.sensitivities.alpha, mutable=False)
-        model.epsilon = pyo.Param(initialize=self.model_params.epsilon, mutable=False)
 
         # Unpack growth rates
         ah = self.growth_rates.ah
@@ -322,9 +320,16 @@ class MPC:
 
         # Build Pyomo model
         model    = pyo.ConcreteModel()
-        model.xk = pyo.RangeSet(0, horizon)     # states   indexed 0..N
-        model.uk = pyo.RangeSet(0, horizon - 1) # controls indexed 0..N-1
-        model.kk = pyo.RangeSet(0, horizon - 1) # kernel indices
+        model.xk = pyo.RangeSet(0, horizon)                # states   indexed 0..N
+        model.uk = pyo.RangeSet(0, horizon - 1)            # controls indexed 0..N-1
+        model.wk = pyo.RangeSet(0, self.fir_horizon_W - 1) # kernel indices
+        model.fk = pyo.RangeSet(0, self.fir_horizon_F - 1)
+        model.tk = pyo.RangeSet(0, self.fir_horizon_T - 1)
+        model.rk = pyo.RangeSet(0, self.fir_horizon_R - 1)
+
+        # Other model parameters
+        model.alpha   = pyo.Param(initialize=self.sensitivities.alpha, mutable=False)
+        model.epsilon = pyo.Param(initialize=self.mpc_params.epsilon, mutable=False)
 
         # Disturbance forecasts as parameters
         model.precipitation = pyo.Param(model.uk, initialize=lambda model, k: float(forecast["precipitation"][k]), mutable=False)
@@ -332,10 +337,10 @@ class MPC:
         model.radiation     = pyo.Param(model.uk, initialize=lambda model, k: float(forecast["radiation"][k]),     mutable=False)
 
         # Kernels as parameters
-        model.kernel_W = pyo.Param(model.kk, initialize=lambda model, j: float(self.kernel_W[j]), mutable=False)
-        model.kernel_F = pyo.Param(model.kk, initialize=lambda model, j: float(self.kernel_F[j]), mutable=False)
-        model.kernel_T = pyo.Param(model.kk, initialize=lambda model, j: float(self.kernel_T[j]), mutable=False)
-        model.kernel_R = pyo.Param(model.kk, initialize=lambda model, j: float(self.kernel_R[j]), mutable=False)
+        model.kernel_W = pyo.Param(model.wk, initialize=lambda model, j: float(self.kernel_W[j]), mutable=False)
+        model.kernel_F = pyo.Param(model.fk, initialize=lambda model, j: float(self.kernel_F[j]), mutable=False)
+        model.kernel_T = pyo.Param(model.tk, initialize=lambda model, j: float(self.kernel_T[j]), mutable=False)
+        model.kernel_R = pyo.Param(model.rk, initialize=lambda model, j: float(self.kernel_R[j]), mutable=False)
 
         # Decision variables: control inputs
         model.uW = pyo.Var(model.uk, bounds=self.bounds.irrigation_bounds)
@@ -406,28 +411,28 @@ class MPC:
         def delayed_water_rule(model, k):
             return model.delayed_water[k] == sum(
                 model.kernel_W[j] * (model.uW[k - j] + model.precipitation[k - j])
-                for j in model.kk if k - j >= 0
+                for j in model.wk if k - j >= 0
             )
         model.delayed_water_constraint = pyo.Constraint(model.uk, rule=delayed_water_rule)
 
         def delayed_fertilizer_rule(model, k):
             return model.delayed_fertilizer[k] == sum(
                 model.kernel_F[j] * model.uF[k - j]
-                for j in model.kk if k - j >= 0
+                for j in model.fk if k - j >= 0
             )
         model.delayed_fertilizer_constraint = pyo.Constraint(model.uk, rule=delayed_fertilizer_rule)
 
         def delayed_temperature_rule(model, k):
             return model.delayed_temperature[k] == sum(
                 model.kernel_T[j] * model.temperature[k - j]
-                for j in model.kk if k - j >= 0
+                for j in model.tk if k - j >= 0
             )
         model.delayed_temperature_constraint = pyo.Constraint(model.uk, rule=delayed_temperature_rule)
 
         def delayed_radiation_rule(model, k):
             return model.delayed_radiation[k] == sum(
                 model.kernel_R[j] * model.radiation[k - j]
-                for j in model.kk if k - j >= 0
+                for j in model.rk if k - j >= 0
             )
         model.delayed_radiation_constraint = pyo.Constraint(model.uk, rule=delayed_radiation_rule)
 
@@ -520,19 +525,19 @@ class MPC:
 
         # Nutrient factor updates
         def nuW_rule(model, k):
-            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_water[k])
+            return pyo.exp(- model.alpha * model.cumulative_divergence_water[k])
         model.nuW = pyo.Expression(model.uk, rule=nuW_rule)
 
         def nuF_rule(model, k):
-            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_fertilizer[k])
+            return pyo.exp(- model.alpha * model.cumulative_divergence_fertilizer[k])
         model.nuF = pyo.Expression(model.uk, rule=nuF_rule)
         
         def nuT_rule(model, k):
-            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_temperature[k])
+            return pyo.exp(- model.alpha * model.cumulative_divergence_temperature[k])
         model.nuT = pyo.Expression(model.uk, rule=nuT_rule)
         
         def nuR_rule(model, k):
-            return pyo.exp(- model.sensitivity_alpha * model.cumulative_divergence_radiation[k])
+            return pyo.exp(- model.alpha * model.cumulative_divergence_radiation[k])
         model.nuR = pyo.Expression(model.uk, rule=nuR_rule)
 
         # Plant dynamics (Forward Euler logistic-like update)
@@ -890,10 +895,10 @@ class MPC:
 
         # Cumulative average deviations
         k_idx = step - 1  # to mirror np.arange starting at 0
-        cumulative_average_water       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
-        cumulative_average_fertilizer  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
-        cumulative_average_temperature = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
-        cumulative_average_radiation   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + self.model_params.epsilon), self.model_params.epsilon)
+        cumulative_average_water       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
+        cumulative_average_fertilizer  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
+        cumulative_average_temperature = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
+        cumulative_average_radiation   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
 
         extra_state["log"]["cumulative_average_water"].append(cumulative_average_water)
         extra_state["log"]["cumulative_average_fertilizer"].append(cumulative_average_fertilizer)
