@@ -11,6 +11,12 @@ class ModelSensitivities(BaseModel):
         description="Parameter for nutrient factor sensitivity to deviations of \
             cumulative divergence from expected watering/fertilization/temp/radiation."
     )
+    beta: PositiveFloat = Field(
+        default=1.0,
+        description="Exponential moving average beta parameter for cumulative \
+            divergence calculation used in nutrient factor estimation. \
+            beta close to 1 => long memory; beta smaller => faster forgetting."
+    )
     sigma_W: PositiveFloat = Field(
         default=30,
         description="Sensitivity of water uptake. Standard deviation of a Gaussian;" \

@@ -1,0 +1,41 @@
+# Dockerfile.lambda
+FROM condaforge/miniforge3:latest
+
+ARG FUNCTION_DIR="/function"
+RUN mkdir -p ${FUNCTION_DIR}
+WORKDIR ${FUNCTION_DIR}
+
+# Make sure conda's bin is first
+ENV PATH=/opt/conda/bin:$PATH
+
+# Install dependencies + Ipopt via mamba/conda-forge
+RUN mamba install -y \
+        "python=3.11" \
+        "boto3" \
+        "numpy" \
+        "pandas" \
+        "pyomo" \
+        "ipopt" \
+        "mpmath" \
+        "pydantic>=2,<3" \
+    && mamba clean -afy
+
+# Install the Lambda runtime interface client *into the same env*
+RUN /opt/conda/bin/pip install --no-cache-dir awslambdaric
+
+# Don't oversubscribe BLAS/OMP
+ENV OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1
+
+# Copy code over
+COPY ./lambda/mpc_lambda_handler.py mpc_helpers.py ./
+COPY ./mpc_shadow ./mpc_shadow
+COPY ./model_shadow ./model_shadow
+
+# ENTRYPOINT: Lambda runtime interface client
+ENTRYPOINT ["/opt/conda/bin/python", "-m", "awslambdaric"]
+
+# CMD: module.function for your handler
+CMD ["mpc_lambda_handler.lambda_handler"]

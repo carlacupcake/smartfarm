@@ -24,6 +24,6 @@ class ModelGrowthRates(BaseModel):
         description="Growth rate of number flower spikelets (1/hr)."
     )
     aP: PositiveFloat = Field(
-        default=0.005,
+        default=0.01,
         description="Growth rate of fruit biomass (1/hr)."
     )

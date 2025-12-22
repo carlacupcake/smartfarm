@@ -170,58 +170,150 @@ class Member:
         c = np.full(total_time_steps, c0)
         P = np.full(total_time_steps, P0)
 
+        # ------------------------------------------------------------
+        # Match MPC/single_time_step physics:
+        # - FIR histories updated step-by-step (NOT full convolution)
+        # - Histories initialized to typical steady-state values
+        # - Anomaly computed on delayed signals (local)
+        # - Divergence updated via EMA (no 1/k)
+        # ------------------------------------------------------------
+
         # Pre-calculate the mu values that correspond to 95% absorption for each sigma ("sensitivity")
         mu_W = get_mu_from_sigma(sigma_W/dt)
         mu_F = get_mu_from_sigma(sigma_F/dt)
         mu_T = get_mu_from_sigma(sigma_T/dt)
         mu_R = get_mu_from_sigma(sigma_R/dt)
 
+        # Build Gaussian FIR kernels (truncate to final horizon)
+        kernel_W = gaussian_kernel(mu_W, sigma_W / dt, total_time_steps)
+        kernel_F = gaussian_kernel(mu_F, sigma_F / dt, total_time_steps)
+        kernel_T = gaussian_kernel(mu_T, sigma_T / dt, total_time_steps)
+        kernel_R = gaussian_kernel(mu_R, sigma_R / dt, total_time_steps)
+
+        '''
         # Convolve input disturbances with Gaussian kernels to model delayed absorption/metalysis
         kernel_W = gaussian_kernel(mu_W, sigma_W/dt, total_time_steps)
         kernel_F = gaussian_kernel(mu_F, sigma_F/dt, total_time_steps)
         kernel_T = gaussian_kernel(mu_T, sigma_T/dt, total_time_steps)
         kernel_R = gaussian_kernel(mu_R, sigma_R/dt, total_time_steps)
+        '''
 
-        delayed_water       = np.convolve(irrigation + precipitation, kernel_W, mode="full")[:total_time_steps]
-        delayed_fertilizer  = np.convolve(fertilizer,  kernel_F, mode="full")[:total_time_steps]
-        delayed_temperature = np.convolve(temperature, kernel_T, mode="full")[:total_time_steps]
-        delayed_radiation   = np.convolve(radiation,   kernel_R, mode="full")[:total_time_steps]
+        # Initialize FIR histories to typical steady-state values (removes startup transient)
+        water_history       = np.ones(total_time_steps, dtype=float) * W_typ
+        fertilizer_history  = np.ones(total_time_steps, dtype=float) * F_typ
+        temperature_history = np.ones(total_time_steps, dtype=float) * T_typ
+        radiation_history   = np.ones(total_time_steps, dtype=float) * R_typ
 
-        # Calculate the cumulative values over time from the delayed values
-        cumulative_water       = np.cumsum(delayed_water)
-        cumulative_fertilizer  = np.cumsum(delayed_fertilizer)
-        cumulative_temperature = np.cumsum(delayed_temperature)
-        cumulative_radiation   = np.cumsum(delayed_radiation)
+        # Storage for delayed and cumulative signals (so verbose CSV stays useful)
+        delayed_water       = np.zeros(total_time_steps, dtype=float)
+        delayed_fertilizer  = np.zeros(total_time_steps, dtype=float)
+        delayed_temperature = np.zeros(total_time_steps, dtype=float)
+        delayed_radiation   = np.zeros(total_time_steps, dtype=float)
 
-        # Calculate the differences between the expected and actual cumulative values
-        cumulative_average_water = np.abs((W_typ * np.arange(total_time_steps) - cumulative_water)       / (W_typ * np.arange(1, total_time_steps + 1)))
-        cumulative_average_fertilizer = np.abs((F_typ * np.arange(total_time_steps) - cumulative_fertilizer)  / (F_typ * np.arange(1, total_time_steps + 1)))
-        cumulative_average_temperature = np.abs((T_typ * np.arange(total_time_steps) - cumulative_temperature) / (T_typ * np.arange(1, total_time_steps + 1)))
-        cumulative_average_radiation = np.abs((R_typ * np.arange(total_time_steps) - cumulative_radiation)   / (R_typ * np.arange(1, total_time_steps + 1)))
+        cumulative_water       = np.zeros(total_time_steps, dtype=float)
+        cumulative_fertilizer  = np.zeros(total_time_steps, dtype=float)
+        cumulative_temperature = np.zeros(total_time_steps, dtype=float)
+        cumulative_radiation   = np.zeros(total_time_steps, dtype=float)
 
-        # Calculate the cumulative deltas over time
-        cumulative_divergence_water       = np.cumsum(cumulative_average_water) / np.arange(1, total_time_steps + 1)
-        cumulative_divergence_fertilizer  = np.cumsum(cumulative_average_fertilizer) / np.arange(1, total_time_steps + 1)
-        cumulative_divergence_temperature = np.cumsum(cumulative_average_temperature) / np.arange(1, total_time_steps + 1)
-        cumulative_divergence_radiation   = np.cumsum(cumulative_average_radiation) / np.arange(1, total_time_steps + 1)
+        # Start cumulative values at 0
+        cumulative_water_prev = 0.0
+        cumulative_fertilizer_prev = 0.0
+        cumulative_temperature_prev = 0.0
+        cumulative_radiation_prev = 0.0
 
-        # Then use the cumulative deltas to calculate the nutrient factors for each time step
-        nuW = np.exp(-self.sensitivities.alpha * cumulative_divergence_water)
-        nuF = np.exp(-self.sensitivities.alpha * cumulative_divergence_fertilizer)
-        nuT = np.exp(-self.sensitivities.alpha * cumulative_divergence_temperature)
-        nuR = np.exp(-self.sensitivities.alpha * cumulative_divergence_radiation)
+        # EMA divergence states
+        cumulative_divergence_water_prev = 0.0
+        cumulative_divergence_fertilizer_prev = 0.0
+        cumulative_divergence_temperature_prev = 0.0
+        cumulative_divergence_radiation_prev = 0.0
 
-        # Calculate the instantaneous adjusted growth rates and carrying capacities
+        # EMA beta
+        beta = self.sensitivities.beta
+
+        # Storage for anomalies/divergences and nutrient factors
+        water_anomaly       = np.zeros(total_time_steps, dtype=float)
+        fertilizer_anomaly  = np.zeros(total_time_steps, dtype=float)
+        temperature_anomaly = np.zeros(total_time_steps, dtype=float)
+        radiation_anomaly   = np.zeros(total_time_steps, dtype=float)
+
+        cumulative_divergence_water       = np.zeros(total_time_steps, dtype=float)
+        cumulative_divergence_fertilizer  = np.zeros(total_time_steps, dtype=float)
+        cumulative_divergence_temperature = np.zeros(total_time_steps, dtype=float)
+        cumulative_divergence_radiation   = np.zeros(total_time_steps, dtype=float)
+
+        nuW = np.zeros(total_time_steps, dtype=float)
+        nuF = np.zeros(total_time_steps, dtype=float)
+        nuT = np.zeros(total_time_steps, dtype=float)
+        nuR = np.zeros(total_time_steps, dtype=float)
+
+        alpha = float(self.sensitivities.alpha)
+        eps = 1e-9  # local numeric safety; keep separate from MPC eps if you want
+
+        for t in range(total_time_steps):
+            # Update FIR histories (shift left, append new sample)
+            water_history       = np.roll(water_history,       -1)
+            fertilizer_history  = np.roll(fertilizer_history,  -1)
+            temperature_history = np.roll(temperature_history, -1)
+            radiation_history   = np.roll(radiation_history,   -1)
+
+            # Match single_time_step convention:
+            # water input into FIR is irrigation + precipitation (already combined)
+            water_history[-1]       = float(irrigation[t] + precipitation[t])
+            fertilizer_history[-1]  = float(fertilizer[t])
+            temperature_history[-1] = float(temperature[t])
+            radiation_history[-1]   = float(radiation[t])
+
+            # Compute delayed signals via FIR dot-product (like MPC)
+            delayed_water[t]       = float(np.dot(kernel_W, water_history))
+            delayed_fertilizer[t]  = float(np.dot(kernel_F, fertilizer_history))
+            delayed_temperature[t] = float(np.dot(kernel_T, temperature_history))
+            delayed_radiation[t]   = float(np.dot(kernel_R, radiation_history))
+
+            # Update cumulative delayed values (for logging / interpretability)
+            cumulative_water_prev       += delayed_water[t]
+            cumulative_fertilizer_prev  += delayed_fertilizer[t]
+            cumulative_temperature_prev += delayed_temperature[t]
+            cumulative_radiation_prev   += delayed_radiation[t]
+
+            cumulative_water[t]       = cumulative_water_prev
+            cumulative_fertilizer[t]  = cumulative_fertilizer_prev
+            cumulative_temperature[t] = cumulative_temperature_prev
+            cumulative_radiation[t]   = cumulative_radiation_prev
+
+            # Local anomaly on delayed signals (this is what you put into CFTOC)
+            water_anomaly[t]       = np.sqrt(((delayed_water[t]       - W_typ) / (W_typ + eps))**2 + eps)
+            fertilizer_anomaly[t]  = np.sqrt(((delayed_fertilizer[t]  - F_typ) / (F_typ + eps))**2 + eps)
+            temperature_anomaly[t] = np.sqrt(((delayed_temperature[t] - T_typ) / (abs(T_typ) + eps))**2 + eps)
+            radiation_anomaly[t]   = np.sqrt(((delayed_radiation[t]   - R_typ) / (R_typ + eps))**2 + eps)
+
+            # EMA divergence update (same structure as CFTOC)
+            cumulative_divergence_water_prev       = beta * cumulative_divergence_water_prev       + (1.0 - beta) * water_anomaly[t]
+            cumulative_divergence_fertilizer_prev  = beta * cumulative_divergence_fertilizer_prev  + (1.0 - beta) * fertilizer_anomaly[t]
+            cumulative_divergence_temperature_prev = beta * cumulative_divergence_temperature_prev + (1.0 - beta) * temperature_anomaly[t]
+            cumulative_divergence_radiation_prev   = beta * cumulative_divergence_radiation_prev   + (1.0 - beta) * radiation_anomaly[t]
+
+            cumulative_divergence_water[t]       = cumulative_divergence_water_prev
+            cumulative_divergence_fertilizer[t]  = cumulative_divergence_fertilizer_prev
+            cumulative_divergence_temperature[t] = cumulative_divergence_temperature_prev
+            cumulative_divergence_radiation[t]   = cumulative_divergence_radiation_prev
+
+            # Nutrient factors (match your current MPC choice; if you're using bounded version there, mirror it here)
+            nuW[t] = np.exp(-alpha * cumulative_divergence_water[t])
+            nuF[t] = np.exp(-alpha * cumulative_divergence_fertilizer[t])
+            nuT[t] = np.exp(-alpha * cumulative_divergence_temperature[t])
+            nuR[t] = np.exp(-alpha * cumulative_divergence_radiation[t])
+
+        # Now compute adjusted growth rates / carrying capacities per step (same as before)
         ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 2 * ah)
         aA_hat = np.clip(aA * (nuF * nuT * nuR)**(1/3), 0, 2 * aA)
         aN_hat = np.clip(aN, 0, 2 * aN) * np.ones(total_time_steps)
-        ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 2 * ac)
+        ac_hat = np.clip(ac * ((1/np.maximum(nuT, eps)) * (1/np.maximum(nuR, eps)))**(1/2), 0, 2 * ac)
         aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 2 * aP)
 
         kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 2 * kh)
         kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 2 * kA)
         kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 2 * kN) * np.ones(total_time_steps)
-        kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 2 * kc)
+        kc_hat = np.clip(kc * (nuW * (1/np.maximum(nuT, eps)) * (1/np.maximum(nuR, eps)))**(1/3), 0, 2 * kc)
         kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 2 * kP)
 
         # Run the season simulation for the given member
@@ -274,6 +366,10 @@ class Member:
                 'cumulative_fertilizer':  cumulative_fertilizer.flatten(),
                 'cumulative_temperature': cumulative_temperature.flatten(),
                 'cumulative_radiation':   cumulative_radiation.flatten(),
+                'water_anomaly':       water_anomaly.flatten(),
+                'fertilizer_anomaly':  fertilizer_anomaly.flatten(),
+                'temperature_anomaly': temperature_anomaly.flatten(),
+                'radiation_anomaly':   radiation_anomaly.flatten(),
                 'cumulative_divergence_water':       cumulative_divergence_water.flatten(),
                 'cumulative_divergence_fertilizer':  cumulative_divergence_fertilizer.flatten(),
                 'cumulative_divergence_temperature': cumulative_divergence_temperature.flatten(),

@@ -45,6 +45,8 @@ On the function page:
 4. Click "Test".
 5. You should see `{"statusCode": 200, "body": "{\"costs\": [1.0, 1.0]}"}` or similar.
 
+# For running MPC
+
 ## Creating a Linux compatible layer
 1. Go to AWS CloudShell.
 2. Run `mkdir python`.
@@ -72,3 +74,33 @@ docker build -t smartfarm-mpc .
 docker run --rm smartfarm-mpc
 ```
 8. It may take >30 minutes to run.
+
+## Building the Ipopt layer for Lambda
+1. docker build -f Dockerfile.lambda -t smartfarm-mpc-lambda .
+2. Sanity check: `docker run --rm -it --entrypoint bash smartfarm-mpc-lambda -lc "which ipopt && ipopt -v | head"` should yield `/opt/conda/bin/ipopt` and a version banner.
+3. Sanity check that `awslambdaric` is installed: `docker run --rm -it --entrypoint bash smartfarm-mpc-lambda -lc "python -c 'import awslambdaric; print(\"ok\")'"`.
+4. Create an ECR repo: 
+```aws ecr create-repository \
+  --repository-name smartfarm-mpc-lambda \
+  --region us-west-1
+```
+5. Use the "repositoryUri" in the next step.
+6. Login Docker to ECR: `aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 870678672224.dkr.ecr.us-west-1.amazonaws.com/`
+7. Tag and push to ECR:
+```
+docker tag smartfarm-mpc-lambda:latest \
+  870678672224.dkr.ecr.us-west-1.amazonaws.com/smartfarm-mpc-lambda
+
+docker push 870678672224.dkr.ecr.us-west-1.amazonaws.com/smartfarm-mpc-lambda:latest
+```
+10. docker buildx build \
+  --platform linux/amd64 \
+  --tag 870678672224.dkr.ecr.us-west-1.amazonaws.com/smartfarm-mpc-lambda:latest \
+  --provenance=false \
+  --sbom=false \
+  --file Dockerfile.lambda \
+  --push \
+  .
+11. Go Lambda and create a function from container, using the container we just created. Make sure to increase the timeout time.
+
+

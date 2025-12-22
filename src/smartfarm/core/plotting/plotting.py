@@ -281,8 +281,9 @@ def plot_applied_vs_absorbed(
     time = np.arange(len(delayed_water))
 
     # Delayed Water
-    axs[0].plot(irrigation + precipitation, label='applied')
-    axs[0].plot(time, delayed_water, label='absorbed')
+    axs[0].plot(precipitation, label='precipitation')
+    axs[0].plot(time, delayed_water, label='water absorbed')
+    axs[0].plot(irrigation, label='irrigation applied')
     axs[0].set_xlabel('Time (steps)')
     axs[0].set_ylabel('Water (in)')
     axs[0].set_title('Applied and Absorbed Water vs. Time')

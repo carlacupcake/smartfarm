@@ -1,0 +1,21 @@
+{
+  "run_id": "test-run-feasible",
+  "idx": 0,
+  "weights_dict": {
+      "weight_irrigation":                     0.1,
+      "weight_fertilizer":                     0.0001,
+      "weight_fruit_biomass":                  4450,
+      "weight_cumulative_average_water":       1.0,
+      "weight_cumulative_average_fertilizer":  1.0,
+      "weight_cumulative_average_temperature": 1.0,
+      "weight_cumulative_average_radiation":   1.0
+  },
+  "context": {
+      "dt": 1,
+      "total_time_steps": 12,
+      "simulation_hours": 12,
+      "closed_form":      false,
+      "data_bucket":      "smartfarm-data",
+      "data_key":         "hourly_prcp_rad_temp_iowa.csv"
+  }
+}
