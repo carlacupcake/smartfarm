@@ -256,7 +256,7 @@ class MPC:
         dt      = 24.0
         alpha   = self.sensitivities.alpha
         beta    = self.sensitivities.beta
-        eps     = self.mpc_params.epsilon
+        eps     = self.sensitivities.epsilon
 
         # Unpack growth rates
         ah = self.growth_rates.ah
@@ -561,24 +561,74 @@ class MPC:
             )
         model.cumulative_divergence_radiation_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_radiation_rule)
 
-        # Nutrient factors as Expressions
-        def nuW_rule(model, k):
+        # ----------------------------
+        # EMA-smoothed nutrient factors
+        # ----------------------------
+        # Choose EMA gain in (0, 1]. Larger = less smoothing. (e.g., 0.2–0.4 is common)
+        ema_beta = 0.30
+
+        # Smooth "max" helper to enforce k_hat >= state without non-differentiable max()
+        # smoothmax(a,b) ≈ max(a,b), with small delta controlling sharpness.
+        smoothmax_delta = 1e-8
+        def smoothmax(a, b, delta=smoothmax_delta):
+            return 0.5 * (a + b + pyo.sqrt((a - b) * (a - b) + delta))
+
+        # --- Raw nutrient factor Expressions ---
+        def nuW_raw_rule(model, k):
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_water[k])
-        model.nuW = pyo.Expression(model.uk, rule=nuW_rule)
+        model.nuW_raw = pyo.Expression(model.uk, rule=nuW_raw_rule)
 
-        def nuF_rule(model, k):
+        def nuF_raw_rule(model, k):
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_fertilizer[k])
-        model.nuF = pyo.Expression(model.uk, rule=nuF_rule)
+        model.nuF_raw = pyo.Expression(model.uk, rule=nuF_raw_rule)
 
-        def nuT_rule(model, k):
+        def nuT_raw_rule(model, k):
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_temperature[k])
-        model.nuT = pyo.Expression(model.uk, rule=nuT_rule)
+        model.nuT_raw = pyo.Expression(model.uk, rule=nuT_raw_rule)
 
-        def nuR_rule(model, k):
+        def nuR_raw_rule(model, k):
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_radiation[k])
-        model.nuR = pyo.Expression(model.uk, rule=nuR_rule)
-        
+        model.nuR_raw = pyo.Expression(model.uk, rule=nuR_raw_rule)
+
+        # --- Smoothed nutrient factors as Vars + EMA constraints ---
+        # (Vars are easiest because EMA is recursive in time.)
+        model.nuW = pyo.Var(model.uk, bounds=(0.0, 1.0))
+        model.nuF = pyo.Var(model.uk, bounds=(0.0, 1.0))
+        model.nuT = pyo.Var(model.uk, bounds=(0.0, 1.0))
+        model.nuR = pyo.Var(model.uk, bounds=(0.0, 1.0))
+
+        # Anchor EMA at the first control index
+        uk0 = min(model.uk)
+
+        def nuW_ema_rule(model, k):
+            if k == uk0:
+                return model.nuW[k] == model.nuW_raw[k]
+            return model.nuW[k] == (1.0 - ema_beta) * model.nuW[k-1] + ema_beta * model.nuW_raw[k]
+        model.nuW_ema = pyo.Constraint(model.uk, rule=nuW_ema_rule)
+
+        def nuF_ema_rule(model, k):
+            if k == uk0:
+                return model.nuF[k] == model.nuF_raw[k]
+            return model.nuF[k] == (1.0 - ema_beta) * model.nuF[k-1] + ema_beta * model.nuF_raw[k]
+        model.nuF_ema = pyo.Constraint(model.uk, rule=nuF_ema_rule)
+
+        def nuT_ema_rule(model, k):
+            if k == uk0:
+                return model.nuT[k] == model.nuT_raw[k]
+            return model.nuT[k] == (1.0 - ema_beta) * model.nuT[k-1] + ema_beta * model.nuT_raw[k]
+        model.nuT_ema = pyo.Constraint(model.uk, rule=nuT_ema_rule)
+
+        def nuR_ema_rule(model, k):
+            if k == uk0:
+                return model.nuR[k] == model.nuR_raw[k]
+            return model.nuR[k] == (1.0 - ema_beta) * model.nuR[k-1] + ema_beta * model.nuR_raw[k]
+        model.nuR_ema = pyo.Constraint(model.uk, rule=nuR_ema_rule)
+
+
+        # ---------------------------------------------------------
         # Daily plant dynamics via closed-form logistic step over dt
+        # with carrying capacities lower-bounded by current state
+        # ---------------------------------------------------------
         def plant_height_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
@@ -588,54 +638,66 @@ class MPC:
             ah_hat = ah * nu_h
             kh_hat = kh * nu_h
 
-            h_next = kh_hat / (1.0 + (kh_hat - model.h[k]) / (model.h[k] + eps) * pyo.exp(-ah_hat * dt))
+            # Enforce kh_hat >= current h[k] (smoothly)
+            kh_eff = smoothmax(kh_hat, model.h[k])
 
+            h_next = kh_eff / (1.0 + (kh_eff - model.h[k]) / (model.h[k] + eps) * pyo.exp(-ah_hat * dt))
             return model.h[k+1] == h_next
 
         model.plant_height = pyo.Constraint(model.xk, rule=plant_height_dynamics_rule)
+
 
         def leaf_area_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_aA = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)** (1.0 / 3.0)
-            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)** (1.0 / 4.0)
+            nu_aA = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0 / 3.0)
+            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0 / 4.0)
 
             aA_hat = aA * nu_aA
             kA_hat = kA * nu_kA
 
-            A_next = kA_hat / (1.0 + (kA_hat - model.A[k]) / (model.A[k] + eps) * pyo.exp(-aA_hat * dt))
+            # Enforce kA_hat >= current A[k]
+            kA_eff = smoothmax(kA_hat, model.A[k])
 
+            A_next = kA_eff / (1.0 + (kA_eff - model.A[k]) / (model.A[k] + eps) * pyo.exp(-aA_hat * dt))
             return model.A[k+1] == A_next
 
         model.leaf_area = pyo.Constraint(model.xk, rule=leaf_area_dynamics_rule)
+
 
         def number_leaves_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            ratio = (kN - model.N[k]) / (model.N[k] + eps)
-            N_next = kN / (1.0 + ratio * pyo.exp(-aN * dt))
+            # Enforce kN >= current N[k] (kN is constant, but we "floor" it forward)
+            kN_eff = smoothmax(kN, model.N[k])
 
+            ratio = (kN_eff - model.N[k]) / (model.N[k] + eps)
+            N_next = kN_eff / (1.0 + ratio * pyo.exp(-aN * dt))
             return model.N[k+1] == N_next
 
         model.leaves = pyo.Constraint(model.xk, rule=number_leaves_dynamics_rule)
+
 
         def number_spikelets_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
             nu_ac = (1.0 / model.nuT[k] * 1.0 / model.nuR[k] + eps)**(1.0/2.0)
-            nu_kc = (model.nuW[k] * 1.0 / model.nuT[k] * 1.0 / model.nuR[k] + eps)** (1.0 / 3.0)
+            nu_kc = (model.nuW[k] * 1.0 / model.nuT[k] * 1.0 / model.nuR[k] + eps)**(1.0 / 3.0)
 
             ac_hat = ac * nu_ac
             kc_hat = kc * nu_kc
 
-            c_next = kc_hat / (1.0 + (kc_hat - model.c[k]) / (model.c[k] + eps) * pyo.exp(-ac_hat * dt))
+            # Enforce kc_hat >= current c[k]
+            kc_eff = smoothmax(kc_hat, model.c[k])
 
+            c_next = kc_eff / (1.0 + (kc_eff - model.c[k]) / (model.c[k] + eps) * pyo.exp(-ac_hat * dt))
             return model.c[k+1] == c_next
 
         model.spikelets = pyo.Constraint(model.xk, rule=number_spikelets_dynamics_rule)
+
 
         def fruit_biomass_dynamics_rule(model, k):
             if k == horizon:
@@ -646,19 +708,26 @@ class MPC:
 
             nu_kh = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0/3.0)
             kh_hat = kh * nu_kh
+            kh_eff = smoothmax(kh_hat, model.h[k])  # keep consistent with height constraint
 
-            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] * (kh_hat / kh) + eps)**(1.0/5.0)
+            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] * (kh_eff / kh) + eps)**(1.0/5.0)
             kA_hat = kA * nu_kA
+            kA_eff = smoothmax(kA_hat, model.A[k])
 
             nu_kc = (model.nuW[k] * (1.0 / model.nuT[k]) * (1.0 / model.nuR[k]) + eps)**(1.0/3.0)
             kc_hat = kc * nu_kc
+            kc_eff = smoothmax(kc_hat, model.c[k])
 
-            nu_kP = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k]
-                        * (kh_hat / kh) * (kA_hat / kA) * (kc_hat / kc) + eps)**(1.0/7.0)
+            nu_kP = (
+                model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k]
+                * (kh_eff / kh) * (kA_eff / kA) * (kc_eff / kc) + eps
+            )**(1.0/7.0)
             kP_hat = kP * nu_kP
 
-            P_next = kP_hat / (1.0 + (kP_hat - model.P[k]) / (model.P[k] + eps) * pyo.exp(-aP_hat * dt))
+            # Enforce kP_hat >= current P[k]
+            kP_eff = smoothmax(kP_hat, model.P[k])
 
+            P_next = kP_eff / (1.0 + (kP_eff - model.P[k]) / (model.P[k] + eps) * pyo.exp(-aP_hat * dt))
             return model.P[k+1] == P_next
 
         fruit_biomass = pyo.Constraint(model.xk, rule=fruit_biomass_dynamics_rule)
@@ -707,7 +776,9 @@ class MPC:
                 w_track_run = self.mpc_params.weight_fruit_target * (frac**2)  # small early, bigger late
                 tracking_cost += w_track_run * (model.P[k] - model.P_target[k])**2
 
-            terminal_reward = - self.mpc_params.weight_fruit_biomass * model.P[horizon] / kP
+            terminal_reward = -self.mpc_params.weight_fruit_biomass * model.P[horizon] / kP
+            terminal_reward -= self.mpc_params.weight_height * model.h[horizon] / kh
+            terminal_reward -= self.mpc_params.weight_leaf_area * model.A[horizon] / k
             terminal_tracking = self.mpc_params.weight_terminal_fruit_target * (model.P[horizon] - model.P_target[horizon])**2
 
             # Project fruit to season end using last-step parameters
@@ -862,6 +933,9 @@ class MPC:
 
         # Unpack model parameters
         dt = self.model_params.dt
+        alpha = self.sensitivities.alpha
+        beta  = self.sensitivities.beta
+        eps   = self.sensitivities.epsilon
 
         # Unpack typical disturbances
         W_typ = self.typical_disturbances.typical_water
@@ -994,10 +1068,10 @@ class MPC:
 
         # Cumulative average deviations
         k_idx = step - 1  # to mirror np.arange starting at 0
-        water_anomaly       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
-        fertilizer_anomaly  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
-        temperature_anomaly = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
-        radiation_anomaly   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + self.mpc_params.epsilon), self.mpc_params.epsilon)
+        water_anomaly       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + eps), eps)
+        fertilizer_anomaly  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + eps), eps)
+        temperature_anomaly = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + eps), eps)
+        radiation_anomaly   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + eps), eps)
 
         extra_state["log"]["water_anomaly"].append(water_anomaly)
         extra_state["log"]["fertilizer_anomaly"].append(fertilizer_anomaly)
@@ -1022,11 +1096,23 @@ class MPC:
         extra_state["log"]["cumulative_divergence_temperature"].append(cumulative_divergence_temperature)
         extra_state["log"]["cumulative_divergence_radiation"].append(cumulative_divergence_radiation)
 
-        # Nutrient factors
-        nuW = np.exp(-self.sensitivities.alpha * cumulative_divergence_water)
-        nuF = np.exp(-self.sensitivities.alpha * cumulative_divergence_fertilizer)
-        nuT = np.exp(-self.sensitivities.alpha * cumulative_divergence_temperature)
-        nuR = np.exp(-self.sensitivities.alpha * cumulative_divergence_radiation)
+        # Raw nutrient factors
+        nuW_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_water)
+        nuF_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_fertilizer)
+        nuT_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_temperature)
+        nuR_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_radiation)
+
+        # Previous EMA nutrient factors
+        prev_nuW = extra_state["log"]["nuW"][-1]
+        prev_nuF = extra_state["log"]["nuF"][-1]
+        prev_nuT = extra_state["log"]["nuT"][-1]
+        prev_nuR = extra_state["log"]["nuR"][-1]
+
+        # Final nutrient factors (drop-in replacements)
+        nuW = (1.0 - beta) * prev_nuW + beta * nuW_raw
+        nuF = (1.0 - beta) * prev_nuF + beta * nuF_raw
+        nuT = (1.0 - beta) * prev_nuT + beta * nuT_raw
+        nuR = (1.0 - beta) * prev_nuR + beta * nuR_raw
 
         extra_state["log"]["nuW"].append(nuW)
         extra_state["log"]["nuF"].append(nuF)
@@ -1040,11 +1126,11 @@ class MPC:
         ac_hat = np.clip(ac * ( (1/nuT) * (1/nuR) )**(1/2), 0, 2 * ac)
         aP_hat = np.clip(aP * (nuT * nuR)**(1/2), 0, 2 * aP)
 
-        kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), 0, 2 * kh)
-        kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), 0, 2 * kA)
-        kN_hat = np.clip(kN * (nuT * nuR)**(1/2), 0, 2 * kN)
-        kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), 0, 2 * kc)
-        kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), 0, 2 * kP)
+        kh_hat = np.clip(kh * (nuF * nuT * nuR)**(1/3), h, 2 * kh)
+        kA_hat = np.clip(kA * (nuW * nuF * nuT * nuR * (kh_hat/kh))**(1/5), A, 2 * kA)
+        kN_hat = np.clip(kN * (nuT * nuR)**(1/2), N, 2 * kN)
+        kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), c, 2 * kc)
+        kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), P, 2 * kP)
 
         # Forward Euler integration, to match the CFTOC model
         h_next = h + dt * (ah_hat * h * (1.0 - h / max(kh_hat, 1e-9)))
