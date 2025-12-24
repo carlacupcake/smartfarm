@@ -86,7 +86,3 @@ class MPCParams(BaseModel):
         default=1,
         description="Time between MPC control updates (in days)."
     )
-    epsilon: PositiveFloat = Field(
-        default=1e-6,
-        description="Small positive number to ensure numerical stability."
-    )

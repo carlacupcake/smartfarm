@@ -37,6 +37,16 @@ class GeneticAlgorithmParams(BaseModel):
         description="Economic penalty per unit of fertilizer applied (in $/lb-acre); \
             used to convert fertilizer usage into a cost term in the GA objective."
     )
+    weight_height: Annotated[float, Field(strict=True, ge=0)] = Field(
+        default=35.0, # $/m = $40/ton * 3.5 ton/acre * 1 acre/3 m avg = $35/m
+        description="Economic reward per unit of plant height achieved \
+            (in $ per m-plant basis); drives the GA to maximize plant height."
+    )
+    weight_leaf_area: Annotated[float, Field(strict=True, ge=0)] = Field(
+        default=215.0, # $/m2 = $40/ton * 3.5 ton/acre * 1 acre/0.65 m2 avg = $215/m2
+        description="Economic reward per unit of leaf area achieved \
+            (in $ per m2-plant basis); drives the GA to maximize leaf area."
+    )
     weight_fruit_biomass: Annotated[float, Field(strict=True, ge=0)] = Field(
         default=4450, # $4/bushel, 1 bushel is ~25.5 kg so $0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
         description="Economic reward per unit of fruit biomass produced \

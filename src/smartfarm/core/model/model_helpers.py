@@ -6,6 +6,65 @@ from core.model.model_growth_rates import ModelGrowthRates
 from core.model.model_carrying_capacities import ModelCarryingCapacities
 
 
+def compute_fir_horizon(
+    kernel:         np.ndarray,
+    mass_threshold: float = 0.95
+    ) -> int:
+    """
+    Return the smallest L such that the first L taps of `kernel`
+    contain at least `mass_threshold` of the total kernel mass.
+
+    TODO
+    """
+    k = np.asarray(kernel, dtype=float)
+    total = np.sum(k)
+    if abs(total) < 1e-12:
+        # Degenerate kernel; just fall back to full length
+        return len(k)
+    cum = np.cumsum(k) / total
+    idx = np.where(cum >= mass_threshold)[0]
+    if idx.size == 0:
+        return len(k)
+    return int(idx[0] + 1)  # +1 because length = index+1
+
+
+def ema_scan(x, beta, y_prev0):
+    """
+    Compute an exponential moving average (EMA) of a 1D signal using an
+    explicit forward scan. Implements the first-order recursive filter
+
+        y[t] = beta * y[t-1] + (1 - beta) * x[t]
+
+    with an externally provided initial condition `y_prev0 = y[-1]`.
+    It is mathematically equivalent to an IIR low-pass filter and is
+    useful when exact step-by-step state propagation is required (e.g.,
+    for matching MPC / CFTOC dynamics or logging internal model state).
+
+    Args:
+        x (np.ndarray)
+            One-dimensional input signal to be smoothed.
+
+        beta (float)
+            Exponential decay factor in (0, 1). Larger values place more weight
+            on past history (slower response); smaller values emphasize recent
+            samples.
+
+        y_prev0 (float)
+            Initial EMA state corresponding to the value at time step t = -1.
+
+    Returns:
+        y (np.ndarray)
+            EMA filtered signal.
+    """
+    y = np.empty_like(x, dtype=float)
+    y_prev = float(y_prev0)
+    one_minus = 1.0 - beta
+    for t in range(x.shape[0]):
+        y_prev = beta * y_prev + one_minus * x[t]
+        y[t] = y_prev
+    return y
+
+
 def gaussian_kernel(
         mu: float,
         sigma_steps: float,
@@ -61,28 +120,6 @@ def get_mu_from_sigma(
     f = lambda mu: mp.erf(mu/(np.sqrt(2) * sigma)) - 0.95
     mu = float(mp.findroot(f, mu_guess))
     return mu
-
-
-def compute_fir_horizon(
-    kernel:         np.ndarray,
-    mass_threshold: float = 0.95
-    ) -> int:
-    """
-    Return the smallest L such that the first L taps of `kernel`
-    contain at least `mass_threshold` of the total kernel mass.
-
-    TODO
-    """
-    k = np.asarray(kernel, dtype=float)
-    total = np.sum(k)
-    if abs(total) < 1e-12:
-        # Degenerate kernel; just fall back to full length
-        return len(k)
-    cum = np.cumsum(k) / total
-    idx = np.where(cum >= mass_threshold)[0]
-    if idx.size == 0:
-        return len(k)
-    return int(idx[0] + 1)  # +1 because length = index+1
         
 
 def get_sim_inputs_from_hourly(

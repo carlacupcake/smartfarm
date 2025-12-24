@@ -12,10 +12,14 @@ class ModelSensitivities(BaseModel):
             cumulative divergence from expected watering/fertilization/temp/radiation."
     )
     beta: PositiveFloat = Field(
-        default=1.0,
+        default=0.95,
         description="Exponential moving average beta parameter for cumulative \
             divergence calculation used in nutrient factor estimation. \
             beta close to 1 => long memory; beta smaller => faster forgetting."
+    )
+    epsilon: PositiveFloat = Field(
+        default=1e-6,
+        description="Small positive number to ensure numerical stability."
     )
     sigma_W: PositiveFloat = Field(
         default=30,
