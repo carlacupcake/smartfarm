@@ -11,10 +11,16 @@ class ModelSensitivities(BaseModel):
         description="Parameter for nutrient factor sensitivity to deviations of \
             cumulative divergence from expected watering/fertilization/temp/radiation."
     )
-    beta: PositiveFloat = Field(
+    beta_divergence: PositiveFloat = Field(
         default=0.95,
         description="Exponential moving average beta parameter for cumulative \
             divergence calculation used in nutrient factor estimation. \
+            beta close to 1 => long memory; beta smaller => faster forgetting."
+    )
+    beta_nutrient_factor: PositiveFloat = Field(
+        default=0.95,
+        description="Exponential moving average beta parameter for nutrient \
+            factor calculation used in nutrient factor estimation. \
             beta close to 1 => long memory; beta smaller => faster forgetting."
     )
     epsilon: PositiveFloat = Field(

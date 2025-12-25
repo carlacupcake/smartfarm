@@ -54,7 +54,7 @@ class MPC:
         self.mpc_params           = mpc_params
         self.bounds               = bounds
 
-        # Precompute Gaussian kernels from existing sensitivities TODO FIR instead??
+        # Precompute FIR kernels from existing sensitivities
         dt = self.model_params.dt
 
         sigma_W = self.sensitivities.sigma_W
@@ -254,9 +254,12 @@ class MPC:
         # Unpack time parameters and other model constants
         horizon = self.mpc_params.daily_horizon
         dt      = 24.0
-        alpha   = self.sensitivities.alpha
-        beta    = self.sensitivities.beta
-        eps     = self.sensitivities.epsilon
+
+        # Unpack sensitivities
+        alpha                = self.sensitivities.alpha
+        beta_divergence      = self.sensitivities.beta_divergence
+        beta_nutrient_factor = self.sensitivities.beta_nutrient_factor
+        epsilon              = self.sensitivities.epsilon
 
         # Unpack growth rates
         ah = self.growth_rates.ah
@@ -355,27 +358,27 @@ class MPC:
             
             # Initialize h values
             model.h[k+1].value = float(pyo.value(
-                kh / (1.0 + ((kh - model.h[k]) / (model.h[k] + eps)) * pyo.exp(-ah * dt))
+                kh / (1.0 + ((kh - model.h[k]) / (model.h[k] + epsilon)) * pyo.exp(-ah * dt))
             ))
 
             # Initialize A values
             model.A[k+1].value = float(pyo.value(
-                kA / (1.0 + ((kA - model.A[k]) / (model.A[k] + eps)) * pyo.exp(-aA * dt))
+                kA / (1.0 + ((kA - model.A[k]) / (model.A[k] + epsilon)) * pyo.exp(-aA * dt))
             ))
 
             # Initialize N values
             model.N[k+1].value = float(pyo.value(
-                kN / (1.0 + ((kN - model.N[k])/(model.N[k] + eps)) * pyo.exp(-aN * dt))
+                kN / (1.0 + ((kN - model.N[k])/(model.N[k] + epsilon)) * pyo.exp(-aN * dt))
             ))
 
             # Initialize c values
             model.c[k+1].value = float(pyo.value(
-                kc / (1.0 + ((kc - model.c[k]) / (model.c[k] + eps)) * pyo.exp(-ac * dt))
+                kc / (1.0 + ((kc - model.c[k]) / (model.c[k] + epsilon)) * pyo.exp(-ac * dt))
             ))
 
             # Initialize P values
             model.P[k+1].value = float(pyo.value(
-                kP / (1.0 + ((kP - model.P[k]) / (model.P[k] + eps)) * pyo.exp(-aP * dt))
+                kP / (1.0 + ((kP - model.P[k]) / (model.P[k] + epsilon)) * pyo.exp(-aP * dt))
             ))
 
         # Forward initialize cumulative values across horizon
@@ -479,49 +482,41 @@ class MPC:
             return model.cumulative_radiation[k + 1] == model.cumulative_radiation[k] + model.delayed_radiation[k]
         model.cumulative_radiation_update = pyo.Constraint(model.uk, rule=cumulative_radiation_update_rule)
 
-        # ------------------------------------------------------------
-        # NEW: Anomaly-based "error magnitude" as Expressions (no Vars)
-        #
-        # Instead of comparing giant cumulative sums to giant typical lines,
-        # we measure instantaneous *delayed-signal anomaly* relative to typical,
-        # normalized by typical magnitude.
-        #
-        # This removes the "big numbers early" effect and makes the metric local.
-        # ------------------------------------------------------------
+        # Anomaly expressions for tracking divergence from typical
         def water_anomaly_rule(model, k):
             anomaly = model.delayed_water[k] - W_typ
-            denom = W_typ + eps
-            return pyo.sqrt((anomaly / denom) ** 2 + eps)
+            denom = W_typ + epsilon
+            return pyo.sqrt((anomaly / denom) ** 2 + epsilon)
         model.water_anomaly = pyo.Expression(model.uk, rule=water_anomaly_rule)
 
         def fertilizer_anomaly_rule(model, k):
             anomaly = model.delayed_fertilizer[k] - F_typ
-            denom = F_typ + eps
-            return pyo.sqrt((anomaly / denom) ** 2 + eps)
+            denom = F_typ + epsilon
+            return pyo.sqrt((anomaly / denom) ** 2 + epsilon)
         model.fertilizer_anomaly = pyo.Expression(model.uk, rule=fertilizer_anomaly_rule)
 
         def temperature_anomaly_rule(model, k):
             anomaly = model.delayed_temperature[k] - T_typ
-            denom = abs(T_typ) + eps
-            return pyo.sqrt((anomaly / denom) ** 2 + eps)
+            denom = abs(T_typ) + epsilon
+            return pyo.sqrt((anomaly / denom) ** 2 + epsilon)
         model.temperature_anomaly = pyo.Expression(model.uk, rule=temperature_anomaly_rule)
 
         def radiation_anomaly_rule(model, k):
             anomaly = model.delayed_radiation[k] - R_typ
-            denom = R_typ + eps
-            return pyo.sqrt((anomaly / denom) ** 2 + eps)
+            denom = R_typ + epsilon
+            return pyo.sqrt((anomaly / denom) ** 2 + epsilon)
         model.radiation_anomaly = pyo.Expression(model.uk, rule=radiation_anomaly_rule)
 
         # Forward initialize divergence Vars to satisfy their recursion constraints
-        def ema_divergence(divergence, anomaly):
+        def smooth_with_ema_pyomo(divergence, anomaly):
             divergence[0].value = 0.0
             for k in range(1, horizon):
-                divergence[k].value = beta * float(divergence[k - 1].value) + (1.0 - beta) * float(pyo.value(anomaly[k]))
+                divergence[k].value = beta_divergence * float(divergence[k - 1].value) + (1.0 - beta_divergence) * float(pyo.value(anomaly[k]))
 
-        ema_divergence(model.cumulative_divergence_water,       model.water_anomaly)
-        ema_divergence(model.cumulative_divergence_fertilizer,  model.fertilizer_anomaly)
-        ema_divergence(model.cumulative_divergence_temperature, model.temperature_anomaly)
-        ema_divergence(model.cumulative_divergence_radiation,   model.radiation_anomaly)
+        smooth_with_ema_pyomo(model.cumulative_divergence_water,       model.water_anomaly)
+        smooth_with_ema_pyomo(model.cumulative_divergence_fertilizer,  model.fertilizer_anomaly)
+        smooth_with_ema_pyomo(model.cumulative_divergence_temperature, model.temperature_anomaly)
+        smooth_with_ema_pyomo(model.cumulative_divergence_radiation,   model.radiation_anomaly)
 
         # EMA smoothing for forgetting divergences from typical
         def cumulative_divergence_water_rule(model, k):
@@ -529,8 +524,8 @@ class MPC:
                 # NEW: start divergences at typical steady-state (0.0)
                 return model.cumulative_divergence_water[0] == 0.0
             return model.cumulative_divergence_water[k] == (
-                beta * model.cumulative_divergence_water[k - 1]
-                + (1.0 - beta) * model.water_anomaly[k]
+                beta_divergence * model.cumulative_divergence_water[k - 1]
+                + (1.0 - beta_divergence) * model.water_anomaly[k]
             )
         model.cumulative_divergence_water_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_water_rule)
 
@@ -538,8 +533,8 @@ class MPC:
             if k == 0:
                 return model.cumulative_divergence_fertilizer[0] == 0.0
             return model.cumulative_divergence_fertilizer[k] == (
-                beta * model.cumulative_divergence_fertilizer[k - 1]
-                + (1.0 - beta) * model.fertilizer_anomaly[k]
+                beta_divergence * model.cumulative_divergence_fertilizer[k - 1]
+                + (1.0 - beta_divergence) * model.fertilizer_anomaly[k]
             )
         model.cumulative_divergence_fertilizer_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_fertilizer_rule)
 
@@ -547,8 +542,8 @@ class MPC:
             if k == 0:
                 return model.cumulative_divergence_temperature[0] == 0.0
             return model.cumulative_divergence_temperature[k] == (
-                beta * model.cumulative_divergence_temperature[k - 1]
-                + (1.0 - beta) * model.temperature_anomaly[k]
+                beta_divergence * model.cumulative_divergence_temperature[k - 1]
+                + (1.0 - beta_divergence) * model.temperature_anomaly[k]
             )
         model.cumulative_divergence_temperature_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_temperature_rule)
 
@@ -556,24 +551,16 @@ class MPC:
             if k == 0:
                 return model.cumulative_divergence_radiation[0] == 0.0
             return model.cumulative_divergence_radiation[k] == (
-                beta * model.cumulative_divergence_radiation[k - 1]
-                + (1.0 - beta) * model.radiation_anomaly[k]
+                beta_divergence * model.cumulative_divergence_radiation[k - 1]
+                + (1.0 - beta_divergence) * model.radiation_anomaly[k]
             )
         model.cumulative_divergence_radiation_constraint = pyo.Constraint(model.uk, rule=cumulative_divergence_radiation_rule)
 
-        # ----------------------------
-        # EMA-smoothed nutrient factors
-        # ----------------------------
-        # Choose EMA gain in (0, 1]. Larger = less smoothing. (e.g., 0.2–0.4 is common)
-        ema_beta = 0.30
-
-        # Smooth "max" helper to enforce k_hat >= state without non-differentiable max()
-        # smoothmax(a,b) ≈ max(a,b), with small delta controlling sharpness.
-        smoothmax_delta = 1e-8
-        def smoothmax(a, b, delta=smoothmax_delta):
+        # Helper to enforce k_hat >= state without non-differentiable max()
+        def smoothmax_pyomo(a, b, delta=1e-8):
             return 0.5 * (a + b + pyo.sqrt((a - b) * (a - b) + delta))
 
-        # --- Raw nutrient factor Expressions ---
+        # Raw nutrient factor Expressions
         def nuW_raw_rule(model, k):
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_water[k])
         model.nuW_raw = pyo.Expression(model.uk, rule=nuW_raw_rule)
@@ -590,8 +577,8 @@ class MPC:
             return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_radiation[k])
         model.nuR_raw = pyo.Expression(model.uk, rule=nuR_raw_rule)
 
-        # --- Smoothed nutrient factors as Vars + EMA constraints ---
-        # (Vars are easiest because EMA is recursive in time.)
+        # Smoothed nutrient factors
+        # Vars are easiest because EMA is recursive in time.
         model.nuW = pyo.Var(model.uk, bounds=(0.0, 1.0))
         model.nuF = pyo.Var(model.uk, bounds=(0.0, 1.0))
         model.nuT = pyo.Var(model.uk, bounds=(0.0, 1.0))
@@ -603,153 +590,131 @@ class MPC:
         def nuW_ema_rule(model, k):
             if k == uk0:
                 return model.nuW[k] == model.nuW_raw[k]
-            return model.nuW[k] == (1.0 - ema_beta) * model.nuW[k-1] + ema_beta * model.nuW_raw[k]
+            return model.nuW[k] == (1.0 - beta_nutrient_factor) * model.nuW[k-1] + beta_nutrient_factor * model.nuW_raw[k]
         model.nuW_ema = pyo.Constraint(model.uk, rule=nuW_ema_rule)
 
         def nuF_ema_rule(model, k):
             if k == uk0:
                 return model.nuF[k] == model.nuF_raw[k]
-            return model.nuF[k] == (1.0 - ema_beta) * model.nuF[k-1] + ema_beta * model.nuF_raw[k]
+            return model.nuF[k] == (1.0 - beta_nutrient_factor) * model.nuF[k-1] + beta_nutrient_factor * model.nuF_raw[k]
         model.nuF_ema = pyo.Constraint(model.uk, rule=nuF_ema_rule)
 
         def nuT_ema_rule(model, k):
             if k == uk0:
                 return model.nuT[k] == model.nuT_raw[k]
-            return model.nuT[k] == (1.0 - ema_beta) * model.nuT[k-1] + ema_beta * model.nuT_raw[k]
+            return model.nuT[k] == (1.0 - beta_nutrient_factor) * model.nuT[k-1] + beta_nutrient_factor * model.nuT_raw[k]
         model.nuT_ema = pyo.Constraint(model.uk, rule=nuT_ema_rule)
 
         def nuR_ema_rule(model, k):
             if k == uk0:
                 return model.nuR[k] == model.nuR_raw[k]
-            return model.nuR[k] == (1.0 - ema_beta) * model.nuR[k-1] + ema_beta * model.nuR_raw[k]
+            return model.nuR[k] == (1.0 - beta_nutrient_factor) * model.nuR[k-1] + beta_nutrient_factor * model.nuR_raw[k]
         model.nuR_ema = pyo.Constraint(model.uk, rule=nuR_ema_rule)
 
-
-        # ---------------------------------------------------------
+        # State variable dynamics as constraints
         # Daily plant dynamics via closed-form logistic step over dt
-        # with carrying capacities lower-bounded by current state
-        # ---------------------------------------------------------
         def plant_height_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_h = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0/3.0)
+            nu_h = (model.nuF[k] * model.nuT[k] * model.nuR[k] + epsilon)**(1.0/3.0)
 
             ah_hat = ah * nu_h
             kh_hat = kh * nu_h
 
             # Enforce kh_hat >= current h[k] (smoothly)
-            kh_eff = smoothmax(kh_hat, model.h[k])
+            kh_eff = smoothmax_pyomo(kh_hat, model.h[k])
 
-            h_next = kh_eff / (1.0 + (kh_eff - model.h[k]) / (model.h[k] + eps) * pyo.exp(-ah_hat * dt))
+            h_next = kh_eff / (1.0 + (kh_eff - model.h[k]) / (model.h[k] + epsilon) * pyo.exp(-ah_hat * dt))
             return model.h[k+1] == h_next
 
-        model.plant_height = pyo.Constraint(model.xk, rule=plant_height_dynamics_rule)
-
+        model.plant_height_dynamics_constraint = pyo.Constraint(model.xk, rule=plant_height_dynamics_rule)
 
         def leaf_area_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_aA = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0 / 3.0)
-            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0 / 4.0)
+            nu_aA = (model.nuF[k] * model.nuT[k] * model.nuR[k] + epsilon)**(1.0 / 3.0)
+            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] + epsilon)**(1.0 / 4.0)
 
             aA_hat = aA * nu_aA
             kA_hat = kA * nu_kA
 
             # Enforce kA_hat >= current A[k]
-            kA_eff = smoothmax(kA_hat, model.A[k])
+            kA_eff = smoothmax_pyomo(kA_hat, model.A[k])
 
-            A_next = kA_eff / (1.0 + (kA_eff - model.A[k]) / (model.A[k] + eps) * pyo.exp(-aA_hat * dt))
+            A_next = kA_eff / (1.0 + (kA_eff - model.A[k]) / (model.A[k] + epsilon) * pyo.exp(-aA_hat * dt))
             return model.A[k+1] == A_next
 
-        model.leaf_area = pyo.Constraint(model.xk, rule=leaf_area_dynamics_rule)
-
+        model.leaf_area_dynamics_constraint = pyo.Constraint(model.xk, rule=leaf_area_dynamics_rule)
 
         def number_leaves_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
             # Enforce kN >= current N[k] (kN is constant, but we "floor" it forward)
-            kN_eff = smoothmax(kN, model.N[k])
+            kN_eff = smoothmax_pyomo(kN, model.N[k])
 
-            ratio = (kN_eff - model.N[k]) / (model.N[k] + eps)
+            ratio = (kN_eff - model.N[k]) / (model.N[k] + epsilon)
             N_next = kN_eff / (1.0 + ratio * pyo.exp(-aN * dt))
             return model.N[k+1] == N_next
 
-        model.leaves = pyo.Constraint(model.xk, rule=number_leaves_dynamics_rule)
-
+        model.number_leaves_dynamics_constraint = pyo.Constraint(model.xk, rule=number_leaves_dynamics_rule)
 
         def number_spikelets_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_ac = (1.0 / model.nuT[k] * 1.0 / model.nuR[k] + eps)**(1.0/2.0)
-            nu_kc = (model.nuW[k] * 1.0 / model.nuT[k] * 1.0 / model.nuR[k] + eps)**(1.0 / 3.0)
+            nu_ac = (1.0 / model.nuT[k] * 1.0 / model.nuR[k] + epsilon)**(1.0/2.0)
+            nu_kc = (model.nuW[k] * 1.0 / model.nuT[k] * 1.0 / model.nuR[k] + epsilon)**(1.0 / 3.0)
 
             ac_hat = ac * nu_ac
             kc_hat = kc * nu_kc
 
             # Enforce kc_hat >= current c[k]
-            kc_eff = smoothmax(kc_hat, model.c[k])
+            kc_eff = smoothmax_pyomo(kc_hat, model.c[k])
 
-            c_next = kc_eff / (1.0 + (kc_eff - model.c[k]) / (model.c[k] + eps) * pyo.exp(-ac_hat * dt))
+            c_next = kc_eff / (1.0 + (kc_eff - model.c[k]) / (model.c[k] + epsilon) * pyo.exp(-ac_hat * dt))
             return model.c[k+1] == c_next
 
-        model.spikelets = pyo.Constraint(model.xk, rule=number_spikelets_dynamics_rule)
-
+        model.number_spikelets_dynamics_constraint = pyo.Constraint(model.xk, rule=number_spikelets_dynamics_rule)
 
         def fruit_biomass_dynamics_rule(model, k):
             if k == horizon:
                 return pyo.Constraint.Skip
 
-            nu_aP = (model.nuT[k] * model.nuR[k] + eps)**(1.0/2.0)
+            nu_aP = (model.nuT[k] * model.nuR[k] + epsilon)**(1.0/2.0)
             aP_hat = aP * nu_aP
 
-            nu_kh = (model.nuF[k] * model.nuT[k] * model.nuR[k] + eps)**(1.0/3.0)
+            nu_kh = (model.nuF[k] * model.nuT[k] * model.nuR[k] + epsilon)**(1.0/3.0)
             kh_hat = kh * nu_kh
-            kh_eff = smoothmax(kh_hat, model.h[k])  # keep consistent with height constraint
+            kh_eff = smoothmax_pyomo(kh_hat, model.h[k])  # keep consistent with height constraint
 
-            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] * (kh_eff / kh) + eps)**(1.0/5.0)
+            nu_kA = (model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k] * (kh_eff / kh) + epsilon)**(1.0/5.0)
             kA_hat = kA * nu_kA
-            kA_eff = smoothmax(kA_hat, model.A[k])
+            kA_eff = smoothmax_pyomo(kA_hat, model.A[k])
 
-            nu_kc = (model.nuW[k] * (1.0 / model.nuT[k]) * (1.0 / model.nuR[k]) + eps)**(1.0/3.0)
+            nu_kc = (model.nuW[k] * (1.0 / model.nuT[k]) * (1.0 / model.nuR[k]) + epsilon)**(1.0/3.0)
             kc_hat = kc * nu_kc
-            kc_eff = smoothmax(kc_hat, model.c[k])
+            kc_eff = smoothmax_pyomo(kc_hat, model.c[k])
 
             nu_kP = (
                 model.nuW[k] * model.nuF[k] * model.nuT[k] * model.nuR[k]
-                * (kh_eff / kh) * (kA_eff / kA) * (kc_eff / kc) + eps
+                * (kh_eff / kh) * (kA_eff / kA) * (kc_eff / kc) + epsilon
             )**(1.0/7.0)
             kP_hat = kP * nu_kP
 
             # Enforce kP_hat >= current P[k]
-            kP_eff = smoothmax(kP_hat, model.P[k])
+            kP_eff = smoothmax_pyomo(kP_hat, model.P[k])
 
-            P_next = kP_eff / (1.0 + (kP_eff - model.P[k]) / (model.P[k] + eps) * pyo.exp(-aP_hat * dt))
+            P_next = kP_eff / (1.0 + (kP_eff - model.P[k]) / (model.P[k] + epsilon) * pyo.exp(-aP_hat * dt))
             return model.P[k+1] == P_next
 
-        fruit_biomass = pyo.Constraint(model.xk, rule=fruit_biomass_dynamics_rule)
-
-        # Logistic target trajectory for fruit biomass over the daily horizon
-        P_target_vals = [float(x0[4])]
-        for _ in range(horizon):
-            P_prev = P_target_vals[-1]
-            ratio = (kP - P_prev) / (P_prev + 1e-9)
-            P_next = kP / (1.0 + ratio * np.exp(-aP * dt))
-            P_target_vals.append(P_next)
-        model.P_target = pyo.Param(
-            model.xk,
-            initialize=lambda m, d: float(P_target_vals[d]),
-            mutable=False,
-        )
+        model.fruit_biomass_dynamics_constraint = pyo.Constraint(model.xk, rule=fruit_biomass_dynamics_rule)
 
         # Objective: daily resource usage + running fruit reward + terminal fruit
         def objective_rule(model):
             stage_cost     = 0.0
-            running_reward = 0.0
-            tracking_cost  = 0.0
 
             for k in model.uk:
                 # Resource costs (per-day)
@@ -763,54 +728,11 @@ class MPC:
                     self.mpc_params.weight_fertilizer_anomaly * model.cumulative_divergence_fertilizer[k]**2
                 )
 
-                #if k > 0:
-                #    stage_cost += 1e-4 * ((model.uW[k]-model.uW[k-1])**2 + (model.uF[k]-model.uF[k-1])**2)
-
-                # Running reward on height, leaf area, and fruit biomass
-                running_reward += - self.mpc_params.weight_running_height    * model.h[k] / kh
-                running_reward += - self.mpc_params.weight_running_leaf_area * model.A[k] / kA
-                running_reward += - self.mpc_params.weight_fruit_biomass     * model.P[k] / kP
-
-                # Tracking cost to target trajectory
-                frac = k / float(horizon - 1) if horizon > 1 else 1.0
-                w_track_run = self.mpc_params.weight_fruit_target * (frac**2)  # small early, bigger late
-                tracking_cost += w_track_run * (model.P[k] - model.P_target[k])**2
-
             terminal_reward = -self.mpc_params.weight_fruit_biomass * model.P[horizon] / kP
             terminal_reward -= self.mpc_params.weight_height * model.h[horizon] / kh
             terminal_reward -= self.mpc_params.weight_leaf_area * model.A[horizon] / k
-            terminal_tracking = self.mpc_params.weight_terminal_fruit_target * (model.P[horizon] - model.P_target[horizon])**2
 
-            # Project fruit to season end using last-step parameters
-            remaining_days = max(
-                0.0,
-                (self.model_params.simulation_hours / dt) - horizon
-            )
-            if remaining_days > 0:
-                nu_kh_last = (model.nuF[horizon-1] * model.nuT[horizon-1] * model.nuR[horizon-1] + eps)**(1.0/3.0)
-                kh_hat_last = kh * nu_kh_last
-
-                nu_kA_last = (model.nuW[horizon-1] * model.nuF[horizon-1] * model.nuT[horizon-1] * model.nuR[horizon-1] + eps)**(1.0/4.0)
-                kA_hat_last = kA * nu_kA_last
-
-                nu_kc_last = (model.nuW[horizon-1] * (1.0/(model.nuT[horizon-1]+eps)) * (1.0/(model.nuR[horizon-1]+eps)) + eps)**(1.0/3.0)
-                kc_hat_last = kc * nu_kc_last
-
-                nu_aP_last = (model.nuT[horizon-1] * model.nuR[horizon-1] + eps)**(1.0/2.0)
-                aP_hat_last = aP * nu_aP_last
-
-                nu_kP_last = (model.nuW[horizon-1] * model.nuF[horizon-1] * model.nuT[horizon-1] * model.nuR[horizon-1]
-                                * (kh_hat_last / kh) * (kA_hat_last / kA) * (kc_hat_last / kc))**(1.0/7.0)
-                kP_hat_last = kP * nu_kP_last
-
-                ratio = (kP_hat_last - model.P[horizon]) / model.P[horizon]
-                P_projected = kP_hat_last / (1.0 + ratio * pyo.exp(-aP_hat_last * dt * remaining_days))
-                projected_tracking = self.mpc_params.weight_projected_fruit_target * (P_projected - kP)**2
-
-            else:
-                projected_tracking = 0.0
-
-            return stage_cost + running_reward + terminal_reward + tracking_cost + terminal_tracking + projected_tracking
+            return stage_cost + terminal_reward
 
         model.obj = pyo.Objective(rule=objective_rule, sense=pyo.minimize)
 
@@ -823,10 +745,6 @@ class MPC:
             solver.options[k] = v
 
         results = solver.solve(model, tee=False, load_solutions=False)
-        # After solver.solve(model, tee=True):
-        logging.basicConfig(level=logging.INFO)
-        #log_infeasible_constraints(model, tol=1e-6)
-        #log_infeasible_bounds(model, tol=1e-9)
 
         status = results.solver.status
         term   = results.solver.termination_condition
@@ -932,10 +850,11 @@ class MPC:
         """
 
         # Unpack model parameters
-        dt = self.model_params.dt
-        alpha = self.sensitivities.alpha
-        beta  = self.sensitivities.beta
-        eps   = self.sensitivities.epsilon
+        dt                   = self.model_params.dt
+        alpha                = self.sensitivities.alpha
+        beta_divergence      = self.sensitivities.beta_divergence
+        beta_nutrient_factor = self.sensitivities.beta_nutrient_factor
+        epsilon              = self.sensitivities.epsilon
 
         # Unpack typical disturbances
         W_typ = self.typical_disturbances.typical_water
@@ -1067,11 +986,11 @@ class MPC:
         extra_state["step"] = step
 
         # Cumulative average deviations
-        k_idx = step - 1  # to mirror np.arange starting at 0
-        water_anomaly       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + eps), eps)
-        fertilizer_anomaly  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + eps), eps)
-        temperature_anomaly = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + eps), eps)
-        radiation_anomaly   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + eps), eps)
+        k_idx = step - 1
+        water_anomaly       = max(np.abs(W_typ * k_idx - cumulative_water)       / (W_typ * (k_idx + 1) + epsilon), epsilon)
+        fertilizer_anomaly  = max(np.abs(F_typ * k_idx - cumulative_fertilizer)  / (F_typ * (k_idx + 1) + epsilon), epsilon)
+        temperature_anomaly = max(np.abs(T_typ * k_idx - cumulative_temperature) / (T_typ * (k_idx + 1) + epsilon), epsilon)
+        radiation_anomaly   = max(np.abs(R_typ * k_idx - cumulative_radiation)   / (R_typ * (k_idx + 1) + epsilon), epsilon)
 
         extra_state["log"]["water_anomaly"].append(water_anomaly)
         extra_state["log"]["fertilizer_anomaly"].append(fertilizer_anomaly)
@@ -1085,11 +1004,10 @@ class MPC:
         prev_cumulative_divergence_radiation   = extra_state["log"]["cumulative_divergence_radiation"][-1]
 
         # Recursive cumulative divergence update
-        beta = self.sensitivities.beta
-        cumulative_divergence_water       = beta * prev_cumulative_divergence_water       + (1.0 - beta) * water_anomaly
-        cumulative_divergence_fertilizer  = beta * prev_cumulative_divergence_fertilizer  + (1.0 - beta) * fertilizer_anomaly
-        cumulative_divergence_temperature = beta * prev_cumulative_divergence_temperature + (1.0 - beta) * temperature_anomaly
-        cumulative_divergence_radiation   = beta * prev_cumulative_divergence_radiation   + (1.0 - beta) * radiation_anomaly
+        cumulative_divergence_water       = beta_divergence * prev_cumulative_divergence_water       + (1.0 - beta_divergence) * water_anomaly
+        cumulative_divergence_fertilizer  = beta_divergence * prev_cumulative_divergence_fertilizer  + (1.0 - beta_divergence) * fertilizer_anomaly
+        cumulative_divergence_temperature = beta_divergence * prev_cumulative_divergence_temperature + (1.0 - beta_divergence) * temperature_anomaly
+        cumulative_divergence_radiation   = beta_divergence * prev_cumulative_divergence_radiation   + (1.0 - beta_divergence) * radiation_anomaly
 
         extra_state["log"]["cumulative_divergence_water"].append(cumulative_divergence_water)
         extra_state["log"]["cumulative_divergence_fertilizer"].append(cumulative_divergence_fertilizer)
@@ -1108,11 +1026,11 @@ class MPC:
         prev_nuT = extra_state["log"]["nuT"][-1]
         prev_nuR = extra_state["log"]["nuR"][-1]
 
-        # Final nutrient factors (drop-in replacements)
-        nuW = (1.0 - beta) * prev_nuW + beta * nuW_raw
-        nuF = (1.0 - beta) * prev_nuF + beta * nuF_raw
-        nuT = (1.0 - beta) * prev_nuT + beta * nuT_raw
-        nuR = (1.0 - beta) * prev_nuR + beta * nuR_raw
+        # Final, smoothed nutrient factors
+        nuW = (1.0 - beta_nutrient_factor) * prev_nuW + beta_nutrient_factor * nuW_raw
+        nuF = (1.0 - beta_nutrient_factor) * prev_nuF + beta_nutrient_factor * nuF_raw
+        nuT = (1.0 - beta_nutrient_factor) * prev_nuT + beta_nutrient_factor * nuT_raw
+        nuR = (1.0 - beta_nutrient_factor) * prev_nuR + beta_nutrient_factor * nuR_raw
 
         extra_state["log"]["nuW"].append(nuW)
         extra_state["log"]["nuF"].append(nuF)

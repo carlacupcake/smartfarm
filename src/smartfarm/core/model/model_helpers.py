@@ -28,7 +28,7 @@ def compute_fir_horizon(
     return int(idx[0] + 1)  # +1 because length = index+1
 
 
-def ema_scan(x, beta, y_prev0):
+def smooth_with_ema(x, beta, y_prev0):
     """
     Compute an exponential moving average (EMA) of a 1D signal using an
     explicit forward scan. Implements the first-order recursive filter
@@ -55,12 +55,16 @@ def ema_scan(x, beta, y_prev0):
     Returns:
         y (np.ndarray)
             EMA filtered signal.
+    
+    Example usage:
+        x = anomaly[k]
+        y = smoothed divergence
+        yprev0 = 0.0 (assume divergence should be zero)
     """
     y = np.empty_like(x, dtype=float)
     y_prev = float(y_prev0)
-    one_minus = 1.0 - beta
     for t in range(x.shape[0]):
-        y_prev = beta * y_prev + one_minus * x[t]
+        y_prev = beta * y_prev + (1.0 - beta) * x[t]
         y[t] = y_prev
     return y
 

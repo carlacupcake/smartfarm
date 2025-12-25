@@ -40,26 +40,6 @@ class MPCParams(BaseModel):
         description="Economic reward per unit of fruit biomass produced \
             (in $ per kg-acre-plant basis); drives the GA to maximize harvest value."
     )
-    weight_running_height: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.0,
-        description="Running reward weight on plant height to encourage early growth."
-    )
-    weight_running_leaf_area: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.0,
-        description="Running reward weight on leaf area to encourage canopy development."
-    )
-    weight_fruit_target: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.0,
-        description="Weight on tracking a logistic fruit target over the horizon."
-    )
-    weight_terminal_fruit_target: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.0,
-        description="Weight on meeting the terminal fruit target."
-    )
-    weight_projected_fruit_target: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.0,
-        description="Weight on projecting fruit growth to season end and tracking kP."
-    )
     weight_water_anomaly: Annotated[float, Field(strict=True, ge=0)] = Field(
         default=0.1, # since the other terms are in hundreds of dollars, this keeps the nutrient factor penalty on the same order
         description="Non-economic weight for nutrient factors. \
