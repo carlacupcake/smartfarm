@@ -50,7 +50,7 @@ class Population:
 
         self.bounds               = bounds
         self.ga_params            = ga_params
-        num_members               = ga_params.num_members
+        self.num_members          = values.shape[0] if values is not None else ga_params.num_members
         self.carrying_capacities  = carrying_capacities
         self.disturbances         = disturbances
         self.growth_rates         = growth_rates
@@ -61,11 +61,11 @@ class Population:
 
         self.values = values
         if self.values is None:
-            self.values = np.zeros((num_members, self.bounds.upper_bounds.shape[0]))
+            self.values = np.zeros((self.num_members, self.bounds.upper_bounds.shape[0]))
 
         self.costs = costs
         if self.costs is None:
-            self.costs = np.zeros((num_members, 1))
+            self.costs = np.zeros((self.num_members, 1))
 
 
     def get_unique_designs(self):
@@ -127,10 +127,9 @@ class Population:
         """
 
         population_values = self.values
-        num_members = self.ga_params.num_members
-        costs = np.zeros(num_members)
+        costs = np.zeros(self.num_members)
         
-        for i in range(num_members):
+        for i in range(self.num_members):
             this_member = Member(
                 ga_params            = self.ga_params,
                 carrying_capacities  = self.carrying_capacities,
@@ -148,7 +147,7 @@ class Population:
         return self
     
 
-    def set_costs_with_cpp(self, verbose: bool = False) -> "Population":
+    def set_costs_with_cpp(self) -> "Population":
         """
         Calculates the costs for each member in the population using the C++ Evaluator.
 
@@ -158,8 +157,6 @@ class Population:
         Returns:
             self (Population)
         """
-        t0 = time.time()
-
         # Build context dict for C++ evaluator
         context = self._build_sim_context_dict_cpp()
 
@@ -168,7 +165,10 @@ class Population:
 
         # Create evaluator (stores expanded disturbances/kernels etc. internally)
         evaluator = Evaluator(context)
+        t0 = time.time()
         costs = evaluator.evaluate_population(values)
+        t1 = time.time()
+        print(f"Time taken to evaluate population with C++ evaluator: {t1 - t0} seconds")
 
         # Convert to a clean 1D numpy array
         costs = np.asarray(costs, dtype=np.float64).reshape(-1)
@@ -179,11 +179,6 @@ class Population:
             )
 
         self.costs = costs
-
-        if verbose:
-            dt_s = time.time() - t0
-            print(f"[set_costs_with_cpp] Evaluated {values.shape[0]} members in {dt_s:.3f} s "
-                f"({(dt_s / max(values.shape[0], 1)):.6f} s/member)")
 
         return self
     
@@ -216,13 +211,12 @@ class Population:
                 region_name=self._LAMBDA_REGION_NAME,
             )
 
-        num_members = self.ga_params.num_members
         population_values = self.values  # shape: (num_members, n_params)
 
         # Serialize all members
         member_dicts = [
             self._member_values_to_dict(population_values[i, :])
-            for i in range(num_members)
+            for i in range(self.num_members)
         ]
 
         # Build shared context once
@@ -230,11 +224,11 @@ class Population:
 
         # Prepare batches as (start, end) index pairs
         batches = [
-            (start, min(start + batch_size, num_members))
-            for start in range(0, num_members, batch_size)
+            (start, min(start + batch_size, self.num_members))
+            for start in range(0, self.num_members, batch_size)
         ]
 
-        costs = np.zeros(num_members, dtype=float)
+        costs = np.zeros(self.num_members, dtype=float)
 
         def invoke_batch(start: int, end: int):
             """Invoke Lambda for members[start:end] and return (start, end, costs_array)."""
@@ -279,7 +273,7 @@ class Population:
         max_workers = min(max_parallel_batches, len(batches))
         if verbose:
             print(
-                f"[Notebook] Evaluating {num_members} members in {len(batches)} batches "
+                f"[Notebook] Evaluating {self.num_members} members in {len(batches)} batches "
                 f"of up to {batch_size}, with up to {max_workers} in parallel..."
             )
 

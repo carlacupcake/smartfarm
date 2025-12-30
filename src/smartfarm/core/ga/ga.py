@@ -395,7 +395,7 @@ class GeneticAlgorithm:
 
         # Calculate the costs of the first generation
         t0 = time.time()
-        population.set_costs_with_cpp(verbose=False) # TODO must write this function
+        population.set_costs_with_cpp()
         t1 = time.time()
         print(f"Time taken to calculate costs for g={g}: {t1 - t0} seconds")
 
@@ -422,6 +422,7 @@ class GeneticAlgorithm:
                 print(f"Generation {g + 1} of {num_generations}")
 
             # Breed parents to create offspring
+            t0 = time.time()
             for p in range(0, num_parents, 2):
 
                 if stagnation_counter > 10:
@@ -440,19 +441,25 @@ class GeneticAlgorithm:
                 # Place kids in the population
                 population.values[num_parents + p,   :] = kid1
                 population.values[num_parents + p+1, :] = kid2
+            t1 = time.time()
+            print(f"Time taken to breed kids for g={g}: {t1 - t0} seconds")
 
             # Fill the rest of the population with random members
             parents_plus_kids = num_parents + num_kids
+            t0 = time.time()
             population.set_random_values(
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 start_member=parents_plus_kids,
             )
+            t1 = time.time()
+            print(f"Time taken to fill random members for g={g}: {t1 - t0} seconds")
 
             # Evaluate the costs of the gth generation with C++
             t0 = time.time()
-            population.set_costs_with_cpp(verbose=False) # TODO must write this function
+            population.set_costs_with_cpp()
             t1 = time.time()
+            print(f"Time taken to calculate costs for g={g}: {t1 - t0} seconds")
 
             # Sort the costs for the gth generation
             [sorted_costs, sorted_indices] = population.sort_costs()
@@ -463,7 +470,10 @@ class GeneticAlgorithm:
             print(f"Lowest cost in generation {g}: {lowest_costs[g]:.2f}")
 
             # Update population based on sorted indices
+            t0 = time.time()
             population.set_order_by_costs(sorted_indices)
+            t1 = time.time()
+            print(f"Time taken to sort population for g={g}: {t1 - t0} seconds")
 
             # Update the stagnation counter
             if np.abs(lowest_costs[g] - lowest_costs[g-1]) < 0.01:
