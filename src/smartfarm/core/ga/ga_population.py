@@ -6,6 +6,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
+from pure_eval import Evaluator
+
 from .ga_bounds import DesignSpaceBounds
 from .ga_member import Member
 from .ga_params import GeneticAlgorithmParams
@@ -18,6 +20,8 @@ from ..model.model_params import ModelParams
 from ..model.model_typical_disturbances import ModelTypicalDisturbances
 from ..model.model_sensitivities import ModelSensitivities
 
+from ga_member_cpp import Evaluator
+
 
 class Population:
     """
@@ -28,7 +32,7 @@ class Population:
     """
 
     _LAMBDA_FUNCTION_NAME = "smartfarm-ga-eval"
-    _LAMBDA_REGION_NAME   = "us-west-2"
+    _LAMBDA_REGION_NAME   = "us-west-1"
 
     def __init__(
         self,
@@ -136,10 +140,51 @@ class Population:
                 model_params         = self.model_params,
                 typical_disturbances = self.typical_disturbances,
                 sensitivities        = self.model_sensitivities,
-                values               = population_values[i, :])
+                values               = population_values[i, :]
+            )
             costs[i] = this_member.get_cost()
 
         self.costs = costs
+        return self
+    
+
+    def set_costs_with_cpp(self, verbose: bool = False) -> "Population":
+        """
+        Calculates the costs for each member in the population using the C++ Evaluator.
+
+        Args:
+            verbose: If True, print basic timing/debug info.
+
+        Returns:
+            self (Population)
+        """
+        t0 = time.time()
+
+        # Build context dict for C++ evaluator
+        context = self._build_sim_context_dict_cpp()
+
+        # Ensure numpy-friendly types (pybind11 is happiest with contiguous float64)
+        values = np.ascontiguousarray(self.values, dtype=np.float64)
+
+        # Create evaluator (stores expanded disturbances/kernels etc. internally)
+        evaluator = Evaluator(context)
+        costs = evaluator.evaluate_population(values)
+
+        # Convert to a clean 1D numpy array
+        costs = np.asarray(costs, dtype=np.float64).reshape(-1)
+
+        if costs.shape[0] != values.shape[0]:
+            raise RuntimeError(
+                f"C++ evaluator returned {costs.shape[0]} costs, expected {values.shape[0]}."
+            )
+
+        self.costs = costs
+
+        if verbose:
+            dt_s = time.time() - t0
+            print(f"[set_costs_with_cpp] Evaluated {values.shape[0]} members in {dt_s:.3f} s "
+                f"({(dt_s / max(values.shape[0], 1)):.6f} s/member)")
+
         return self
     
 
@@ -181,7 +226,7 @@ class Population:
         ]
 
         # Build shared context once
-        context = self._build_sim_context_dict()
+        context = self._build_sim_context_dict_lambda()
 
         # Prepare batches as (start, end) index pairs
         batches = [
@@ -300,7 +345,7 @@ class Population:
         }
 
 
-    def _build_sim_context_dict(self) -> dict:
+    def _build_sim_context_dict_lambda(self) -> dict:
         """
         Build a JSON-serializable dict containing all simulation parameters
         that are shared across all members in the population.
@@ -321,7 +366,6 @@ class Population:
             "dt": float(model_params.dt),
             "total_time_steps": int(model_params.total_time_steps),
             "simulation_hours": int(model_params.simulation_hours),
-            "closed_form":      bool(model_params.closed_form),
 
             # Disturbances (hourly)
             "hourly_precipitation": np.asarray(disturbances.precipitation, dtype=float).tolist(),
@@ -362,6 +406,107 @@ class Population:
             "sigma_R": float(model_sensitivities.sigma_R),
 
             # GA weights used in the cost
+            "weight_height":         float(getattr(ga, "weight_height",        1.0)),
+            "weight_leaf_area":      float(getattr(ga, "weight_leaf_area",     1.0)),
+            "weight_fruit_biomass":  float(getattr(ga, "weight_fruit_biomass", 1.0)),
+            "weight_irrigation":     float(getattr(ga, "weight_irrigation",    1.0)),
+            "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),
+        }
+
+        return context
+    
+
+    def _build_sim_context_dict_cpp(self) -> dict:
+        """
+        Build a JSON-serializable dict containing all simulation parameters
+        that are shared across all members in the population.
+        """
+
+        model_params         = self.model_params
+        disturbances         = self.disturbances
+        typical_disturbances = self.typical_disturbances
+        initial_conditions   = self.initial_conditions
+        growth_rates         = self.growth_rates
+        carrying_capacities  = self.carrying_capacities
+        model_sensitivities  = self.model_sensitivities
+        ga                   = self.ga_params
+
+        # Build kernel_W here for C++ context
+        dummy_member = Member(
+            ga_params            = self.ga_params,
+            carrying_capacities  = self.carrying_capacities,
+            disturbances         = self.disturbances,
+            growth_rates         = self.growth_rates,
+            initial_conditions   = self.initial_conditions,
+            model_params         = self.model_params,
+            typical_disturbances = self.typical_disturbances,
+            sensitivities        = self.model_sensitivities,
+            values               = np.zeros_like(self.values[0, :])
+        )
+
+        context = {
+
+            # Time stepping / horizon
+            "dt": float(model_params.dt),
+            "total_time_steps": int(model_params.total_time_steps),
+            "simulation_hours": int(model_params.simulation_hours),
+
+            # Sensitivity values
+            "alpha":                float(model_sensitivities.alpha),
+            "beta_divergence":      float(model_sensitivities.beta_divergence),
+            "beta_nutrient_factor": float(model_sensitivities.beta_nutrient_factor),
+            "epsilon":              float(model_sensitivities.epsilon),
+            "sigma_W":              float(model_sensitivities.sigma_W),
+            "sigma_F":              float(model_sensitivities.sigma_F),
+            "sigma_T":              float(model_sensitivities.sigma_T),
+            "sigma_R":              float(model_sensitivities.sigma_R),
+
+            # Kernel attributes
+            "kernel_W": np.asarray(dummy_member.kernel_W, dtype=np.float64),
+            "kernel_F": np.asarray(dummy_member.kernel_F, dtype=np.float64),
+            "kernel_T": np.asarray(dummy_member.kernel_T, dtype=np.float64),
+            "kernel_R": np.asarray(dummy_member.kernel_R, dtype=np.float64),
+
+            "fir_horizon_W": int(dummy_member.fir_horizon_W),
+            "fir_horizon_F": int(dummy_member.fir_horizon_F),
+            "fir_horizon_T": int(dummy_member.fir_horizon_T),
+            "fir_horizon_R": int(dummy_member.fir_horizon_R),
+
+            # Disturbances (hourly)
+            "hourly_precipitation": np.asarray(disturbances.precipitation, dtype=np.float64),
+            "hourly_temperature":   np.asarray(disturbances.temperature,   dtype=np.float64),
+            "hourly_radiation":     np.asarray(disturbances.radiation,     dtype=np.float64),
+
+            # Typical disturbances
+            "W_typ": float(typical_disturbances.typical_water),
+            "F_typ": float(typical_disturbances.typical_fertilizer),
+            "T_typ": float(typical_disturbances.typical_temperature),
+            "R_typ": float(typical_disturbances.typical_radiation),
+
+            # Initial conditions
+            "h0": float(initial_conditions.h0),
+            "A0": float(initial_conditions.A0),
+            "N0": float(initial_conditions.N0),
+            "c0": float(initial_conditions.c0),
+            "P0": float(initial_conditions.P0),
+
+            # Growth rates
+            "ah": float(growth_rates.ah),
+            "aA": float(growth_rates.aA),
+            "aN": float(growth_rates.aN),
+            "ac": float(growth_rates.ac),
+            "aP": float(growth_rates.aP),
+
+            # Carrying capacities
+            "kh": float(carrying_capacities.kh),
+            "kA": float(carrying_capacities.kA),
+            "kN": float(carrying_capacities.kN),
+            "kc": float(carrying_capacities.kc),
+            "kP": float(carrying_capacities.kP),
+
+            # GA weights used in the cost
+            "weight_height":         float(getattr(ga, "weight_height",        1.0)),
+            "weight_leaf_area":      float(getattr(ga, "weight_leaf_area",     1.0)),
             "weight_fruit_biomass":  float(getattr(ga, "weight_fruit_biomass", 1.0)),
             "weight_irrigation":     float(getattr(ga, "weight_irrigation",    1.0)),
             "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),

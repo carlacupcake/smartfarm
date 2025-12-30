@@ -1,5 +1,6 @@
 # ga_run.py
 import numpy as np
+import time
 
 from .ga_bounds import DesignSpaceBounds
 from .ga_params import GeneticAlgorithmParams
@@ -14,7 +15,6 @@ from ..model.model_params import ModelParams
 from ..model.model_typical_disturbances import ModelTypicalDisturbances
 from ..model.model_sensitivities import ModelSensitivities
 
-import time # temporary
 
 class GeneticAlgorithm:
     """
@@ -170,9 +170,7 @@ class GeneticAlgorithm:
             )
 
             # Evaluate the costs of the gth generation with Lambda
-            t0 = time.time()
             population.set_costs()
-            t1 = time.time()
             print(f"Time to evaluate generation {g}: {t1 - t0:.2f} s")
 
             # Sort the costs for the gth generation
@@ -313,6 +311,147 @@ class GeneticAlgorithm:
             # Evaluate the costs of the gth generation with Lambda
             t0 = time.time()
             population.set_costs_with_lambda(verbose=False)
+            t1 = time.time()
+
+            # Sort the costs for the gth generation
+            [sorted_costs, sorted_indices] = population.sort_costs()
+
+            # Store the cost of the best performer and average cost of the parents
+            lowest_costs[g] = np.min(sorted_costs)
+            avg_parent_costs[g] = np.mean(sorted_costs[0:num_parents])
+            print(f"Lowest cost in generation {g}: {lowest_costs[g]:.2f}")
+
+            # Update population based on sorted indices
+            population.set_order_by_costs(sorted_indices)
+
+            # Update the stagnation counter
+            if np.abs(lowest_costs[g] - lowest_costs[g-1]) < 0.01:
+                stagnation_counter = stagnation_counter + 1
+
+            # Update the generation counter
+            g = g + 1
+
+        return GeneticAlgorithmResult(
+            ga_params        = self.ga_params,
+            final_population = population,
+            lowest_costs     = lowest_costs,
+            avg_parent_costs = avg_parent_costs
+        )
+    
+
+    def run_with_cpp(self) -> GeneticAlgorithmResult:
+        """
+        Execute the Genetic Algorithm (GA) using C++ for cost evaluation.
+
+        This method mirrors the standard `run()` procedure—initializing a population,
+        breeding across generations, and tracking best/average costs—but delegates
+        all cost computations to remote Lambda calls for scalable parallel evaluation.
+
+        Args:
+            None:
+                All configuration (population sizes, bounds, model parameters,
+                number of generations, and cost-function definitions) is taken
+                from attributes stored in `self`.
+
+        Returns:
+            GeneticAlgorithmResult:
+                Contains the final evolved population, the best cost in each
+                generation, and the average cost among selected parent members
+                across generations.
+        """
+
+        # Unpack necessary attributes from self
+        num_parents     = self.ga_params.num_parents
+        num_kids        = self.ga_params.num_kids
+        num_generations = self.ga_params.num_generations
+
+        lower_bounds = self.bounds.lower_bounds
+        upper_bounds = self.bounds.upper_bounds
+
+        # Initialize arrays to store best performer and parent avg
+        lowest_costs = np.zeros(num_generations)     # best cost
+        avg_parent_costs = np.zeros(num_generations) # avg cost of parents
+
+        # Generation counter
+        g = 0
+
+        # Randomly populate first generation
+        population = Population(
+            bounds               = self.bounds,
+            ga_params            = self.ga_params,
+            carrying_capacities  = self.carrying_capacities,
+            disturbances         = self.disturbances,
+            growth_rates         = self.growth_rates,
+            initial_conditions   = self.initial_conditions,
+            model_params         = self.model_params,
+            typical_disturbances = self.typical_disturbances,
+            sensitivities        = self.model_sensitivities
+        )
+        population.set_random_values(
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            start_member=0
+        )
+
+        # Calculate the costs of the first generation
+        t0 = time.time()
+        population.set_costs_with_cpp(verbose=False) # TODO must write this function
+        t1 = time.time()
+        print(f"Time taken to calculate costs for g={g}: {t1 - t0} seconds")
+
+        # Sort the costs of the first generation
+        [sorted_costs, sorted_indices] = population.sort_costs()
+
+        # Store the cost of the best performer and average cost of the parents
+        lowest_costs[g] = np.min(sorted_costs)
+        avg_parent_costs[g] = np.mean(sorted_costs[0:num_parents])
+
+        # Update population based on sorted indices
+        population.set_order_by_costs(sorted_indices)
+
+        # Update the generation counter
+        g = g + 1
+
+        # Initialize the stagnation counter
+        stagnation_counter = 0
+
+        # Perform all later generations
+        while g < num_generations:
+
+            if self.gen_counter:
+                print(f"Generation {g + 1} of {num_generations}")
+
+            # Breed parents to create offspring
+            for p in range(0, num_parents, 2):
+
+                if stagnation_counter > 10:
+                    a = -1
+                    b = 2
+                    phi1, phi2 = (b-a) * np.random.rand(2) + a # introduce mutation
+                    stagnation_counter = 0                     # reset counter
+                else:
+                    phi1, phi2 = np.random.rand(2)
+                parent1 = population.values[p, :]
+                parent2 = population.values[p+1, :]
+
+                kid1 = phi1 * parent1 + (1 - phi1) * parent2
+                kid2 = phi2 * parent1 + (1 - phi2) * parent2
+
+                # Place kids in the population
+                population.values[num_parents + p,   :] = kid1
+                population.values[num_parents + p+1, :] = kid2
+
+            # Fill the rest of the population with random members
+            parents_plus_kids = num_parents + num_kids
+            population.set_random_values(
+                lower_bounds=lower_bounds,
+                upper_bounds=upper_bounds,
+                start_member=parents_plus_kids,
+            )
+
+            # Evaluate the costs of the gth generation with C++
+            t0 = time.time()
+            population.set_costs_with_cpp(verbose=False) # TODO must write this function
             t1 = time.time()
 
             # Sort the costs for the gth generation

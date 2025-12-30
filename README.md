@@ -15,14 +15,14 @@ On the function page:
 1. Go to the "Code" tab.
 2. At the top right of the "Code source" box, click "Upload from".
 3. Select ".zip file".
-4. Locally, from the directory `src/smartfarm/core/aws/`, zip the latest versions of
+4. Locally, from the directory `src/smartfarm/core/aws/ga`, zip the latest versions of
    - `ga_lambda_handler.py`
    - `ga_lambda_helpers.py`
 5. Click "Deploy".
 6. In the "Runtime settings" section, make sure:
    - Handler = `ga_lambda_handler.lambda_handler`
 7. In the "Layers" section, click "Add a layer".
-   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-2`...it may be different in other regions).
+   - Use the dropdown to select `AWSSDKPandas-Python310` and then version 27 (Note: this is what worked in `us-west-1`...it may be different in other regions).
    - Click "Add".
 8. (Optional) Now, go to Lambda itself (not the specific Lambda function we are creating).
    - Go to "Layers" and click "Create layer".
@@ -103,4 +103,22 @@ docker push 870678672224.dkr.ecr.us-west-1.amazonaws.com/smartfarm-mpc-lambda:la
   .
 11. Go Lambda and create a function from container, using the container we just created. Make sure to increase the timeout time.
 
+# For running with C++
 
+## Rebuild after changes to C++
+1. From the repo root (where pyproject.toml lives):
+```
+pip install -U scikit-build-core pybind11 numpy
+pip install -e .
+```
+This will:
+* Configure CMake
+* Compile `ga_member.cpp`
+* Install the extension module `ga_member_cpp` in editable mode
+2. Because this is a compiled extension, it must be rebuilt after editing `ga_member.cpp`.
+```
+# Activate the venv you are ACTUALLY using here (mine is src/.venv)
+source .venv/bin/activate
+rm -rf build/ dist/ *.egg-info
+python -m pip install -e . -v
+```

@@ -3,7 +3,7 @@ import json
 import numpy as np
 import os
 import time
-from smartfarm.core.aws.ga.ga_lambda_helpers import *
+from ga_lambda_helpers import *
 
 PRICE_PER_GB_SECOND = 0.0000166667  # USD per GB-second (approx; region-specific)
 
@@ -35,9 +35,6 @@ def lambda_handler(event, context):
     start = time.time()
     members = event["members"]
     ctx     = event["context"]
-
-    #print(f"[Lambda] Starting evaluation for {num_members} members. "
-    #      f"RequestId={context.aws_request_id}")
 
     # Perform common operations on the context before processing with Lambda
     enriched_ctx = ctx.copy()

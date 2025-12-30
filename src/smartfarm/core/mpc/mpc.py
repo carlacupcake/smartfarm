@@ -562,19 +562,19 @@ class MPC:
 
         # Raw nutrient factor Expressions
         def nuW_raw_rule(model, k):
-            return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_water[k])
+            return pyo.exp(-alpha * model.cumulative_divergence_water[k])
         model.nuW_raw = pyo.Expression(model.uk, rule=nuW_raw_rule)
 
         def nuF_raw_rule(model, k):
-            return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_fertilizer[k])
+            return pyo.exp(-alpha * model.cumulative_divergence_fertilizer[k])
         model.nuF_raw = pyo.Expression(model.uk, rule=nuF_raw_rule)
 
         def nuT_raw_rule(model, k):
-            return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_temperature[k])
+            return pyo.exp(-alpha * model.cumulative_divergence_temperature[k])
         model.nuT_raw = pyo.Expression(model.uk, rule=nuT_raw_rule)
 
         def nuR_raw_rule(model, k):
-            return 0.1 + 0.9 * pyo.exp(-alpha * model.cumulative_divergence_radiation[k])
+            return pyo.exp(-alpha * model.cumulative_divergence_radiation[k])
         model.nuR_raw = pyo.Expression(model.uk, rule=nuR_raw_rule)
 
         # Smoothed nutrient factors
@@ -1015,10 +1015,10 @@ class MPC:
         extra_state["log"]["cumulative_divergence_radiation"].append(cumulative_divergence_radiation)
 
         # Raw nutrient factors
-        nuW_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_water)
-        nuF_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_fertilizer)
-        nuT_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_temperature)
-        nuR_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_radiation)
+        nuW_raw = np.exp(-alpha * cumulative_divergence_water)
+        nuF_raw = np.exp(-alpha * cumulative_divergence_fertilizer)
+        nuT_raw = np.exp(-alpha * cumulative_divergence_temperature)
+        nuR_raw = np.exp(-alpha * cumulative_divergence_radiation)
 
         # Previous EMA nutrient factors
         prev_nuW = extra_state["log"]["nuW"][-1]

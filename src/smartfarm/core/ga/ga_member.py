@@ -113,7 +113,6 @@ class Member:
         dt = self.model_params.dt
         total_time_steps = self.model_params.total_time_steps
         simulation_hours = self.model_params.simulation_hours
-        closed_form      = self.model_params.closed_form
         verbose          = self.model_params.verbose
 
         # Unpack sensitivities
@@ -290,11 +289,10 @@ class Member:
             cumulative_radiation[t+1]   = cumulative_radiation[t]   + delayed_radiation[t]
 
             # Calculate the differences between the expected and actual cumulative values
-            tau = t - 1
-            water_anomaly[t]       = max(np.abs(W_typ * tau - cumulative_water[t])       / (W_typ * (tau + 1) + epsilon), epsilon)
-            fertilizer_anomaly[t]  = max(np.abs(F_typ * tau - cumulative_fertilizer[t])  / (F_typ * (tau + 1) + epsilon), epsilon)
-            temperature_anomaly[t] = max(np.abs(T_typ * tau - cumulative_temperature[t]) / (T_typ * (tau + 1) + epsilon), epsilon)
-            radiation_anomaly[t]   = max(np.abs(R_typ * tau - cumulative_radiation[t])   / (R_typ * (tau + 1) + epsilon), epsilon)
+            water_anomaly[t]       = max(np.abs(W_typ * (t-1) - cumulative_water[t])       / (W_typ * t + epsilon), epsilon)
+            fertilizer_anomaly[t]  = max(np.abs(F_typ * (t-1) - cumulative_fertilizer[t])  / (F_typ * t + epsilon), epsilon)
+            temperature_anomaly[t] = max(np.abs(T_typ * (t-1) - cumulative_temperature[t]) / (T_typ * t + epsilon), epsilon)
+            radiation_anomaly[t]   = max(np.abs(R_typ * (t-1) - cumulative_radiation[t])   / (R_typ * t + epsilon), epsilon)
 
             # Recursive cumulative divergence update
             cumulative_divergence_water[t]       = beta_divergence * cumulative_divergence_water[t-1]       + (1.0 - beta_divergence) * water_anomaly[t]
@@ -303,10 +301,10 @@ class Member:
             cumulative_divergence_radiation[t]   = beta_divergence * cumulative_divergence_radiation[t-1]   + (1.0 - beta_divergence) * radiation_anomaly[t]
 
             # Raw nutrient factors
-            nuW_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_water[t])
-            nuF_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_fertilizer[t])
-            nuT_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_temperature[t])
-            nuR_raw = 0.1 + 0.9 * np.exp(-alpha * cumulative_divergence_radiation[t])
+            nuW_raw = np.exp(-alpha * cumulative_divergence_water[t])
+            nuF_raw = np.exp(-alpha * cumulative_divergence_fertilizer[t])
+            nuT_raw = np.exp(-alpha * cumulative_divergence_temperature[t])
+            nuR_raw = np.exp(-alpha * cumulative_divergence_radiation[t])
 
             # Final, smoothed nutrient factors
             nuW[t] = (1.0 - beta_nutrient_factor) * nuW[t-1] + beta_nutrient_factor * nuW_raw
@@ -328,27 +326,11 @@ class Member:
             kP_hat[t] = np.clip(kP * (nuW[t] * nuF[t] * nuT[t] * nuR[t] * (kh_hat[t]/kh) * (kA_hat[t]/kA) * (kc_hat[t]/kc))**(1/7), P[t], 2 * kP)
 
             # Logistic-style updates
-            if closed_form:
-                h[t+1] = logistic_step(h[t], ah_hat[t], kh_hat[t], dt)
-                A[t+1] = logistic_step(A[t], aA_hat[t], kA_hat[t], dt)
-                N[t+1] = logistic_step(N[t], aN_hat[t], kN_hat[t], dt)
-                c[t+1] = logistic_step(c[t], ac_hat[t], kc_hat[t], dt)
-                P[t+1] = logistic_step(P[t], aP_hat[t], kP_hat[t], dt)
-
-            else:
-                # Forward Euler integration
-                h[t+1] = h[t] + dt * (ah_hat[t] * h[t] * (1 - h[t]/max(kh_hat[t], 1e-9)))
-                A[t+1] = A[t] + dt * (aA_hat[t] * A[t] * (1 - A[t]/max(kA_hat[t], 1e-9)))
-                N[t+1] = N[t] + dt * (aN_hat[t] * N[t] * (1 - N[t]/max(kN_hat[t], 1e-9)))
-                c[t+1] = c[t] + dt * (ac_hat[t] * c[t] * (1 - c[t]/max(kc_hat[t], 1e-9)))
-                P[t+1] = P[t] + dt * (aP_hat[t] * P[t] * (1 - P[t]/max(kP_hat[t], 1e-9)))
-
-                # Enforce non-negativity explicitly
-                h[t+1] = max(h[t+1], 0.0)
-                A[t+1] = max(A[t+1], 0.0)
-                N[t+1] = max(N[t+1], 0.0)
-                c[t+1] = max(c[t+1], 0.0)
-                P[t+1] = max(P[t+1], 0.0)
+            h[t+1] = logistic_step(h[t], ah_hat[t], kh_hat[t], dt)
+            A[t+1] = logistic_step(A[t], aA_hat[t], kA_hat[t], dt)
+            N[t+1] = logistic_step(N[t], aN_hat[t], kN_hat[t], dt)
+            c[t+1] = logistic_step(c[t], ac_hat[t], kc_hat[t], dt)
+            P[t+1] = logistic_step(P[t], aP_hat[t], kP_hat[t], dt)
 
         # Combined objective (negative because GA minimizes)
         profit = self.ga_params.weight_fruit_biomass * P[-1] + self.ga_params.weight_height * h[-1] + self.ga_params.weight_leaf_area * A[-1]

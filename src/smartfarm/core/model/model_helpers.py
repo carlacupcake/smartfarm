@@ -14,7 +14,14 @@ def compute_fir_horizon(
     Return the smallest L such that the first L taps of `kernel`
     contain at least `mass_threshold` of the total kernel mass.
 
-    TODO
+    Args:
+        kernel (np.ndarray):
+            1D array representing the FIR kernel.
+        mass_threshold (float):
+            Cumulative mass threshold in (0, 1].
+    Returns:
+        int:
+            The computed FIR horizon length.
     """
     k = np.asarray(kernel, dtype=float)
     total = np.sum(k)

@@ -16,12 +16,12 @@ class MPCParams(BaseModel):
         description="Number of days in the model predictive control horizon."
     )
     weight_irrigation: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.01, # scaled down to encourage actuation
+        default=0.1, # scaled down to encourage actuation
         description="Economic penalty per unit of irrigation applied (in $/acre-inch); \
             used to convert water usage into a cost term in the GA objective."
     )
     weight_fertilizer: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.01, # scaled down to encourage actuation
+        default=0.005, # scaled down to encourage actuation
         description="Economic penalty per unit of fertilizer applied (in $/lb-acre); \
             used to convert fertilizer usage into a cost term in the GA objective."
     )
