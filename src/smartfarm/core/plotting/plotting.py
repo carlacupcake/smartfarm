@@ -1,4 +1,4 @@
-# model_helpers.py
+# plotting.py
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import Optional
