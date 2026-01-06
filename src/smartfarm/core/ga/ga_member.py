@@ -307,10 +307,10 @@ class Member:
             nuR_raw = np.exp(-alpha * cumulative_divergence_radiation[t])
 
             # Final, smoothed nutrient factors
-            nuW[t] = (1.0 - beta_nutrient_factor) * nuW[t-1] + beta_nutrient_factor * nuW_raw
-            nuF[t] = (1.0 - beta_nutrient_factor) * nuF[t-1] + beta_nutrient_factor * nuF_raw
-            nuT[t] = (1.0 - beta_nutrient_factor) * nuT[t-1] + beta_nutrient_factor * nuT_raw
-            nuR[t] = (1.0 - beta_nutrient_factor) * nuR[t-1] + beta_nutrient_factor * nuR_raw
+            nuW[t] = beta_nutrient_factor * nuW[t-1] + (1 - beta_nutrient_factor) * nuW_raw
+            nuF[t] = beta_nutrient_factor * nuF[t-1] + (1 - beta_nutrient_factor) * nuF_raw
+            nuT[t] = beta_nutrient_factor * nuT[t-1] + (1 - beta_nutrient_factor) * nuT_raw
+            nuR[t] = beta_nutrient_factor * nuR[t-1] + (1 - beta_nutrient_factor) * nuR_raw
 
             # Calculate the instantaneous adjusted growth rates and carrying capacities
             ah_hat[t] = np.clip(ah * (nuF[t] * nuT[t] * nuR[t])**(1/3), 0, 2 * ah)

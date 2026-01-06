@@ -401,11 +401,11 @@ def get_cost_with_lambda(
         nuR_raw = np.exp(-alpha * cumulative_divergence_radiation)
 
         # Final, smoothed nutrient factors
-        beta_nutrient_factor = 0.95
-        nuW = (1.0 - beta_nutrient_factor) * nuW + beta_nutrient_factor * nuW_raw
-        nuF = (1.0 - beta_nutrient_factor) * nuF + beta_nutrient_factor * nuF_raw
-        nuT = (1.0 - beta_nutrient_factor) * nuT + beta_nutrient_factor * nuT_raw
-        nuR = (1.0 - beta_nutrient_factor) * nuR + beta_nutrient_factor * nuR_raw
+        beta_nutrient_factor = 0.05
+        nuW = beta_nutrient_factor * nuW + (1 - beta_nutrient_factor) * nuW_raw
+        nuF = beta_nutrient_factor * nuF + (1 - beta_nutrient_factor) * nuF_raw
+        nuT = beta_nutrient_factor * nuT + (1 - beta_nutrient_factor) * nuT_raw
+        nuR = beta_nutrient_factor * nuR + (1 - beta_nutrient_factor) * nuR_raw
 
         # Calculate the instantaneous adjusted growth rates and carrying capacities
         ah_hat = np.clip(ah * (nuF * nuT * nuR)**(1/3), 0, 2 * ah)

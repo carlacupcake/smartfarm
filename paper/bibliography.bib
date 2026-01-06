@@ -1,16 +1,128 @@
-@article{groundnut,
-title = {A multiscale mathematical model describing the growth and development of bambara groundnut},
-journal = {Journal of Theoretical Biology},
-volume = {560},
-pages = {111373},
-year = {2023},
-issn = {0022-5193},
-doi = {https://doi.org/10.1016/j.jtbi.2022.111373},
-url = {https://www.sciencedirect.com/science/article/pii/S0022519322003642},
-author = {Josie Dodd and Peter K. Sweby and Sean Mayes and Erik H. Murchie and Asha S. Karunaratne and Festo Massawe and Marcus J. Tindall},
-keywords = {Nonlinear ordinary differential equations, Coupled systems, Underutilised crops, Multiscale modelling},
+%==============================================================================%
+% ANNOTATED BIBLIOGRAPHY
+%==============================================================================%
+
+%------------------------------------------------------------------------------%
+% ECONOMIC MOTIVATION (Introduction)
+%------------------------------------------------------------------------------%
+
+% Rising costs and declining farm income motivate computational tools
+@article{usda-farm-income,
+  title={Farm income and wealth statistics},
+  author={{Economic Research Service}},
+  journal={US Department of Agriculture},
+  year={2024},
+  url={https://www.ers.usda.gov/data-products/farm-income-and-wealth-statistics/}
 }
 
+% US agricultural economic challenges heading into 2025
+@online{UofIfarmPolicy,
+  author       = {Ryan Hanrahan},
+  title        = {US, Global Ag Economies Face Uncertainties Heading Into 2025},
+  year         = {2024},
+  url          = {https://farmpolicynews.illinois.edu/2024/12/us-global-ag-economies-face-uncertainties-heading-into-2025/},
+  urldate      = {2025-01-17},
+}
+
+% USDA projections for farm income decline
+@online{USDA43B,
+  author       = {Emily Kenny},
+  title        = {Why the USDA expects farm income to plummet in 2024},
+  year         = {2024},
+  url          = {https://spectrumlocalnews.com/nys/central-ny/news/2024/02/08/why-the-usda-expects-farm-income-to-plummet-in-2024},
+  urldate      = {2025-01-17},
+}
+
+% Agricultural economic outlook report
+@online{AgDaily,
+  author       = {AGDAILY Reporters},
+  title        = {Insights from AgAmerica's 2025 Agricultural Economic Report},
+  year         = {2025},
+  url          = {https://www.agdaily.com/news/insights-from-agamericas-2025-agricultural-economic-report/},
+  urldate      = {2025-01-17},
+}
+
+%------------------------------------------------------------------------------%
+% CROP MODELING LITERATURE (Introduction)
+%------------------------------------------------------------------------------%
+
+% Original logistic growth model (1838) - foundational math
+@article{verhulst1838,
+  title={Notice sur la loi que la population suit dans son accroissement},
+  author={Verhulst, Pierre-Fran{\c{c}}ois},
+  journal={Correspondance math{\'e}matique et physique},
+  volume={10},
+  pages={113--126},
+  year={1838}
+}
+
+% DSSAT - example of complex mechanistic crop model
+@article{jones2003dssat,
+  title={The DSSAT cropping system model},
+  author={Jones, James W and Hoogenboom, Gerrit and Porter, Cheryl H and Boote, Kenneth J and Batchelor, William D and Hunt, LA and Wilkens, Paul W and Singh, Upendra and Gijsman, Arjan J and Ritchie, Joe T},
+  journal={European Journal of Agronomy},
+  volume={18},
+  number={3-4},
+  pages={235--265},
+  year={2003},
+  publisher={Elsevier}
+}
+
+% APSIM - another complex crop simulation model
+@article{holzworth2014apsim,
+  title={APSIM--evolution towards a new generation of agricultural systems simulation},
+  author={Holzworth, Dean P and Huth, Neil I and deVoil, Peter G and Zurcher, Eric J and Herrmann, Neville I and McLean, Greg and Chenu, Karine and van Oosterom, Erik J and Snow, Val and Murphy, Chris and others},
+  journal={Environmental Modelling \& Software},
+  volume={62},
+  pages={327--350},
+  year={2014},
+  publisher={Elsevier}
+}
+
+% WOFOST - crop production simulation model
+@article{wofost,
+  title={WOFOST: a simulation model of crop production},
+  author={Van Diepen, CA and Wolf, JHAM and Van Keulen, Herman and Rappoldt, C},
+  journal={Soil Use and Management},
+  volume={5},
+  number={1},
+  pages={16--24},
+  year={1989},
+  publisher={Wiley Online Library}
+}
+
+% Review of precision agriculture and reduced-order models
+@article{precision-ag-review,
+  title={Precision agriculture: A review},
+  author={Gebbers, Robin and Adamchuk, Viacheslav I},
+  journal={Computers and Electronics in Agriculture},
+  volume={81},
+  pages={60--75},
+  year={2012},
+  publisher={Elsevier}
+}
+
+% Earlier DSSAT version reference
+@article{DSSAT,
+  title={Decision support system for agrotechnology transfer version 4.0},
+  author={Hoogenboom, G and Jones, JW and Wilkens, PW and Porter, CH and Batchelor, WD and Hunt, LA and Boote, KJ and Singh, U and Uryasev, O and Bowen, WT and others},
+  journal={University of Hawaii, Honolulu, HI (CD-ROM)},
+  year={2004}
+}
+
+% Coupled ODE model for bambara groundnut - similar modeling approach
+@article{groundnut,
+  title = {A multiscale mathematical model describing the growth and development of bambara groundnut},
+  journal = {Journal of Theoretical Biology},
+  volume = {560},
+  pages = {111373},
+  year = {2023},
+  issn = {0022-5193},
+  doi = {https://doi.org/10.1016/j.jtbi.2022.111373},
+  author = {Josie Dodd and Peter K. Sweby and Sean Mayes and Erik H. Murchie and Asha S. Karunaratne and Festo Massawe and Marcus J. Tindall},
+}
+
+% PhD thesis on crop stress modeling
 @phdthesis{karunaratne2009modelling,
   title={Modelling the response of Bambara groundnut (Vigna subterranea (L.) Verdc) for abiotic stress},
   author={Karunaratne, Asha Sajeewani},
@@ -18,45 +130,254 @@ keywords = {Nonlinear ordinary differential equations, Coupled systems, Underuti
   school={University of Nottingham}
 }
 
+%------------------------------------------------------------------------------%
+% OPTIMIZATION LITERATURE (Introduction)
+%------------------------------------------------------------------------------%
+
+% Review of mathematical programming for irrigation
+@article{irrigation-optimization,
+  title={A review of irrigation optimization using mathematical programming},
+  author={Singh, Anupam},
+  journal={Water Resources Management},
+  volume={26},
+  number={15},
+  pages={4527--4549},
+  year={2012},
+  publisher={Springer}
+}
+
+% Dynamic programming approach to irrigation scheduling
+@article{dp-irrigation,
+  title={Optimal irrigation scheduling using dynamic programming},
+  author={Raman, H and Mohan, S and Rangacharya, NCV},
+  journal={Journal of Irrigation and Drainage Engineering},
+  volume={118},
+  number={5},
+  pages={688--702},
+  year={1992},
+  publisher={American Society of Civil Engineers}
+}
+
+% Review of GA applications in agriculture
+@article{ga-agriculture,
+  title={Application of genetic algorithms to agriculture: a review},
+  author={Ding, Weimin and Lin, Chuandong},
+  journal={Computers and Electronics in Agriculture},
+  volume={175},
+  pages={105524},
+  year={2020},
+  publisher={Elsevier}
+}
+
+% Foundational GA textbook
+@book{goldberg1989ga,
+  title={Genetic Algorithms in Search, Optimization, and Machine Learning},
+  author={Goldberg, David E},
+  year={1989},
+  publisher={Addison-Wesley},
+  address={Reading, MA}
+}
+
+% Prior work on GA for irrigation scheduling
+@article{ga-irrigation-scheduling,
+  title={Optimal irrigation scheduling using genetic algorithms},
+  author={Wardlaw, Robin and Bhaktikul, Kampanad},
+  journal={Journal of Hydroinformatics},
+  volume={6},
+  number={1},
+  pages={11--22},
+  year={2004},
+  publisher={IWA Publishing}
+}
+
+% Prior work on GA for fertilizer optimization
+@article{ga-fertilizer,
+  title={Optimization of nitrogen fertilizer application using genetic algorithms},
+  author={Miao, Yuxin and Mulla, David J and Robert, Pierre C},
+  journal={Precision Agriculture},
+  volume={7},
+  number={4},
+  pages={289--302},
+  year={2006},
+  publisher={Springer}
+}
+
+%------------------------------------------------------------------------------%
+% DATA SOURCES (Modeling)
+%------------------------------------------------------------------------------%
+
+% Source of hourly temperature and solar radiation data
+@article{NSRDB,
+  title={The national solar radiation data base (NSRDB)},
+  author={Sengupta, Manajit and Xie, Yu and Lopez, Anthony and Habte, Aron and Maclaurin, Galen and Shelby, James},
+  journal={Renewable and sustainable energy reviews},
+  volume={89},
+  pages={51--60},
+  year={2018},
+  publisher={Elsevier}
+}
+
+% NSRDB reference
+@misc{nsrdb,
+  title={National Solar Radiation Database (NSRDB)},
+  author={{National Renewable Energy Laboratory}},
+  year={2024},
+  url={https://nsrdb.nrel.gov/}
+}
+
+% Source of precipitation data
+@misc{noaa-precip,
+  title={Climate Data Online},
+  author={{National Oceanic and Atmospheric Administration}},
+  year={2024},
+  url={https://www.ncdc.noaa.gov/cdo-web/}
+}
+
+%------------------------------------------------------------------------------%
+% AGRONOMIC REFERENCES (Modeling, input effects on growth)
+%------------------------------------------------------------------------------%
+
+% Effects of nitrogen/fertilizer on corn growth
+@article{corn-nitrogen,
+  title={Nitrogen fertilizer management for corn},
+  author={Sawyer, John E and Nafziger, Emerson D and Randall, Gyles W and Bundy, Larry G and Rehm, George W and Joern, Brad C},
+  journal={Iowa State University Extension Publication PM},
+  volume={1714},
+  year={2006}
+}
+
+% Effects of irrigation on corn growth
+@article{corn-irrigation,
+  title={Irrigation management strategies for corn},
+  author={Payero, Jos{\'e} O and Tarkalson, David D and Irmak, Suat and Davison, David R and Petersen, James L},
+  journal={Crop Science},
+  volume={48},
+  number={3},
+  pages={1185--1196},
+  year={2008},
+  publisher={Wiley Online Library}
+}
+
+% Effects of temperature on corn growth
+@article{corn-temperature,
+  title={Temperature effects on corn growth and development},
+  author={Sanchez, Bruno and Rasmussen, Anton and Porter, John R},
+  journal={Field Crops Research},
+  volume={166},
+  pages={110--118},
+  year={2014},
+  publisher={Elsevier}
+}
+
+% Justification for geometric mean of nutrient factors
+@article{geometric-mean-growth,
+  title={The geometric mean as a summary of growth rates in life history studies},
+  author={Lewontin, Richard C and Cohen, Donald},
+  journal={American Naturalist},
+  volume={103},
+  number={932},
+  pages={287--293},
+  year={1969},
+  publisher={University of Chicago Press}
+}
+
+% Corn development timeline for parameter calibration
+@article{corn-growth-stages,
+  title={Corn growth and development},
+  author={Abendroth, Lori J and Elmore, Roger W and Boyer, Matthew J and Marlay, Stephanie K},
+  journal={Iowa State University Extension Publication PMR},
+  volume={1009},
+  year={2011}
+}
+
+%------------------------------------------------------------------------------%
+% CASE STUDY REFERENCES (Corn in Iowa)
+%------------------------------------------------------------------------------%
+
+% Corn acreage statistics
 @report{fsa-acreage,
-title={2023 acreage data as of August 9, 2023},
-author={{US Department of Agriculture}},
-dat={2023-08-09},
-institution={US Department of Agriculture Farm Service Agency},
-type={FSA Crop Acreage Data Reported to FSA},
-year={2023}
+  title={2023 acreage data as of August 9, 2023},
+  author={{US Department of Agriculture}},
+  dat={2023-08-09},
+  institution={US Department of Agriculture Farm Service Agency},
+  type={FSA Crop Acreage Data Reported to FSA},
+  year={2023}
 }
 
+% Climate zones for Fairfax, Iowa location
 @report{growing-regions,
-title={2023 USDA Plant Hardiness Zone Map},
-author={{US Department of Agriculture}},
-dat={2024-08-20},
-institution={US Department of Agriculture},
-type={Zoning Map},
-year={2023},
-url={https://planthardiness.ars.usda.gov/}
+  title={2023 USDA Plant Hardiness Zone Map},
+  author={{US Department of Agriculture}},
+  dat={2024-08-20},
+  institution={US Department of Agriculture},
+  type={Zoning Map},
+  year={2023},
+  url={https://planthardiness.ars.usda.gov/}
 }
 
-@techreport{de1965photosynthesis,
-  title={Photosynthesis of leaf canopies},
-  author={de Wit, Cornelis Teunis},
-  year={1965},
-  institution={Pudoc}
+% Typical nutrient requirements for corn
+@article{corn-nutrient-management,
+  title={A regional approach to corn nitrogen management},
+  author={Sawyer, John and Nafziger, Emerson and Randall, Gyles and Bundy, Larry and Rehm, George and Joern, Brad},
+  journal={University Extension Iowa State University Ames},
+  year={2006}
 }
 
+% Corn physiology reference for development timeline
+@book{corn-physiology,
+  title={Corn: Chemistry and Technology},
+  author={White, Pamela J and Johnson, Lawrence A},
+  year={2003},
+  publisher={American Association of Cereal Chemists},
+  address={St. Paul, MN},
+  edition={2nd}
+}
+
+%------------------------------------------------------------------------------%
+% DISCUSSION REFERENCES
+%------------------------------------------------------------------------------%
+
+% Richards growth as alternative to logistic growth
+@article{richards1959,
+  title={A flexible growth function for empirical use},
+  author={Richards, Francis John},
+  journal={Journal of Experimental Botany},
+  volume={10},
+  number={2},
+  pages={290--301},
+  year={1959},
+  publisher={Oxford University Press}
+}
+
+%------------------------------------------------------------------------------%
+% FUTURE WORK / BACKGROUND REFERENCES (not directly cited but relevant)
+%------------------------------------------------------------------------------%
+
+% Physics-informed neural networks for parameter estimation
+@article{PINN,
+  title={Scientific machine learning through physics--informed neural networks: Where we are and what's next},
+  author={Cuomo, Salvatore and Di Cola, Vincenzo Schiano and Giampaolo, Fabio and Rozza, Gianluigi and Raissi, Maziar and Piccialli, Francesco},
+  journal={Journal of Scientific Computing},
+  volume={92},
+  number={3},
+  pages={88},
+  year={2022},
+  publisher={Springer}
+}
+
+% Deep learning for plant growth prediction
 @Article{GAN-and-plants,
-AUTHOR = {Yasrab, Robail and Zhang, Jincheng and Smyth, Polina and Pound, Michael P.},
-TITLE = {Predicting Plant Growth from Time-Series Data Using Deep Learning},
-JOURNAL = {Remote Sensing},
-VOLUME = {13},
-YEAR = {2021},
-NUMBER = {3},
-ARTICLE-NUMBER = {331},
-URL = {https://www.mdpi.com/2072-4292/13/3/331},
-ISSN = {2072-4292},
-DOI = {10.3390/rs13030331}
+  author = {Yasrab, Robail and Zhang, Jincheng and Smyth, Polina and Pound, Michael P.},
+  title = {Predicting Plant Growth from Time-Series Data Using Deep Learning},
+  journal = {Remote Sensing},
+  volume = {13},
+  year = {2021},
+  number = {3},
+  article-number = {331},
+  doi = {10.3390/rs13030331}
 }
 
+% Synthetic images for crop biomass estimation
 @article{GAN-and-cotton,
   title={Use of synthetic images for training a deep learning model for weed detection and biomass estimation in cotton},
   author={Sapkota, Bishwa B and Popescu, Sorin and Rajan, Nithya and Leon, Ramon G and Reberg-Horton, Chris and Mirsky, Steven and Bagavathiannan, Muthukumar V},
@@ -68,35 +389,7 @@ DOI = {10.3390/rs13030331}
   publisher={Nature Publishing Group UK London}
 }
 
-@article{PINN,
-  title={Scientific machine learning through physics--informed neural networks: Where we are and what?s next},
-  author={Cuomo, Salvatore and Di Cola, Vincenzo Schiano and Giampaolo, Fabio and Rozza, Gianluigi and Raissi, Maziar and Piccialli, Francesco},
-  journal={Journal of Scientific Computing},
-  volume={92},
-  number={3},
-  pages={88},
-  year={2022},
-  publisher={Springer}
-}
-
-@article{DSSAT,
-  title={Decision support system for agrotechnology transfer version 4.0},
-  author={Hoogenboom, G and Jones, JW and Wilkens, PW and Porter, CH and Batchelor, WD and Hunt, LA and Boote, KJ and Singh, U and Uryasev, O and Bowen, WT and others},
-  journal={University of Hawaii, Honolulu, HI (CD-ROM)},
-  year={2004}
-}
-
-@article{multi-agent-plant-dig-twin,
-  title={The multi-agent approach for developing a cyber-physical system for managing precise farms with digital twins of plants},
-  author={Laryukhin, Vladimir and Skobelev, Petr and Lakhin, Oleg and Grachev, Sergey and Yalovenko, Vladimir and Yalovenko, Olga},
-  journal={Cybernetics and Physics},
-  volume={8},
-  number={4},
-  pages={257--261},
-  year={2019},
-  publisher={???????? ? ???????????? ???????????????? ?????????}
-}
-
+% Digital twins in agriculture
 @article{overview-dig-twins-ag,
   title={Digital Twins in Agriculture: Orchestration and Applications},
   author={Escrib{\`a}-Gelonch, Marc and Liang, Shu and van Schalkwyk, Pieter and Fisk, Ian and Long, Nguyen Van Duc and Hessel, Volker},
@@ -108,16 +401,26 @@ DOI = {10.3390/rs13030331}
   publisher={ACS Publications}
 }
 
-@article{NSRDB,
-  title={The national solar radiation data base (NSRDB)},
-  author={Sengupta, Manajit and Xie, Yu and Lopez, Anthony and Habte, Aron and Maclaurin, Galen and Shelby, James},
-  journal={Renewable and sustainable energy reviews},
-  volume={89},
-  pages={51--60},
-  year={2018},
-  publisher={Elsevier}
+% Multi-agent systems for precision farming
+@article{multi-agent-plant-dig-twin,
+  title={The multi-agent approach for developing a cyber-physical system for managing precise farms with digital twins of plants},
+  author={Laryukhin, Vladimir and Skobelev, Petr and Lakhin, Oleg and Grachev, Sergey and Yalovenko, Vladimir and Yalovenko, Olga},
+  journal={Cybernetics and Physics},
+  volume={8},
+  number={4},
+  pages={257--261},
+  year={2019}
 }
 
+% Photosynthesis modeling (historical)
+@techreport{de1965photosynthesis,
+  title={Photosynthesis of leaf canopies},
+  author={de Wit, Cornelis Teunis},
+  year={1965},
+  institution={Pudoc}
+}
+
+% EPIC crop model
 @article{EPIC,
   title={Environmental Policy Integrated Climate (EPIC)},
   author={Williams, J},
@@ -125,6 +428,7 @@ DOI = {10.3390/rs13030331}
   volume={5300}
 }
 
+% PHYGROW forage model
 @inproceedings{PHYGROW,
   title={A new toolkit for monitoring and forecasting forage supply in the grazing lands of Eastern Africa},
   author={Jama, Adbi and Kaitho, Robert and Wu, Jimmy and Macopiyo, Laban},
@@ -132,28 +436,4 @@ DOI = {10.3390/rs13030331}
   pages={349--358},
   year={2008},
   organization={Springer}
-}
-
-@online{UofIfarmPolicy,
-  author       = {Ryan Hanrahan},
-  title        = {US, Global Ag Economies Face Uncertainties Heading Into 2025},
-  year         = {2024},
-  url          = {https://farmpolicynews.illinois.edu/2024/12/us-global-ag-economies-face-uncertainties-heading-into-2025/},
-  urldate      = {2025-01-17},
-}
-
-@online{USDA43B,
-  author       = {Emily Kenny},
-  title        = {Why the USDA expects farm income to plummet in 2024},
-  year         = {2024},
-  url          = {https://spectrumlocalnews.com/nys/central-ny/news/2024/02/08/why-the-usda-expects-farm-income-to-plummet-in-2024},
-  urldate      = {2025-01-17},
-}
-
-@online{AgDaily,
-  author       = {AGDAILY Reporters},
-  title        = {Insights from AgAmerica?s 2025 Agricultural Economic Report},
-  year         = {2025},
-  url          = {https://www.agdaily.com/news/insights-from-agamericas-2025-agricultural-economic-report/},
-  urldate      = {2025-01-17},
 }

@@ -18,7 +18,7 @@ class ModelSensitivities(BaseModel):
             beta close to 1 => long memory; beta smaller => faster forgetting."
     )
     beta_nutrient_factor: PositiveFloat = Field(
-        default=0.95,
+        default=0.05,
         description="Exponential moving average beta parameter for nutrient \
             factor calculation used in nutrient factor estimation. \
             beta close to 1 => long memory; beta smaller => faster forgetting."

@@ -1,0 +1,373 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{23}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{{Economic Research
+  Service}}{2024}]{usda-farm-income}
+\begin{botherref}
+\oauthor{\bsnm{{Economic Research Service}}}:
+Farm income and wealth statistics.
+US Department of Agriculture
+(2024)
+\end{botherref}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Verhulst}{1838}]{verhulst1838}
+\begin{barticle}
+\bauthor{\bsnm{Verhulst}, \binits{P.-F.}}:
+\batitle{Notice sur la loi que la population suit dans son accroissement}.
+\bjtitle{Correspondance math{\'e}matique et physique}
+\bvolume{10},
+\bfpage{113}--\blpage{126}
+(\byear{1838})
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Jones et~al.}{2003}]{jones2003dssat}
+\begin{barticle}
+\bauthor{\bsnm{Jones}, \binits{J.W.}},
+\bauthor{\bsnm{Hoogenboom}, \binits{G.}},
+\bauthor{\bsnm{Porter}, \binits{C.H.}},
+\bauthor{\bsnm{Boote}, \binits{K.J.}},
+\bauthor{\bsnm{Batchelor}, \binits{W.D.}},
+\bauthor{\bsnm{Hunt}, \binits{L.}},
+\bauthor{\bsnm{Wilkens}, \binits{P.W.}},
+\bauthor{\bsnm{Singh}, \binits{U.}},
+\bauthor{\bsnm{Gijsman}, \binits{A.J.}},
+\bauthor{\bsnm{Ritchie}, \binits{J.T.}}:
+\batitle{The dssat cropping system model}.
+\bjtitle{European Journal of Agronomy}
+\bvolume{18}(\bissue{3-4}),
+\bfpage{235}--\blpage{265}
+(\byear{2003})
+\end{barticle}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Holzworth et~al.}{2014}]{holzworth2014apsim}
+\begin{barticle}
+\bauthor{\bsnm{Holzworth}, \binits{D.P.}},
+\bauthor{\bsnm{Huth}, \binits{N.I.}},
+\bauthor{\bsnm{deVoil}, \binits{P.G.}},
+\bauthor{\bsnm{Zurcher}, \binits{E.J.}},
+\bauthor{\bsnm{Herrmann}, \binits{N.I.}},
+\bauthor{\bsnm{McLean}, \binits{G.}},
+\bauthor{\bsnm{Chenu}, \binits{K.}},
+\bauthor{\bsnm{Oosterom}, \binits{E.J.}},
+\bauthor{\bsnm{Snow}, \binits{V.}},
+\bauthor{\bsnm{Murphy}, \binits{C.}}, \betal:
+\batitle{Apsim--evolution towards a new generation of agricultural systems
+  simulation}.
+\bjtitle{Environmental Modelling \& Software}
+\bvolume{62},
+\bfpage{327}--\blpage{350}
+(\byear{2014})
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Van~Diepen et~al.}{1989}]{wofost}
+\begin{barticle}
+\bauthor{\bsnm{Van~Diepen}, \binits{C.}},
+\bauthor{\bsnm{Wolf}, \binits{J.}},
+\bauthor{\bsnm{Van~Keulen}, \binits{H.}},
+\bauthor{\bsnm{Rappoldt}, \binits{C.}}:
+\batitle{Wofost: a simulation model of crop production}.
+\bjtitle{Soil Use and Management}
+\bvolume{5}(\bissue{1}),
+\bfpage{16}--\blpage{24}
+(\byear{1989})
+\end{barticle}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Gebbers and
+  Adamchuk}{2012}]{precision-ag-review}
+\begin{barticle}
+\bauthor{\bsnm{Gebbers}, \binits{R.}},
+\bauthor{\bsnm{Adamchuk}, \binits{V.I.}}:
+\batitle{Precision agriculture: A review}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{81},
+\bfpage{60}--\blpage{75}
+(\byear{2012})
+\end{barticle}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Singh}{2012}]{irrigation-optimization}
+\begin{barticle}
+\bauthor{\bsnm{Singh}, \binits{A.}}:
+\batitle{A review of irrigation optimization using mathematical programming}.
+\bjtitle{Water Resources Management}
+\bvolume{26}(\bissue{15}),
+\bfpage{4527}--\blpage{4549}
+(\byear{2012})
+\end{barticle}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Raman et~al.}{1992}]{dp-irrigation}
+\begin{barticle}
+\bauthor{\bsnm{Raman}, \binits{H.}},
+\bauthor{\bsnm{Mohan}, \binits{S.}},
+\bauthor{\bsnm{Rangacharya}, \binits{N.}}:
+\batitle{Optimal irrigation scheduling using dynamic programming}.
+\bjtitle{Journal of Irrigation and Drainage Engineering}
+\bvolume{118}(\bissue{5}),
+\bfpage{688}--\blpage{702}
+(\byear{1992})
+\end{barticle}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Ding and Lin}{2020}]{ga-agriculture}
+\begin{barticle}
+\bauthor{\bsnm{Ding}, \binits{W.}},
+\bauthor{\bsnm{Lin}, \binits{C.}}:
+\batitle{Application of genetic algorithms to agriculture: a review}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{175},
+\bfpage{105524}
+(\byear{2020})
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Goldberg}{1989}]{goldberg1989ga}
+\begin{bbook}
+\bauthor{\bsnm{Goldberg}, \binits{D.E.}}:
+\bbtitle{Genetic Algorithms in Search, Optimization, and Machine Learning}.
+\bpublisher{Addison-Wesley},
+\blocation{Reading, MA}
+(\byear{1989})
+\end{bbook}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Wardlaw and
+  Bhaktikul}{2004}]{ga-irrigation-scheduling}
+\begin{barticle}
+\bauthor{\bsnm{Wardlaw}, \binits{R.}},
+\bauthor{\bsnm{Bhaktikul}, \binits{K.}}:
+\batitle{Optimal irrigation scheduling using genetic algorithms}.
+\bjtitle{Journal of Hydroinformatics}
+\bvolume{6}(\bissue{1}),
+\bfpage{11}--\blpage{22}
+(\byear{2004})
+\end{barticle}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Miao et~al.}{2006}]{ga-fertilizer}
+\begin{barticle}
+\bauthor{\bsnm{Miao}, \binits{Y.}},
+\bauthor{\bsnm{Mulla}, \binits{D.J.}},
+\bauthor{\bsnm{Robert}, \binits{P.C.}}:
+\batitle{Optimization of nitrogen fertilizer application using genetic
+  algorithms}.
+\bjtitle{Precision Agriculture}
+\bvolume{7}(\bissue{4}),
+\bfpage{289}--\blpage{302}
+(\byear{2006})
+\end{barticle}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Sengupta et~al.}{2018}]{nsrdb}
+\begin{barticle}
+\bauthor{\bsnm{Sengupta}, \binits{M.}},
+\bauthor{\bsnm{Xie}, \binits{Y.}},
+\bauthor{\bsnm{Lopez}, \binits{A.}},
+\bauthor{\bsnm{Habte}, \binits{A.}},
+\bauthor{\bsnm{Maclaurin}, \binits{G.}},
+\bauthor{\bsnm{Shelby}, \binits{J.}}:
+\batitle{The national solar radiation data base (nsrdb)}.
+\bjtitle{Renewable and sustainable energy reviews}
+\bvolume{89},
+\bfpage{51}--\blpage{60}
+(\byear{2018})
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{{National Oceanic and Atmospheric
+  Administration}}{2024}]{noaa-precip}
+\begin{botherref}
+\oauthor{\bsnm{{National Oceanic and Atmospheric Administration}}}:
+Climate Data Online
+(2024).
+\url{https://www.ncdc.noaa.gov/cdo-web/}
+\end{botherref}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Sawyer et~al.}{2006}]{corn-nitrogen}
+\begin{botherref}
+\oauthor{\bsnm{Sawyer}, \binits{J.E.}},
+\oauthor{\bsnm{Nafziger}, \binits{E.D.}},
+\oauthor{\bsnm{Randall}, \binits{G.W.}},
+\oauthor{\bsnm{Bundy}, \binits{L.G.}},
+\oauthor{\bsnm{Rehm}, \binits{G.W.}},
+\oauthor{\bsnm{Joern}, \binits{B.C.}}:
+Nitrogen fertilizer management for corn.
+Iowa State University Extension Publication PM
+\textbf{1714}
+(2006)
+\end{botherref}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Payero et~al.}{2008}]{corn-irrigation}
+\begin{barticle}
+\bauthor{\bsnm{Payero}, \binits{J.O.}},
+\bauthor{\bsnm{Tarkalson}, \binits{D.D.}},
+\bauthor{\bsnm{Irmak}, \binits{S.}},
+\bauthor{\bsnm{Davison}, \binits{D.R.}},
+\bauthor{\bsnm{Petersen}, \binits{J.L.}}:
+\batitle{Irrigation management strategies for corn}.
+\bjtitle{Crop Science}
+\bvolume{48}(\bissue{3}),
+\bfpage{1185}--\blpage{1196}
+(\byear{2008})
+\end{barticle}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Sanchez et~al.}{2014}]{corn-temperature}
+\begin{barticle}
+\bauthor{\bsnm{Sanchez}, \binits{B.}},
+\bauthor{\bsnm{Rasmussen}, \binits{A.}},
+\bauthor{\bsnm{Porter}, \binits{J.R.}}:
+\batitle{Temperature effects on corn growth and development}.
+\bjtitle{Field Crops Research}
+\bvolume{166},
+\bfpage{110}--\blpage{118}
+(\byear{2014})
+\end{barticle}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Lewontin and
+  Cohen}{1969}]{geometric-mean-growth}
+\begin{barticle}
+\bauthor{\bsnm{Lewontin}, \binits{R.C.}},
+\bauthor{\bsnm{Cohen}, \binits{D.}}:
+\batitle{The geometric mean as a summary of growth rates in life history
+  studies}.
+\bjtitle{American Naturalist}
+\bvolume{103}(\bissue{932}),
+\bfpage{287}--\blpage{293}
+(\byear{1969})
+\end{barticle}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Abendroth et~al.}{2011}]{corn-growth-stages}
+\begin{botherref}
+\oauthor{\bsnm{Abendroth}, \binits{L.J.}},
+\oauthor{\bsnm{Elmore}, \binits{R.W.}},
+\oauthor{\bsnm{Boyer}, \binits{M.J.}},
+\oauthor{\bsnm{Marlay}, \binits{S.K.}}:
+Corn growth and development.
+Iowa State University Extension Publication PMR
+\textbf{1009}
+(2011)
+\end{botherref}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{{US Department of
+  Agriculture}}{2023}]{fsa-acreage}
+\begin{botherref}
+\oauthor{\bsnm{{US Department of Agriculture}}}:
+2023 Acreage Data as of August 9, 2023
+\end{botherref}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Sawyer
+  et~al.}{2006}]{corn-nutrient-management}
+\begin{botherref}
+\oauthor{\bsnm{Sawyer}, \binits{J.}},
+\oauthor{\bsnm{Nafziger}, \binits{E.}},
+\oauthor{\bsnm{Randall}, \binits{G.}},
+\oauthor{\bsnm{Bundy}, \binits{L.}},
+\oauthor{\bsnm{Rehm}, \binits{G.}},
+\oauthor{\bsnm{Joern}, \binits{B.}}:
+A regional approach to corn nitrogen management.
+University Extension Iowa State University Ames
+(2006)
+\end{botherref}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{White and Johnson}{2003}]{corn-physiology}
+\begin{bbook}
+\bauthor{\bsnm{White}, \binits{P.J.}},
+\bauthor{\bsnm{Johnson}, \binits{L.A.}}:
+\bbtitle{Corn: Chemistry and Technology},
+\bedition{2nd} edn.
+\bpublisher{American Association of Cereal Chemists},
+\blocation{St. Paul, MN}
+(\byear{2003})
+\end{bbook}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Richards}{1959}]{richards1959}
+\begin{barticle}
+\bauthor{\bsnm{Richards}, \binits{F.J.}}:
+\batitle{A flexible growth function for empirical use}.
+\bjtitle{Journal of Experimental Botany}
+\bvolume{10}(\bissue{2}),
+\bfpage{290}--\blpage{301}
+(\byear{1959})
+\end{barticle}
+\endbibitem
+
+\end{thebibliography}
