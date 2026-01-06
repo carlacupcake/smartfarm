@@ -1,0 +1,822 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Math and Physical Sciences Numbered Reference Style
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+% Standard Packages
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\raggedbottom
+\newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
+
+\begin{document}
+
+\title[Article Title]{A generalized, coupled-ODE model for crop growth and genetic algorithm for optimal fertilizer and irrigation strategy}
+
+%======================================================================================%
+%% TARGET JOURNAL: Computers and Electronics in Agriculture
+%% https://www.sciencedirect.com/journal/computers-and-electronics-in-agriculture/publish/guide-for-authors
+
+% Paper A (Model + GA):
+% Given a nonlinear, delay-affected plant growth system with resource penalties, can 
+% global optimization discover non-intuitive but high-performing control strategies?
+
+% Paper B (MPC):
+% Given that same system, can we close the loop and recover near-optimal performance
+% under uncertainty and disturbances?
+%======================================================================================%
+
+\author*[1]{\fnm{Carla J.} \sur{Becker}}\email{carlabecker@berkeley.edu, ORCID: 0009-0004-0646-6386}
+
+\author[1]{\fnm{Tarek I.} \sur{Zohdi}}\email{zohdi@berkeley.edu, ORCID: 0000-0002-0844-3573}
+%\equalcont{These authors contributed equally to this work.}
+
+\affil*[1]{\orgdiv{Department of Mechanical Engineering}, \orgname{University of California, Berkeley}, \orgaddress{\street{6141 Etcheverry Hall}, \city{Berkeley}, \postcode{94720}, \state{California}, \country{United States of America}}}
+
+%======================================================================================%
+% ABSTRACT
+%======================================================================================%
+% Must be under 250 words!
+\abstract{nonlinear, physiology-inspired control system with a delayed-absorption model, FIR-based environmental response kernels, and a receding-horizon optimizer that balances cumulative stress versus resource application.}
+
+\keywords{precision agriculture, modeling, simulation, optimization}
+\maketitle
+
+%======================================================================================%
+% INTRODUCTION
+%======================================================================================%
+\section{Introduction}\label{sec:intro}
+% The introduction should not include subheadings!
+
+The agricultural sector in the United States faces significant challenges as the number of farms decline and the cost of farming continues to rise. Rising production expenses for equipment, seeds, and labor, coupled with elevated interest rates and dropping commodity prices, have made farming increasingly expensive. To navigate this challenging landscape, farmers are employing strategies such as cost management and debt restructuring. One such cost management strategy is to use modeling and simulation to optimize farm operations without substantial capital investment. Toward this end, we develop a coupled, nonlinear ordinary differential equation model to describe the growth and decay of a general crop. The model takes as input farm configuration, farm location, crop type, dates of growing season, irrigation amount and frequency, and fertilizer amount and frequency, and outputs hourly values of plant height, leaf area, number of leaves, flower size, and fruit biomass over the growing season. Given sufficient data over a season for a specific crop, from camera-based measurements for example, a farmer could fit the general model parameters to their specific crop, then search for the ideal irrigation and fertilizer inputs to simultaneously maximize crop yield and minimize irrigation and fertilizer costs. To demonstrate this approach, we employ a genetic algorithm to optimize irrigation and fertilizer inputs for a toy model of corn. The algorithm evaluates numerous strategies over the growing season, maximizing fruit biomass (e.g., ear of corn mass) while minimizing expenses incurred from irrigation and fertilizer. In doing so, this work highlights the potential of computational tools to improve farm efficiency and profitability in an increasingly challenging agricultural landscape. %\cite{UofIfarmPolicy} \cite{USDA43B} \cite{AgDaily}
+
+This model exists to enable global optimization under delayed, stochastic, resource-coupled dynamics.
+Existing plant models
+Logistic growth as standard
+Existing work on optimization for economics on a farm
+
+%------------------------------------%
+% FIR CONVOLUTION
+%------------------------------------%
+\subsection{Finite Impulse Response Convolution}\label{subsec:fir-conv}
+
+Note: FIR encodes memory of past inputs without changing the LTI nature of the ODE model. Saturation is modeled via the time-dependent carrying capacities of each of the state variables in the plant model.
+
+The finite impulse response (FIR) filter is the simplest kind of linear, time-invariant system: the output $y$ at time $n$ is a finite-weighted sum of past and present inputs $x$. That is, the FIR filter has an impulse response $g$ that is zero outside of a finite window, usually $n=0,...,L-1$, that is
+\begin{equation}
+g[n] = 0 \quad \text{for} \, n\geq0 \,\text{and}\, n<L.
+\label{eqn:fir-horizon}
+\end{equation}
+
+Then, the convolution sum collapses to finitely many terms
+\begin{equation}
+y[n] = \sum_{k=0}^{L-1} g[k]x[n-k].
+\label{eqn:fir-sum}
+\end{equation}
+
+Canonically, we say ``tap" $k$ multiplies the input delayed by $k$.
+
+A plant does not immediately process (``absorb" or ``metabolize") the input nutrients water, fertilizer, temperature, and radiation. Instead, there is a delayed response, and thus FIR convolution is a natural way to process the raw inputs.
+
+Since we expect plants to absorb the nutrients in a sigmoid fashion, with
+\begin{itemize}
+\item Slow initial uptake due to transport lag,
+\item A rapid increase once pathways are activated,
+\item Eventual deceleration due to nutrient saturation or depletion of nutrient supply,
+\end{itemize}
+
+we might say that if the cumulative uptake of a nutrient like fertilizer $f(t)$ follows
+\begin{equation}
+f(t) = \text{sigmoid}
+\label{eqn:sigmoid}
+\end{equation}
+
+then the instantaneous absorption is
+\begin{equation}
+\df{df}{dt} \propto \text{bell-shaped curve}.
+\label{eqn:bell-shaped}
+\end{equation}
+
+A Gaussian is the least assumptive choice for a bell-shaped curve, as all we need to model are
+\begin{itemize}
+\item The typical delay in peak absorption, $\mu$
+\item The temporal spread of the absorption, $\sigma$.
+\end{itemize}
+
+In this work, the only value specified a priori for each nutrient is the temporal spread. We then ask what typical delay $\mu$ would ensure 95\% of a zero-mean Gaussian with standard deviation $\sigma$ lies within $[-\mu, \mu]$. That is, given $\sigma$, what $\mu$ achieves
+\begin{equation}
+\int_{-\mu}^{\mu} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{x^{2}}{\sigma^{2}} \right\} dx = 0.95.
+\label{eqn:mu-problem}
+\end{equation}
+
+Shifting the Gaussian from zero-mean to $\mu$-mean and applying symmetry, we can rewrite as
+\begin{equation}
+2\int_{0}^{\mu} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{(x-\mu)^{2}}{\sigma^{2}} \right\} dx = 0.95.
+\label{eqn:mu-symm}
+\end{equation}
+
+By defining
+\begin{equation}
+\chi^{2} = \df{1}{2}\df{(x-\mu)^{2}}{\sigma^{2}}
+\label{eqn:mu-chi2}
+\end{equation}
+
+we can apply a change of variables such that upper integration bound becomes
+\begin{equation}
+\chi_{\text{upper}} = \df{\mu}{\sigma\sqrt{2}},
+\label{eqn:mu-upper}
+\end{equation}
+
+the differential becomes
+\begin{equation}
+d\chi = \df{1}{\sigma\sqrt{2}}dx,
+\label{eqn:mu-differential}
+\end{equation}
+
+and the integral becomes
+\begin{equation}
+2\int_{0}^{\mu/\sigma\sqrt{2}} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\{ -\chi^{2} \} (\sigma\sqrt{2})d\chi = 0.95
+\label{eqn:mu-chi}
+\end{equation}
+
+or
+\begin{equation}
+\text{erf}\left(\df{\mu}{\sigma\sqrt{2}}\right) = 0.95,
+\label{eqn:erf}
+\end{equation}
+
+which is ultimately solved with a root finder.
+
+Armed with $\mu$ and $\sigma$, we construct the Gaussian kernel
+\begin{equation}
+g[k] = \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{(k-\mu)^{2}}{\sigma^{2}} \right\}.
+\label{eqn:gaussian-kernel}
+\end{equation}
+
+We then find an FIR horizon $L^{*}$ such that 95\% (not related to the 95\% above...both are arbitrary choices in a sense) of the kernel mass lies within the horizon and convolve with the history of how much input has been applied and when in order to obtain the delayed absorption signal for the nutrient. That is, we must solve
+\begin{equation}
+L^{*} = \min_{L\in\{ 1,...,K \}} L \quad \text{s.t.} \, C(L) \geq 0.95
+\label{eqn:L-star}
+\end{equation}
+
+where $K$ is the simulation length (length of the growing season in hours) and $C(L)$ is the normalized cumulative kernel
+\begin{equation}
+C(L) = \df{\sum_{k=0}^{L-1} g[k]}{\sum_{k=0}^{K-1} g[k]}.
+\label{eqn:CL}
+\end{equation}
+
+%------------------------------------%
+% EMA SMOOTHING
+%------------------------------------%
+\subsection{Infinite Impulse Response Convolution and Exponential Moving Average}\label{subsec:ema-smooth}
+
+The exponential moving average (EMA) is equivalent to a first-order linear, time-invariant infinite-impulse response filter. In continuous time, the defining property of an exponential is that it is proportional to its derivative by a constant factor:
+\begin{equation}
+\df{d}{dt} e^{\beta t} = \beta e^{\beta t}.
+\label{eqn:continuous-exp}
+\end{equation}
+
+In discrete time, however, the defining property is that for adjacent time steps, the function values are proportional by a constant factor:
+\begin{equation}
+g[k+1] = \beta g[k].
+\label{eqn:discrete-exp}
+\end{equation}
+
+For an exponential moving average, we know that for a constant input $x[k] = c$ for all $k$, it should output an identical constant output $y[k] = c$ for all $k$. For a linear, time-invariant system with impulse response $g[k]$, since
+\begin{equation}
+y[k] = \sum_{n=0}^{\infty} g[n]x[k-n] \rightarrow c \mapsto c\sum_{n=0}^{\infty} g[n],
+\label{eqn:ema-conv}
+\end{equation}
+
+a property of an EMA-equivalent filter would be that its kernel adheres to
+\begin{equation}
+1 = \sum_{n=0}^{\infty} g[n].
+\label{eqn:ema-unity}
+\end{equation}
+
+Applying the recursion formula required by the exponential property for discrete time, the kernel requirement becomes
+\begin{equation}
+1 = \sum_{n=0}^{\infty} g_{0}\beta^{n}.
+\label{eqn:ema-recursion}
+\end{equation}
+
+For convergence, we would then require $|\beta| < 1$, and for smoothing, we would more strictly require $\beta\in[0,1)$. By geometric series, the requirement becomes
+\begin{equation}
+1 = g_{0}\df{1}{1 - \beta} \quad \text{or} \quad g_{0} = 1 - \beta
+\label{eqn:ema-g0}
+\end{equation}
+
+and, thus, the EMA-equivalent kernel is
+\begin{equation}
+g[k] = (1-\beta)\beta^{k}.
+\label{eqn:ema-kernel}
+\end{equation}
+
+By the definition of convolution, it follows that for an EMA-equivalent filter,
+\begin{align}
+y[k]
+&= \sum_{n=0}^{\infty} g[n]x[k-n] \\
+&= \sum_{n=0}^{\infty} (1 - \beta)\beta^{k}x[k-n] \\
+&= (1 - \beta)x[k] + \sum_{n=1}^{\infty} (1 - \beta)\beta^{k}x[k-n].
+\label{eqn:ema-almost}
+\end{align}
+
+Considering the expression for $\beta y[k-1]$, we see
+\begin{equation}
+\beta y[k-1] = \sum_{n=0}^{\infty} (1 - \beta)\beta^{k}x[k-n-1].
+\label{eqn:ema-pre-reindex}
+\end{equation}
+
+Reindexing with $m=n+1$, we find
+\begin{equation}
+\beta y[k-1] = \sum_{m=0}^{\infty} (1 - \beta)\beta^{k}x[k-m]
+\label{eqn:ema-reindex}
+\end{equation}
+
+and so, by substitution, the EMA-equivalent filter becomes
+\begin{equation}
+\beta y[k] = (1 - \beta)x[k] + \beta y[k-1]
+\label{eqn:iir-filter}
+\end{equation}
+
+which we recognize as the infinite impulse response filter.
+
+%======================================================================================%
+% MODELING
+%======================================================================================%
+\section{Generalized, Coupled-ODE Crop Model}\label{sec:modeling}
+
+\begin{itemize}
+\item nonlinear growth with state-dependent carrying capacities,
+\item multi-input delayed effects (fertilizer, water, radiation, temperature),
+\item convolution kernels learned from data (sigma ? mu ? FIR kernels),
+\item running deviation metrics (? cumulative),
+\item nutrient stress factors (nu?s) feeding directly into logistic-like growth equations
+\end{itemize}
+
+%------------------------------------%
+% KEY DEPENDENCIES
+%------------------------------------%
+\subsection{Key Dependencies Between Variables}\label{subsec:keydep}
+
+These are guiding relationships for writing down the dynamics, with corn as an example.
+
+Taller stalks -> larger leaf area
+More spikelets (larger tassels) -> smaller cobs
+Taller stalks -> larger cobs
+Larger leaves -> larger cobs
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+State variable &
+\multicolumn{1}{|p{2cm}|}{\centering Irrigation on \\ growth rate} &
+\multicolumn{1}{|p{2cm}|}{\centering Fertilizer on \\ growth rate} &
+\multicolumn{1}{|p{2cm}|}{\centering Irrigation on \\ carrying capacity} &
+\multicolumn{1}{|p{2cm}|}{\centering Fertilizer on \\ carrying capacity} \\
+\hline\hline
+Plant height     & little to none & positive       & little to none & positive       \\
+Leaf area        & little to none & positive       & positive       & positive       \\
+Number of leaves & little to none & little to none & little to none & little to none \\
+Flower size      & little to none & little to none & positive       & little to none \\
+Fruit biomass    & little to none & little to none & positive       & positive       \\
+\hline
+\end{tabular}
+\caption{Effects of irrigation and fertilizer on growth of the different state variables in the plant model when applied optimally (where ``optimally'' in this case refers to what farmers have observed) {\color{red} ADD CITATIONS !!}}
+\label{tab:fert-irr-effects}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+State variable &
+\multicolumn{1}{|p{2cm}|}{\centering Temperature on \\ growth rate} &
+\multicolumn{1}{|p{2cm}|}{\centering Temperature on \\ carrying capacity} &
+\multicolumn{1}{|p{2cm}|}{\centering Solar radiation on \\ growth rate} &
+\multicolumn{1}{|p{2cm}|}{\centering Solar radiation on \\ carrying capacity} \\
+\hline\hline
+Plant height     & positive       & positive & positive       & positive \\
+Leaf area        & positive       & positive & positive       & positive \\
+Number of leaves & little to none & positive & little to none & positive \\
+Flower size      & negative       & negative & negative       & negative \\
+Fruit biomass    & positive       & positive & positive       & positive \\
+\hline
+\end{tabular}
+\caption{Effects of temperature and solar radiation on growth of the different state variables in the plant model when the temperature and radiation follow optimal values {\color{red} ADD CITATIONS !!}}
+\label{tab:temp-rad-effects}
+\end{table}
+
+%------------------------------------%
+% DISTURBANCES
+%------------------------------------%
+\subsection{Disturbances}\label{subsec:disturbances}
+
+\begin{itemize}
+\item $S$, Precipitation (in) - from NOAA daily data, https://www.climate.gov/maps-data/dataset/past-weather-zip-code-data-table
+\item $T$, Temperature (\textdegree C) - from National Solar Radiation Database (NSRDB), M. Sengupta, Y. Xie, A. Lopez, A. Habte, G. Maclaurin, J. Shelby, The national solar radiation data base (nsrdb), Renewable and sustainable energy reviews 89 (2018) 51?60.
+\item $R$, Radiation (W/m\textsuperscript{2}) - from NSRDB
+\end{itemize}
+
+%------------------------------------%
+% INPUTS
+%------------------------------------%
+\subsection{Inputs}\label{subsec:inputs}
+
+\begin{itemize}
+\item $w$, water from irrigation (in)
+\item $f$, fertilizer (lbs)
+\end{itemize}
+
+%------------------------------------%
+% TRANSFORMED INPUTS AND NUTRIENT FACTORS
+%------------------------------------%
+\subsection{Metabolism and Delayed, Cumulative, and Anomaly Values}\label{subsec:transformations}
+
+See metabolism\_analysis.ipynb
+
+Crops constantly experience radiation and temperature, and thus, in a sense, they have short-term memory of these input disturbances, or a quick metabolism of these disturbances. That said, crops do still have a memory for these disturbances. For example, even though a plant will easily recover from a single hour of high temperatures, we do not expect the plant to bounce-back after a several-day-long heat wave, and, in fact, we may expect there to be long term damage to the plant after the heat wave even if temperatures return to normal.
+
+Crops experience water and fertilizer, however, only for the period from application to full absorption and usage of the resources. We might say that plants have adapted to metabolize the water and fertilizer input more slowly, since they receive those inputs more infrequently. 
+
+The goal is to use a similar model for how the plant uses each of the input disturbances and control inputs, capturing the differences in metabolism of each. The authors propose the following series of ``nutrient transformations" that account for the plants metabolism and memory of nutrients. The transformations result in nutrient factors that in turn affect the growth rates and carrying capacities of typically logistic state variables such that they are time-varying.
+\begin{itemize}
+\item Delayed absorption transformation
+\item Cumulative absorption transformation
+\item Instantaneous anomaly transformation
+\item Cumulative divergence transformation
+\item Nutrient factor calculation
+\end{itemize}
+
+We use fertilizer as an example nutrient to demonstrate the series of transformations, but the same transformations are applied to all nutrients (inputs and disturbances).
+
+Delayed absorption transformation: 
+FIR enables distributed delay, not a simple delay in the fertilizer signal itself.
+If the raw, discrete fertilizer applied is $f[k]$, then the fertilizer absorbed is
+\begin{equation}
+\bar{f}[k] = \sum_{n=k}^{k+L_{f}-1} g_{f}[n-k]f[k]
+\label{eqn:delayed-trans}
+\end{equation}
+
+where $g_{f}$ is the Gaussian FIR kernel for fertilizer, found from the empirically found temporal spread $\sigma_{f}$, and $L_{f}$ is the FIR kernel for fertilizer metabolism, both found according to section \ref{subsec:fir-conv}. 
+
+Cumulative absorption transformation:
+\begin{equation}
+F[k] = \sum_{n=0}^{k} \bar{f}[n]
+\label{eqn:cum-trans}
+\end{equation}
+
+Instantaneous anomaly transformation:
+\begin{equation}
+\delta_{f}[k] = \biggl\vert \df{k f_{\text{typ}} - F[k]}{k f_{\text{typ}}} \biggr\vert
+\label{eqn:anomaly-trans}
+\end{equation}
+
+where $f_{\text{typ}}$ is the typical fertilizer level the plant ``expects" to see at a given hourly time step.
+
+Cumulative divergence transformation:
+Apply EMA smoothing so that there is some tolerance to anomalies. Apply the IIR filter from section \ref{subsec:ema-smooth}.
+\begin{equation}
+\Delta_{f}[k] = \beta \Delta_{f}[k-1] + (1 - \beta) \delta_{f}[k]
+\label{eqn:cum-div-trans}
+\end{equation}
+
+Nutrient factor calculation: Goal is to have the nutrient factors $\nu\in[0,1]$ and behave such that when $\Delta = 0$, $\nu=1$ and when $\Delta\geq 1$, $\nu=0$. A smooth function that achieves this is a decaying exponential. Additionally, we once more apply EMA smoothing so that the nutrient factors have some capacity to accumulate anomalies before the plant majorly reacts.
+\begin{equation}
+\nu_{f}[k] = \beta \exp\{ -\alpha\Delta_{f}[k] \} + (1 - \beta) \nu_{f}[k-1] % check this formula...this is what's in the code but coefficients seem swapped
+\label{eqn:nut-fac-trans}
+\end{equation}
+
+where in order for $\nu_{f} = 0.05$ when $\Delta_{f} = 1$, then we choose $\alpha = 3$. In this paper we use $\beta = 0.95$, which corresponds to a fairly long memory.
+
+%------------------------------------%
+% DYNAMICS
+%------------------------------------%
+\subsection{Dynamics}\label{subsec:dynamics}
+
+State variables:
+\begin{itemize}
+\item Plant height (m)
+\item Leaf area (m2)
+\item Number of leaves (count)
+\item Flower size (count of spikelets)
+\item Fruit biomass (kg)
+\end{itemize}
+
+Initial conditions: since time steps are on order of thousands, I chose 1/1000th, but this was kind of an arbitrary choice...looking for justification.
+\begin{itemize}
+\item $h_{0} = 0.001$ m
+\item $A_{0} = 0.001$ m\textsuperscript{2}
+\item $N_{0} = 0.001$ leaves
+\item $c_{0} = 0.001$ flower spikelets
+\item $P_{0} = 0.001$ kg
+\end{itemize}
+
+Baseline growth rates from fitting model from data:
+\begin{itemize}
+\item $a_{h} = 0.01/\text{hr}$, plant height growth rate, for corn
+\item $a_{A} = 0.0105/\text{hr}$, leaf area growth rate, for corn
+\item $a_{N} = 0.011/\text{hr}$, number of leaves growth rate, for corn
+\item $a_{c} = 0.01/\text{hr}$, flower size growth rate, for corn
+\item $a_{A} = 0.0105/\text{hr}$, leaf area growth rate, for corn
+\end{itemize}
+
+Baseline carrying capacities from fitting model from data:
+\begin{itemize}
+\item $k_{h} = 3.0$ m, plant height carrying capacity, for corn
+\item $k_{A} = 0.65$ m\textsuperscript{2}, leaf area carrying capacity, for corn
+\item $k_{N} = 20$, number of leaves carrying capacity, for corn
+\item $k_{c} = 1000$ spikelets, flower size carrying capacity, for corn
+\item $k_{A} = 0.25$ kg, leaf area carrying capacity, for corn
+\end{itemize}
+
+Plant height:
+\begin{equation}
+\df{dh}{dt} = \hat{a}_{h}(t)h(t) \left( 1 - \df{h(t)}{\hat{k}_{h}(t)} \right)
+\label{eqn:plant-height-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{h}(t) = a_{h}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3} \quad \text{and} \quad \hat{k}_{h}(t) = k_{h}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3}
+\label{eqn:hats-for-h}
+\end{equation}
+
+as meeting the expected nutrient levels for fertilizer, temperature, and solar radiation have a positive on growth of the cornstalk, see Tables \ref{tab:fert-irr-effects} and \ref{tab:temp-rad-effects}. Growth Rates: When dealing with percentages or rates that are compounded over time (like investment returns), the geometric mean is more accurate than the arithmetic mean, according to Investopedia. https://www.investopedia.com/terms/g/geometricmean.asp
+
+Leaf area:
+\begin{equation}
+\df{dA}{dt} = \hat{a}_{A}(t)A(t) \left( 1 - \df{A(t)}{\hat{k}_{A}(t)} \right)
+\label{eqn:leaf-area-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{A}(t) = a_{A}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3} \quad \text{and} \quad \hat{k}_{A}(t) = k_{A}(\nu_{w}(t)\nu_{f}(t)\nu_{T}(t)\nu_{R}(t)(\hat{k}_{h}/k_{h}))^{1/5}
+\label{eqn:hats-for-A}
+\end{equation}
+
+Number of leaves:
+\begin{equation}
+\df{dN}{dt} = \hat{a}_{N}(t)N(t) \left( 1 - \df{N(t)}{\hat{k}_{N}(t)} \right)
+\label{eqn:number-leaves-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{N}(t) = a_{N} \quad \text{and} \quad \hat{k}_{N}(t) = k_{N}(\nu_{T}(t)\nu_{R}(t))^{1/2}
+\label{eqn:hats-for-N}
+\end{equation}
+
+Flower size:
+\begin{equation}
+\df{dc}{dt} = \hat{a}_{c}(t)c(t) \left( 1 - \df{c(t)}{\hat{k}_{c}(t)} \right)
+\label{eqn:flower-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{c}(t) = a_{c} \quad \text{and} \quad \hat{k}_{c}(t) = k_{c}(\nu_{w}(t)(1/\nu_{T}(t))(1/\nu_{R}(t)))^{1/3}
+\label{eqn:hats-for-c}
+\end{equation}
+
+Fruit biomass:
+\begin{equation}
+\df{dP}{dt} = \hat{a}_{P}(t)P(t) \left( 1 - \df{P(t)}{\hat{k}_{P}(t)} \right)
+\label{eqn:fruit-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{P}(t) = a_{P} \quad \text{and} \quad \hat{k}_{P}(t) = k_{P}(\nu_{w}(t)\nu_{f}(t)\nu_{T}(t)\nu_{R}(t)(\hat{k}_{h}/k_{h})(\hat{k}_{A}/k_{A})(\hat{k}_{c}/k_{c}))^{1/7}
+\label{eqn:hats-for-P}
+\end{equation}
+
+
+%======================================================================================%
+% SIMULATION
+%======================================================================================%
+\section{Simulation}\label{sec:simulation}
+
+%------------------------------------%
+% TIME-STEPPING
+%------------------------------------%
+\subsection{Time-stepping}\label{subsec:timestepping}
+
+Discussion on choice of Forward Euler vs. something potentially better like RK4. See the PDF discussion in sources/Forward Euler vs RK4 vs closed-form Log Growth.pdf
+
+%======================================================================================%
+% GENETIC ALGORITHM
+%======================================================================================%
+\section{Identifying Optimal Inputs via Genetic Algorithm}\label{sec:ga}
+
+%------------------------------------%
+% DESIGN VARIABLES
+%------------------------------------%
+\subsection{Design Variables}\label{subsec:costfunc}
+
+\begin{equation}
+\bf{u} =
+\begin{bmatrix}
+u_{1} \\ u_{2} \\ u_{3} \\ u_{4}
+\end{bmatrix} =
+\begin{bmatrix}
+\text{irrigation frequency} \\
+\text{irrigation amount}    \\
+\text{fertilizer frequency} \\
+\text{fertilizer amount}    \\
+\end{bmatrix}
+\end{equation}
+
+Irrigation and fertilizer frequencies should be interpreted as once per $u_{x}$ hours i.e. if $u_{1} = 100$, then that means irrigate every 100 hours. Irrigation amount in inches. Fertilizer amount in pounds.
+
+%------------------------------------%
+% COST FUNCTION DESIGN
+%------------------------------------%
+\subsection{Cost Function Design}\label{subsec:costfunc}
+
+\begin{equation}
+\text{profit} = \omega_{h}h_{\text{end}} + \omega_{A}A_{\text{end}} + \omega_{P}P_{\text{end}}
+\label{eqn:profit}
+\end{equation}
+
+\begin{equation}
+\text{expenses} = \omega_{w} \sum_{k=0}^{K} w[k] + \omega_{f} \sum_{k=0}^{K} f[k]
+\label{eqn:expenses}
+\end{equation}
+
+\begin{equation}
+\text{revenue} = \text{profit} - \text{expenses}
+\label{eqn:revenue}
+\end{equation}
+
+\begin{itemize}
+\item $\omega_{w} = \$2/in$, irrigation weight
+\item $\omega_{f} = \$0.614/\text{lb-acre}$, fertilizer weight, from typical NPK ratio for corn: 230 lb/acre N (\$0.68/lb), 60 P (\$.56/lb), 65 K (\$0.43/lb) => 1/(230 + 65 + 60) * (230 * 0.68 + 60 * 0.56 + 65 * 0.43) = \$0.614 per lb-acre of fertilizer
+\item $\omega_{h} = \$35/\text{m}$, plant height weight, \$40/ton * 3.5 ton/acre * 1 acre/3 m avg = \$35/m
+\item $\omega_{A} = \$215/\text{m}^{2}$, leaf area weight, \$40/ton * 3.5 ton/acre * 1 acre/0.65 m2 avg = \$215/m2
+\item $\omega_{P} = \$35/\text{kg-acre}$, fruit biomass weight, \$4/bushel, 1 bushel is ~25.5 kg so \$0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
+\end{itemize}
+
+\begin{equation}
+\text{cost} = -\text{revenue}
+\label{eqn:cost}
+\end{equation}
+
+The cost is the negative revenue -- lower cost means higher revenue. Typical corn revenue per acre is \$200-400 (CITE! CHECK!).
+
+Optimization problem:
+\begin{equation}
+\max_{\bf{u}} \text{revenue} = \min_{\bf{u}} \text{cost}
+\label{eqn:max-revenue}
+\end{equation}
+
+%------------------------------------%
+% HOW A GA WORKS
+%------------------------------------%
+\subsection{Genetic Algorithm}\label{subsec:ga}
+With the cost function defined, a genetic algorithm is used to converge to an optimal solution. Each member of a population in the genetic algorithm is composed of candidate sets of \{ irrigation frequency, irrigation amount, fertilizer frequency, fertilizer amount \}. After successive selection and breeding over many generations, the genetic algorithm will converge. The default genetic algorithm parameters are 16 parents, 16 children, 128 members per population, and 100 generations. Note: It's generally good to have a larger population than generations in a GA, as a big population ensures diversity for better exploration, allowing "late-bloomer" genes to survive and mature over fewer generations, which prevents premature convergence to suboptimal answers.
+
+
+%======================================================================================%
+% CORN AS EXAMPLE
+%======================================================================================%
+\section{Corn as an Example}\label{sec:corn}
+
+Why corn? Table \ref{tab:key-crops} shows the top 10 crops in the US by acreage and corn is at the top of the list.
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Crop &
+\multicolumn{1}{|p{1.8cm}|}{\centering Life Cyle \\ Type} &
+\multicolumn{1}{|p{3.2cm}|}{\centering Annual Acreage \\ Harvested (US Total)} &
+\multicolumn{1}{|p{2.2cm}|}{\centering Typical Yields \\ per acre} &
+\multicolumn{1}{|p{2.5cm}|}{\centering Typical Sales} \\
+\hline\hline
+Corn      & Annual    & 92,990,416 & 100 bushels   & \$4/bushel \\
+Soybeans  & Annual    & 82,601,111 & 47 bushels    & \$9.80/bushel \\
+Wheat     & Annual    & 51,179,326 & 65 bushels    & \$5.80/bushel \\
+Cotton    & Annual    & 9,573,414  & 700-1200 lbs  & \$0.70/lb \\
+Alfalfa   & Perennial & 9,518,736  & 8-14 tons     & \$140-\$250/ton \\
+Sorghum   & Annual    & 9,233,080  & 0.6-0.9 tons  & \$200-\$230/ton \\
+Rice      & Annual    & 2,840,503  & 5 tons        & \$ 500-1300/ton \\
+Sugarcane & Perennial & 659,471    & 24-28 tons    & \$23-\$44/ton \\ 
+Grapes    & Perennial & 111,136    & 4 tons        & \$2700/ton \\
+Oranges   & Perennial & 40,433     & 150-300 boxes & \$10-20/box \\
+\hline
+\end{tabular}
+\caption{Acreage data from the United States Department of Agriculture (USDA) Farm Service Agency (FSA) 2023 census \cite{fsa-acreage}. The mainland US contains climate regions 2a-10a, as defined by the USDA \cite{growing-regions}. {\color{red} ADD CITATIONS !!}}
+\label{tab:key-crops}
+\end{table}
+
+%------------------------------------%
+% TYPICAL DISTURBANCES
+%------------------------------------%
+\subsection{Typical Control Inputs and Disturbances}\label{subsec:typinputs}
+Growth of corn with typical fertilizer and irrigation strategy
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Crop &
+\multicolumn{1}{|p{2cm}|}{\centering Seasonal \\ Irrigation \\ Requirement (inches/acre)} &
+\multicolumn{1}{|p{2cm}|}{\centering Seasonal N \\ Requirement (lbs/acre)} &
+\multicolumn{1}{|p{2cm}|}{\centering Seasonal P \\ Requirement (lbs/acre)} &
+\multicolumn{1}{|p{2cm}|}{\centering Seasonal K \\ Requirement (lbs/acre)} &
+\multicolumn{1}{|p{2cm}|}{\centering Other Seasonal \\ Nutrient Requirements} \\
+\hline\hline
+Corn      & 28       & 180-280 & 40-80   & 30-100  & ---  \\
+\hline
+\end{tabular}
+\caption{Acreage data from the United States Department of Agriculture (USDA) Farm Service Agency (FSA) 2023 census \cite{fsa-acreage}. The mainland US contains climate regions 2a-10a, as defined by the USDA \cite{growing-regions}. {\color{red} ADD CITATIONS !!}}
+\label{tab:key-crops}
+\end{table}
+
+28 inches over the season, with 2900 hours in the season, that is ~0.01 inches/hour
+355 (from range 250-460) pounds over the season, with 2900 hours in the season, that is ~0.12 pounds/hour <-per acre numbers
+Comes from estimating 230 lbs/acre of N (\$156.40/acre), 60 lbs/acre of P (\$33.60/acre), and 65 lbs/acre of K (\$27.95/acre)
+22.82 = Typical (mean) hourly temperature in degrees Celsius.
+580 = Typical (mean) hourly radiation in watts/m\text{2}.
+Corn is sold in bushels. Typically 112 ears of corn per bushel (cite!)
+Typically sold for \$4/bushel
+Typically 28,328 stalks/acre
+Somehow arrive at \$40/ton
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Crop &
+\multicolumn{1}{|p{3cm}|}{\centering Representative \\ City, State} &
+\multicolumn{1}{|p{2cm}|}{\centering (Latitude, Longitude)} &
+\multicolumn{1}{|p{1.5cm}|}{\centering UTC Offset} &
+\multicolumn{1}{|p{2cm}|}{\centering Climate Regions} \\
+\hline\hline
+Corn      & Fairfax, IA      & (41.76, -91.87)  & -5 & 4b-5b  \\
+\hline
+\end{tabular}
+\caption{Acreage data from the United States Department of Agriculture (USDA) Farm Service Agency (FSA) 2023 census \cite{fsa-acreage}. The mainland US contains climate regions 2a-10a, as defined by the USDA \cite{growing-regions}.}
+\label{tab:key-regions}
+\end{table}
+
+Use Fairfax, IA precipitation data.
+
+%------------------------------------%
+% CORN MODEL PARAMS
+%------------------------------------%
+\subsection{Fitting the Generalized Model Parameters for Corn}\label{subsec:cornparams}
+
+Tables of carrying capacities, growth rates, initial conditions, and sensitivities
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+State variable &
+\multicolumn{1}{|p{2cm}|}{\centering Days after sowing} &
+\multicolumn{1}{|p{2cm}|}{\centering Hours after sowing} &
+\multicolumn{1}{|p{2cm}|}{\centering Full size reached} \\
+\hline\hline
+Plant height               & 65-70 & 1560-1680 & 2.7-3.7 m                    \\
+Leaf area                  & 55-65 & 1320-1560 & 0.6-0.7 m\textsuperscript{2} \\
+Number of leaves           & 65    & 1560      & 18-20                        \\
+Number of flower spikelets & 65-70 & 1560-1680 & 1000                         \\
+Fruit biomass              & 125   & 3000      & 0.145-0.357 kg               \\
+\hline
+\end{tabular}
+\caption{{\color{red} ADD CITATIONS !!}}
+\label{tab:days-after-sowing}
+\end{table}
+
+%------------------------------------%
+% TYPICAL VS. OPTIMAL GROWTH
+%------------------------------------%
+\subsection{Typical Growth vs. Optimal Growth}\label{subsec:optgrowth}
+
+%======================================================================================%
+% DISCUSSION
+%======================================================================================%
+\section{Discussion}\label{sec:discussion}
+
+%------------------------------------%
+% FITTING MODEL
+%------------------------------------%
+\subsection{Fitting all the Model Parameters}\label{subsec:fitparams}
+
+Could use a PINN or a GAN with real-world data (such as camera data + CV model) to get growth curves for different state variables and fit baseline carrying capacity and growth rate data. Botanist, farmer, and/or biologist expertise could be used to make educated guesses for the absorption times for different nutrients, and then be used to fit temporal spread (sigma) values.
+
+%------------------------------------%
+% POTENTIAL MODIFICATIONS
+%------------------------------------%
+\subsection{Potential Modifications}\label{subsec:mods}
+Could model with Richards growth instead of logistic growth:
+\begin{equation}
+\df{dh}{dt} = a_{h}h\left[ 1 - \left( \df{h}{k_{h}} \right)^{\nu} \right]
+\label{eqn:richardgrowth}
+\end{equation}
+
+with analytic solution
+\begin{equation}
+h(t) = k_{h} \left[ 1 + \left\{ \left( \df{k_{h}}{h_{0}} \right)^{\nu} - 1 \right\} e^{-\nu a_{h}t} \right]^{-1/\nu}
+\label{eqn:richardgrowth}
+\end{equation}
+
+where $\nu = 1$ is equivalent to logistic growth, $\nu > 1$ is for steep early growth, and $\nu < 1$ is for steep slow growth.
+
+Another potential improvement: real nutrient absorption is often skewed with a faster activation and slower decay, but the choice of a Gaussian kernel for the FIR filter cannot encode this skew. A log-normal or Gamma kernel could achieve this.
+
+Additionally, the Gaussian kernel does not actually model plant saturation -- any inputs applied are modeled to be absorbed, and this is not realistic. The bandaid in this model is to clip the ranges of the nutrient factors which in turn clips the values of the growth rates and carrying capacities.
+
+%======================================================================================%
+% CONCLUSION
+%======================================================================================%
+\section{Conclusion}\label{sec:conclusion}
+
+Conclusions may be used to restate your hypothesis or research question, restate your major findings, explain the relevance and the added value of your work, highlight any limitations of your study, describe future directions for research and recommendations. 
+
+In some disciplines use of Discussion or 'Conclusion' is interchangeable. It is not mandatory to use both. Please refer to Journal-level guidance for any specific requirements. 
+
+%======================================================================================%
+% SUPPLEMENTARY INFORMATION
+%======================================================================================%
+\backmatter
+%\bmhead{Supplementary information}
+
+%======================================================================================%
+% ACKNOWLEDGEMENTS
+%======================================================================================%
+\bmhead{Acknowledgements}
+
+This work has been partially supported by the UC Berkeley College of Engineering and the USDA AI Institute for Next Generation Food Systems (AIFS), USDA award number 2020-67021-32855.
+
+%======================================================================================%
+% DECLARATIONS
+%======================================================================================%
+\section*{Declarations}
+
+\noindent\textbf{Competing Interests}
+\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\noindent\textbf{Code availability}
+\noindent The source code used for this study is archived on Zenodo at [insert DOI link, e.g., doi.org] 
+
+%======================================================================================%
+% EXAMPLE TABLE AND FIGURES
+%======================================================================================%
+\section{Example Table and Figure}\label{sec:example}
+% Avoid subfigures!
+
+\begin{table}[h]
+\caption{Caption text}\label{tab1}%
+\begin{tabular}{@{}llll@{}}
+\toprule
+Column 1 & Column 2  & Column 3 & Column 4\\
+\midrule
+row 1    & data 1   & data 2  & data 3  \\
+row 2    & data 4   & data 5\footnotemark[1]  & data 6  \\
+row 3    & data 7   & data 8  & data 9\footnotemark[2]  \\
+\botrule
+\end{tabular}
+\footnotetext{Source: This is an example of table footnote. This is an example of table footnote.}
+\footnotetext[1]{Example for a first table footnote. This is an example of table footnote.}
+\footnotetext[2]{Example for a second table footnote. This is an example of table footnote.}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{fig.eps}
+\caption{This is a widefig. This is an example of long caption this is an example of long caption  this is an example of long caption this is an example of long caption}\label{fig1}
+\end{figure}
+
+All cited bib entries are printed at the end of this article: \cite{bib1}, \cite{bib2}, \cite{bib3}.
+
+%======================================================================================%
+% BIBLIOGRAPHY
+%======================================================================================%
+\bibliography{bibliography}
+
+\end{document}
