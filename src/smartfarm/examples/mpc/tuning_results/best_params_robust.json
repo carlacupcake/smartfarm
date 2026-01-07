@@ -1,0 +1,28 @@
+{
+  "best_mean_revenue": 886.469877869039,
+  "best_params": {
+    "weight_irrigation": 0.17652565925029204,
+    "weight_fertilizer": 0.002122826504940829,
+    "weight_height": 590.8246147091686,
+    "weight_leaf_area": 490.9837641813352,
+    "weight_fruit_biomass": 1203.308271452593,
+    "weight_water_anomaly": 2.93880647822164,
+    "weight_fertilizer_anomaly": 1.2072165353368776,
+    "daily_horizon": 9
+  },
+  "per_scenario_revenue": {
+    "normal_1": 1016.7917609544058,
+    "moderate_dry": 1058.895733047265,
+    "summer_drought": 977.1417070760306,
+    "wet_year": 736.7896239881122,
+    "extreme_drought_heat": 642.730564279382
+  },
+  "n_trials": 50,
+  "scenarios_used": [
+    "normal_1",
+    "moderate_dry",
+    "summer_drought",
+    "wet_year",
+    "extreme_drought_heat"
+  ]
+}

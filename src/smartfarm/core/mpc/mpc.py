@@ -590,25 +590,25 @@ class MPC:
         def nuW_ema_rule(model, k):
             if k == uk0:
                 return model.nuW[k] == model.nuW_raw[k]
-            return model.nuW[k] == (1.0 - beta_nutrient_factor) * model.nuW[k-1] + beta_nutrient_factor * model.nuW_raw[k]
+            return model.nuW[k] == beta_nutrient_factor * model.nuW[k-1] +  (1.0 - beta_nutrient_factor) * model.nuW_raw[k]
         model.nuW_ema = pyo.Constraint(model.uk, rule=nuW_ema_rule)
 
         def nuF_ema_rule(model, k):
             if k == uk0:
                 return model.nuF[k] == model.nuF_raw[k]
-            return model.nuF[k] == (1.0 - beta_nutrient_factor) * model.nuF[k-1] + beta_nutrient_factor * model.nuF_raw[k]
+            return model.nuF[k] == beta_nutrient_factor * model.nuF[k-1] +  (1.0 - beta_nutrient_factor) * model.nuF_raw[k]
         model.nuF_ema = pyo.Constraint(model.uk, rule=nuF_ema_rule)
 
         def nuT_ema_rule(model, k):
             if k == uk0:
                 return model.nuT[k] == model.nuT_raw[k]
-            return model.nuT[k] == (1.0 - beta_nutrient_factor) * model.nuT[k-1] + beta_nutrient_factor * model.nuT_raw[k]
+            return model.nuT[k] == beta_nutrient_factor * model.nuT[k-1] +  (1.0 - beta_nutrient_factor) * model.nuT_raw[k]
         model.nuT_ema = pyo.Constraint(model.uk, rule=nuT_ema_rule)
 
         def nuR_ema_rule(model, k):
             if k == uk0:
                 return model.nuR[k] == model.nuR_raw[k]
-            return model.nuR[k] == (1.0 - beta_nutrient_factor) * model.nuR[k-1] + beta_nutrient_factor * model.nuR_raw[k]
+            return model.nuR[k] == beta_nutrient_factor * model.nuR[k-1] +  (1.0 - beta_nutrient_factor) * model.nuR_raw[k]
         model.nuR_ema = pyo.Constraint(model.uk, rule=nuR_ema_rule)
 
         # State variable dynamics as constraints
@@ -1026,11 +1026,11 @@ class MPC:
         prev_nuT = extra_state["log"]["nuT"][-1]
         prev_nuR = extra_state["log"]["nuR"][-1]
 
-        # Final, smoothed nutrient factors
-        nuW = (1.0 - beta_nutrient_factor) * prev_nuW + beta_nutrient_factor * nuW_raw
-        nuF = (1.0 - beta_nutrient_factor) * prev_nuF + beta_nutrient_factor * nuF_raw
-        nuT = (1.0 - beta_nutrient_factor) * prev_nuT + beta_nutrient_factor * nuT_raw
-        nuR = (1.0 - beta_nutrient_factor) * prev_nuR + beta_nutrient_factor * nuR_raw
+        # Final, smoothed nutrient factors (EMA: weight on previous value is beta)
+        nuW = beta_nutrient_factor * prev_nuW + (1.0 - beta_nutrient_factor) * nuW_raw
+        nuF = beta_nutrient_factor * prev_nuF + (1.0 - beta_nutrient_factor) * nuF_raw
+        nuT = beta_nutrient_factor * prev_nuT + (1.0 - beta_nutrient_factor) * nuT_raw
+        nuR = beta_nutrient_factor * prev_nuR + (1.0 - beta_nutrient_factor) * nuR_raw
 
         extra_state["log"]["nuW"].append(nuW)
         extra_state["log"]["nuF"].append(nuF)
@@ -1050,12 +1050,12 @@ class MPC:
         kc_hat = np.clip(kc * (nuW * (1/nuT) * (1/nuR))**(1/3), c, 2 * kc)
         kP_hat = np.clip(kP * (nuW * nuF * nuT * nuR * (kh_hat/kh) * (kA_hat/kA) * (kc_hat/kc))**(1/7), P, 2 * kP)
 
-        # Forward Euler integration, to match the CFTOC model
-        h_next = h + dt * (ah_hat * h * (1.0 - h / max(kh_hat, 1e-9)))
-        A_next = A + dt * (aA_hat * A * (1.0 - A / max(kA_hat, 1e-9)))
-        N_next = N + dt * (aN_hat * N * (1.0 - N / max(kN_hat, 1e-9)))
-        c_next = c + dt * (ac_hat * c * (1.0 - c / max(kc_hat, 1e-9)))
-        P_next = P + dt * (aP_hat * P * (1.0 - P / max(kP_hat, 1e-9)))
+        # Closed-form logistic step (matches GA and CFTOC constraints)
+        h_next = logistic_step(h, ah_hat, kh_hat, dt)
+        A_next = logistic_step(A, aA_hat, kA_hat, dt)
+        N_next = logistic_step(N, aN_hat, kN_hat, dt)
+        c_next = logistic_step(c, ac_hat, kc_hat, dt)
+        P_next = logistic_step(P, aP_hat, kP_hat, dt)
 
         # Enforce non-negativity explicitly
         h_next = max(h_next, 0.0)

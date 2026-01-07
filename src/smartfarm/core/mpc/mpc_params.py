@@ -12,41 +12,41 @@ class MPCParams(BaseModel):
     """
 
     daily_horizon: PositiveInt = Field(
-        default=30,
+        default=9,
         description="Number of days in the model predictive control horizon."
     )
     weight_irrigation: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.1, # scaled down to encourage actuation
+        default=0.176526, # scaled down to encourage actuation
         description="Economic penalty per unit of irrigation applied (in $/acre-inch); \
-            used to convert water usage into a cost term in the GA objective."
+            used to convert water usage into a cost term in the objective."
     )
     weight_fertilizer: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.005, # scaled down to encourage actuation
+        default=0.002123,
         description="Economic penalty per unit of fertilizer applied (in $/lb-acre); \
-            used to convert fertilizer usage into a cost term in the GA objective."
+            used to convert fertilizer usage into a cost term in the objective."
     )
     weight_height: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=100.0,
+        default=590.82,
         description="Economic reward per unit of plant height (in $ per cm-acre-plant basis); \
             drives the GA to maximize early growth."
     )
     weight_leaf_area: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=100.0,
+        default=490.98,
         description="Economic reward per unit of leaf area (in $ per cm²-acre-plant basis); \
             drives the GA to maximize canopy development."
     )
     weight_fruit_biomass: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=2000.0, # $4/bushel, 1 bushel is ~25.5 kg so $0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
+        default=1203.31,
         description="Economic reward per unit of fruit biomass produced \
             (in $ per kg-acre-plant basis); drives the GA to maximize harvest value."
     )
     weight_water_anomaly: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.1, # since the other terms are in hundreds of dollars, this keeps the nutrient factor penalty on the same order
+        default=2.938806,
         description="Non-economic weight for nutrient factors. \
             Ensures nutrient factors stay close to 1.0 in CFTOC."
     )
     weight_fertilizer_anomaly: Annotated[float, Field(strict=True, ge=0)] = Field(
-        default=0.1, # since the other terms are in hundreds of dollars, this keeps the nutrient factor penalty on the same order
+        default=1.207217,
         description="Non-economic weight for nutrient factors. \
             Ensures nutrient factors stay close to 1.0 in CFTOC."
     )
@@ -56,13 +56,12 @@ class MPCParams(BaseModel):
     )
     solver_options: Optional[Dict[str, Any]] = Field(
         default={
-            "max_iter": 2000,
-            "tol": 1e-6,
-            "acceptable_tol": 1e-3,
-            "acceptable_iter": 20,
-            "bound_relax_factor": 1e-8,
-            "acceptable_constr_viol_tol": 1e-4,
-            "print_level": 5
+            "tol": 1e-4,
+            "acceptable_iter": 100,
+            "max_iter": 500,
+            "print_level": 0,
+            "mu_strategy": "adaptive",
+            "linear_solver": "mumps",
         },
         description="Optional dictionary of solver options to pass to the \
             optimization solver used in MPC."
