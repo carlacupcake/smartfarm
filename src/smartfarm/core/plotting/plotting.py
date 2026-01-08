@@ -1,14 +1,77 @@
 # plotting.py
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import ticker
 from typing import Optional
 
 from core.model.model_disturbances import ModelDisturbances
 from core.model.model_growth_rates import ModelGrowthRates
 from core.model.model_carrying_capacities import ModelCarryingCapacities
+from core.model.model_params import ModelParams
 
 from core.plotting.plotting_colors import PlottingColors
 from core.plotting.plotting_params import PlottingParams
+
+def get_hour_formatter(dt: float = 1.0):
+    """
+    Create a FuncFormatter that converts step values to hours.
+
+    Args:
+        dt: Time step in hours (default 1.0)
+
+    Returns:
+        A matplotlib FuncFormatter that scales x-axis values by dt
+    """
+    def scale_to_hours(x, pos):
+        return f'{x * dt:g}'
+    return ticker.FuncFormatter(scale_to_hours)
+
+
+def add_adaptive_legend(ax, loc: str = 'lower right', max_per_col: int = 5) -> None:
+    """
+    Add a legend that adapts to multiple columns based on the number of items.
+
+    Args:
+        ax: Matplotlib Axes object
+        loc: Legend location (default 'lower right')
+        max_per_col: Maximum items per column before adding another column
+    """
+    handles, labels = ax.get_legend_handles_labels()
+    n_items = len(labels)
+
+    if n_items == 0:
+        return
+
+    # Calculate number of columns needed
+    ncol = max(1, (n_items + max_per_col - 1) // max_per_col)
+
+    ax.legend(loc=loc, ncol=ncol, fontsize=9, framealpha=0.9)
+
+
+def apply_time_formatter(fig_or_axes, dt: float = 1.0) -> None:
+    """
+    Apply hour-scaling formatter to all x-axes in a figure or list of axes.
+
+    Args:
+        fig_or_axes: A matplotlib Figure, single Axes, or array of Axes
+        dt: Time step in hours (default 1.0)
+    """
+    formatter = get_hour_formatter(dt)
+
+    # Handle different input types
+    if hasattr(fig_or_axes, 'get_axes'):
+        # It's a Figure
+        axes = fig_or_axes.get_axes()
+    elif hasattr(fig_or_axes, '__iter__'):
+        # It's an array/list of axes
+        axes = np.array(fig_or_axes).flatten()
+    else:
+        # It's a single Axes
+        axes = [fig_or_axes]
+
+    for ax in axes:
+        ax.xaxis.set_major_formatter(get_hour_formatter(dt))
+        ax.xaxis.set_major_locator(ticker.AutoLocator())
 
 
 def setup_plotting_styles() -> None:
@@ -64,7 +127,14 @@ def plot_hourly_inputs(
     else:
         num_subplots = 5
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(input_disturbances.precipitation))
+    timesteps = len(input_disturbances.precipitation)
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Precipitation
     axs[0].plot(time, input_disturbances.precipitation)
@@ -129,17 +199,21 @@ def plot_control_inputs(
     _, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 2
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(irrigation))
+    timesteps = len(irrigation)
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    apply_time_formatter(axs, dt=1.0)
 
     # Irrigation Events
     axs[0].plot(time, irrigation)
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Irrigation (in)')
     axs[0].set_title(f'Irrigation Events vs. Time')
 
     # Fertilizer Events
     axs[1].plot(time, fertilizer)
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel('Fertilizer (lbs)')
     axs[1].set_title(f'Fertilizer Events vs. Time')
 
@@ -186,47 +260,54 @@ def plot_crop_growth_results(
     _, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_plots = 5
     fig, axs = plt.subplots(num_plots, 1, figsize=(9, 3 * num_plots))
-    time = np.arange(0, len(hs[0]))
+    timesteps = len(hs[0])
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Plant Height
     for i, h in enumerate(hs):
         axs[0].plot(time, h, label=labels[i] if labels else None)
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Plant Height (m)')
     axs[0].set_title('Plant Height vs. Time')
-    axs[0].legend()
+    add_adaptive_legend(axs[0])
 
     # Leaf Area
     for i, A in enumerate(As):
         axs[1].plot(time, A, label=labels[i] if labels else None)
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel(r'Leaf Area (m\textsuperscript{2})')
     axs[1].set_title('Leaf Area vs. Time')
-    axs[1].legend()
+    add_adaptive_legend(axs[1])
 
     # Number of Leaves
     for i, N in enumerate(Ns):
         axs[2].plot(time, N, label=labels[i] if labels else None)
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel('Number of Leaves (unitless)')
     axs[2].set_title('Number of Leaves vs. Time')
-    axs[2].legend()
+    add_adaptive_legend(axs[2])
 
     # Spikelet Count
     for i, c in enumerate(cs):
         axs[3].plot(time, c, label=labels[i] if labels else None)
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel('Spikelet Count (unitless)')
     axs[3].set_title('Spikelet Count vs. Time')
-    axs[3].legend()
+    add_adaptive_legend(axs[3])
 
     # Fruit Biomass
     for i, P in enumerate(Ps):
         axs[4].plot(time, P, label=labels[i] if labels else None)
-    axs[4].set_xlabel('Time (steps)')
+    axs[4].set_xlabel('Time (hours)')
     axs[4].set_ylabel('Fruit Biomass (kg)')
     axs[4].set_title('Fruit Biomass vs. Time')
-    axs[4].legend()
+    add_adaptive_legend(axs[4])
 
     fig.suptitle('Plant Growth over Season', y=suptitle_y_position)
     plt.tight_layout(rect=tight_layout_rect)
@@ -278,20 +359,27 @@ def plot_applied_vs_absorbed(
     colors, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 4
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(delayed_water))
+    timesteps = len(delayed_water)
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Delayed Water
     axs[0].plot(precipitation, label='precipitation')
     axs[0].plot(time, delayed_water, label='water absorbed')
     axs[0].plot(irrigation, label='irrigation applied')
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Water (in)')
     axs[0].set_title('Applied and Absorbed Water vs. Time')
     axs[0].legend(loc='upper right')
 
     # Delayed Fertilizer
     axs[1].plot(fertilizer, label='applied')
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel('Fertilizer Applied (lbs)')
     axs[1].tick_params(axis='y', colors=colors.vivid_green)
     axs[1].yaxis.label.set_color(colors.vivid_green) 
@@ -311,7 +399,7 @@ def plot_applied_vs_absorbed(
     # Delayed Temperature
     axs[2].plot(temperature, label='applied')
     axs[2].plot(time, delayed_temperature, label='absorbed')
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel(r'Temperature (\textdegree C)')
     axs[2].set_title('Applied and Absorbed Temperature vs. Time')
     axs[2].legend(loc='upper right')
@@ -319,7 +407,7 @@ def plot_applied_vs_absorbed(
     # Delayed Radiation
     axs[3].plot(radiation, label='applied')
     axs[3].plot(time, delayed_radiation, label='absorbed')
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel(r'Radiation (W/m\textsuperscript{2})')
     axs[3].set_title('Applied and Absorbed Radiation vs. Time')
     axs[3].legend(loc='upper right')
@@ -363,7 +451,14 @@ def plot_cumulative_values(
     colors, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 4
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(cumulative_water))
+    timesteps = len(cumulative_water)
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     R_typ = typical_disturbances.typical_radiation   * time
     T_typ = typical_disturbances.typical_temperature * time
@@ -373,28 +468,28 @@ def plot_cumulative_values(
     # Cumulative Water
     axs[0].plot(time, cumulative_water)
     axs[0].plot(W_typ, linestyle='--', color=colors.vivid_red)
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Cumulative Water (in)')
     axs[0].set_title('Cumulative Water vs. Time')
 
     # Cumulative Fertilizer
     axs[1].plot(time, cumulative_fertilizer)
     axs[1].plot(F_typ, linestyle='--', color=colors.vivid_red)
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel('Cumulative Fertilizer (lbs)')
     axs[1].set_title('Cumulative Fertilizer vs. Time')
 
     # Cumulative Temperature
     axs[2].plot(time, cumulative_temperature)
     axs[2].plot(T_typ, linestyle='--', color=colors.vivid_red)
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel(r'Cumulative Temperature (\textdegree C)')
     axs[2].set_title('Cumulative Temperature vs. Time')
 
     # Cumulative Radiation
     axs[3].plot(time, cumulative_radiation)
     axs[3].plot(R_typ, linestyle='--', color=colors.vivid_red)
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel(r'Cumulative Radiation (W/m\textsuperscript{2})')
     axs[3].set_title('Cumulative Radiation vs. Time')
 
@@ -431,33 +526,40 @@ def plot_actual_vs_expected_cumulatives(
     _, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 4
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(delta_cumulative_water))
+    timesteps = len(delta_cumulative_water)
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Delta Cumulative Water
     axs[0].plot(time, delta_cumulative_water)
     axs[0].set_ylim(bottom=0, top=None) 
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel(r'$\Delta$ (normed)')
     axs[0].set_title(r'$\Delta$ Cumulative Water vs. Time')
 
     # Delta Cumulative Fertilizer
     axs[1].plot(time, delta_cumulative_fertilizer)
     axs[1].set_ylim(bottom=0, top=None) 
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel(r'$\Delta$ (normed)')
     axs[1].set_title(r'$\Delta$ Cumulative Fertilizer vs. Time')
 
     # Delta Cumulative Temperature
     axs[2].plot(time, delta_cumulative_temperature)
     axs[2].set_ylim(bottom=0, top=None) 
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel(r'$\Delta$ (normed)')
     axs[2].set_title(r'$\Delta$ Cumulative Temperature vs. Time')
 
     # Delta Cumulative Radiation
     axs[3].plot(time, delta_cumulative_radiation)
     axs[3].set_ylim(bottom=0, top=None) 
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel(r'$\Delta$ (normed)')
     axs[3].set_title(r'$\Delta$ Cumulative Radiation vs. Time')
 
@@ -501,47 +603,54 @@ def plot_nutrient_factor_evolution(
     colors, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 4
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(len(nuWs[0]))
+    timesteps = len(nuWs[0])
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Water Nutrient Factor
     for i, nuW_values in enumerate(nuWs):
         axs[0].plot(time, nuW_values, label=labels[i] if labels else None)
     axs[0].axhline(y=1, linestyle='--', color=colors.vivid_red)
-    axs[0].set_ylim(bottom=0, top=None) 
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_ylim(bottom=0, top=None)
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Nutrient Factor (unitless)')
     axs[0].set_title('Water Nutrient Factor vs. Time')
-    axs[0].legend()
+    add_adaptive_legend(axs[0])
 
     # Fertilizer Nutrient Factor
     for i, nuF_values in enumerate(nuFs):
         axs[1].plot(time, nuF_values, label=labels[i] if labels else None)
     axs[1].axhline(y=1, linestyle='--', color=colors.vivid_red)
-    axs[1].set_ylim(bottom=0, top=None) 
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_ylim(bottom=0, top=None)
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel('Nutrient Factor (unitless)')
     axs[1].set_title('Fertilizer Nutrient Factor vs. Time')
-    axs[1].legend()
+    add_adaptive_legend(axs[1])
 
     # Temperature Nutrient Factor
     for i, nuT_values in enumerate(nuTs):
         axs[2].plot(time, nuT_values, label=labels[i] if labels else None)
     axs[2].axhline(y=1, linestyle='--', color=colors.vivid_red)
-    axs[2].set_ylim(bottom=0, top=None) 
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_ylim(bottom=0, top=None)
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel('Nutrient Factor (unitless)')
     axs[2].set_title('Temperature Nutrient Factor vs. Time')
-    axs[2].legend()
+    add_adaptive_legend(axs[2])
 
     # Radiation Nutrient Factor
     for i, nuR_values in enumerate(nuRs):
         axs[3].plot(time, nuR_values, label=labels[i] if labels else None)
     axs[3].axhline(y=1, linestyle='--', color=colors.vivid_red)
-    axs[3].set_ylim(bottom=0, top=None) 
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_ylim(bottom=0, top=None)
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel('Nutrient Factor (unitless)')
     axs[3].set_title('Radiation Nutrient Factor vs. Time')
-    axs[3].legend()
+    add_adaptive_legend(axs[3])
 
     fig.suptitle('Nutrient Factors over Season', y=suptitle_y_position)
     plt.tight_layout(rect=tight_layout_rect)
@@ -590,57 +699,64 @@ def plot_growth_rate_evolution(
     colors, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 5
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(0, len(ah_hats[0]))
+    timesteps = len(ah_hats[0])
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Plant Height Growth Rate
     for i, ah_hat in enumerate(ah_hats):
         axs[0].plot(time, ah_hat, label=labels[i] if labels else None)
     axs[0].axhline(y=growth_rates.ah, linestyle='--', color=colors.vivid_red)
-    axs[0].set_ylim(bottom=0, top=None) 
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_ylim(bottom=0, top=None)
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Growth Rate (1/hr)')
     axs[0].set_title('Plant Height Growth Rate vs. Time')
-    axs[0].legend()
+    add_adaptive_legend(axs[0])
 
     # Leaf Area Growth Rate
     for i, aA_hat in enumerate(aA_hats):
         axs[1].plot(time, aA_hat, label=labels[i] if labels else None)
     axs[1].axhline(y=growth_rates.aA, linestyle='--', color=colors.vivid_red)
-    axs[1].set_ylim(bottom=0, top=None) 
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_ylim(bottom=0, top=None)
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel('Growth Rate (1/hr)')
     axs[1].set_title('Leaf Area Growth Rate vs. Time')
-    axs[1].legend()
+    add_adaptive_legend(axs[1])
 
     # Number of Leaves Growth Rate
     for i, aN_hat in enumerate(aN_hats):
         axs[2].plot(time, aN_hat, label=labels[i] if labels else None)
     axs[2].axhline(y=growth_rates.aN, linestyle='--', color=colors.vivid_red)
-    axs[2].set_ylim(bottom=0, top=None) 
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_ylim(bottom=0, top=None)
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel('Growth Rate (1/hr)')
     axs[2].set_title('Number of Leaves Growth Rate vs. Time')
-    axs[2].legend()
+    add_adaptive_legend(axs[2])
 
     # Spikelet Count Growth Rate
     for i, ac_hat in enumerate(ac_hats):
         axs[3].plot(time, ac_hat, label=labels[i] if labels else None)
     axs[3].axhline(y=growth_rates.ac, linestyle='--', color=colors.vivid_red)
-    axs[3].set_ylim(bottom=0, top=None) 
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_ylim(bottom=0, top=None)
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel('Growth Rate (1/hr)')
     axs[3].set_title('Spikelet Count Growth Rate vs. Time')
-    axs[3].legend()
+    add_adaptive_legend(axs[3])
 
     # Fruit Biomass Growth Rate
     for i, aP_hat in enumerate(aP_hats):
         axs[4].plot(time, aP_hat, label=labels[i] if labels else None)
     axs[4].axhline(y=growth_rates.aP, linestyle='--', color=colors.vivid_red)
-    axs[4].set_ylim(bottom=0, top=None) 
-    axs[4].set_xlabel('Time (steps)')
+    axs[4].set_ylim(bottom=0, top=None)
+    axs[4].set_xlabel('Time (hours)')
     axs[4].set_ylabel('Growth Rate (1/hr)')
     axs[4].set_title('Fruit Biomass Growth Rate vs. Time')
-    axs[4].legend()
+    add_adaptive_legend(axs[4])
 
     fig.suptitle('Plant Growth Rates over Season', y=suptitle_y_position)
     plt.tight_layout(rect=tight_layout_rect)
@@ -692,57 +808,64 @@ def plot_carrying_capacity_evolution(
     colors, suptitle_y_position, tight_layout_rect = setup_plotting_styles()
     num_subplots = 5
     fig, axs = plt.subplots(num_subplots, 1, figsize=(9, num_subplots*3))
-    time = np.arange(0, len(kh_hats[0]))
+    timesteps = len(kh_hats[0])
+    time = np.arange(timesteps)
+
+    # Apply hour formatting to all axes
+    model_params = ModelParams()
+    simulation_hours = model_params.simulation_hours
+    dt = simulation_hours/timesteps
+    apply_time_formatter(axs, dt=dt)
 
     # Plant Height Carrying Capacity
     for i, kh_hat in enumerate(kh_hats):
         axs[0].plot(time, kh_hat, label=labels[i] if labels else None)
     axs[0].axhline(y=carrying_capacities.kh, linestyle='--', color=colors.vivid_red)
-    axs[0].set_ylim(bottom=0, top=None) 
-    axs[0].set_xlabel('Time (steps)')
+    axs[0].set_ylim(bottom=0, top=None)
+    axs[0].set_xlabel('Time (hours)')
     axs[0].set_ylabel('Carrying Capacity (m)')
     axs[0].set_title('Plant Height Carrying Capacity vs. Time')
-    axs[0].legend()
+    add_adaptive_legend(axs[0])
 
     # Leaf Area Carrying Capacity
     for i, kA_hat in enumerate(kA_hats):
         axs[1].plot(time, kA_hat, label=labels[i] if labels else None)
     axs[1].axhline(y=carrying_capacities.kA, linestyle='--', color=colors.vivid_red)
     axs[1].set_ylim(bottom=0, top=None)
-    axs[1].set_xlabel('Time (steps)')
+    axs[1].set_xlabel('Time (hours)')
     axs[1].set_ylabel(r'Carrying Capacity (m\textsuperscript{2})')
     axs[1].set_title('Leaf Area Carrying Capacity vs. Time')
-    axs[1].legend()
+    add_adaptive_legend(axs[1])
 
     # Number of Leaves Carrying Capacity
     for i, kN_hat in enumerate(kN_hats):
         axs[2].plot(time, kN_hat, label=labels[i] if labels else None)
     axs[2].axhline(y=carrying_capacities.kN, linestyle='--', color=colors.vivid_red)
-    axs[2].set_ylim(bottom=0, top=None) 
-    axs[2].set_xlabel('Time (steps)')
+    axs[2].set_ylim(bottom=0, top=None)
+    axs[2].set_xlabel('Time (hours)')
     axs[2].set_ylabel('Carrying Capacity (count)')
     axs[2].set_title('Number of Leaves Carrying Capacity vs. Time')
-    axs[2].legend()
+    add_adaptive_legend(axs[2])
 
     # Spikelet Count Carrying Capacity
     for i, kc_hat in enumerate(kc_hats):
         axs[3].plot(time, kc_hat, label=labels[i] if labels else None)
     axs[3].axhline(y=carrying_capacities.kc, linestyle='--', color=colors.vivid_red)
-    axs[3].set_ylim(bottom=0, top=None) 
-    axs[3].set_xlabel('Time (steps)')
+    axs[3].set_ylim(bottom=0, top=None)
+    axs[3].set_xlabel('Time (hours)')
     axs[3].set_ylabel('Carrying Capacity (count)')
     axs[3].set_title('Spikelet Count Carrying Capacity vs. Time')
-    axs[3].legend()
+    add_adaptive_legend(axs[3])
 
     # Fruit Biomass Carrying Capacity
     for i, kP_hat in enumerate(kP_hats):
         axs[4].plot(time, kP_hat, label=labels[i] if labels else None)
     axs[4].axhline(y=carrying_capacities.kP, linestyle='--', color=colors.vivid_red)
-    axs[4].set_ylim(bottom=0, top=None) 
-    axs[4].set_xlabel('Time (steps)')
+    axs[4].set_ylim(bottom=0, top=None)
+    axs[4].set_xlabel('Time (hours)')
     axs[4].set_ylabel('Carrying Capacity (kg)')
     axs[4].set_title('Fruit Biomass Carrying Capacity vs. Time')
-    axs[4].legend()
+    add_adaptive_legend(axs[4])
 
     fig.suptitle('Plant Carrying Capacities over Season', y=suptitle_y_position)
     plt.tight_layout(rect=tight_layout_rect)

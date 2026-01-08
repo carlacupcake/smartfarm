@@ -113,14 +113,14 @@ class GeneticAlgorithmResult():
         fig, ax = plt.subplots(figsize=(9, 4))
 
         gs = list(range(self.ga_params.num_generations))
-        ax.plot(gs, self.avg_parent_costs, label="Avg. of top 10 performers")
-        ax.plot(gs, self.lowest_costs,     label="Best costs")
+        ax.plot(gs, -self.avg_parent_costs, label="Avg. of top 10 performers")
+        ax.plot(gs, -self.lowest_costs,     label="Best revenues")
 
         
         ax.set_xlabel("Generation")
-        ax.set_ylabel(r"Cost (-Revenue) in \$")
+        ax.set_ylabel(r"Revenue in \$")
         ax.set_title("Convergence of Genetic Algorithm")
-        ax.legend(fontsize=12, loc="upper right", framealpha=0.5)
+        ax.legend(fontsize=12, loc="lower right", framealpha=0.5)
 
         fig.tight_layout(rect=tight_layout_rect)
 
