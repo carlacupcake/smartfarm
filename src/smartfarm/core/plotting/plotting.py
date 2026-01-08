@@ -23,8 +23,67 @@ def get_hour_formatter(dt: float = 1.0):
         A matplotlib FuncFormatter that scales x-axis values by dt
     """
     def scale_to_hours(x, pos):
-        return f'{x * dt:g}'
+        hours = x * dt
+        # Round to nearest integer for clean display
+        return f'{int(round(hours))}'
     return ticker.FuncFormatter(scale_to_hours)
+
+
+def get_hour_locator(dt: float = 1.0, nbins: int = 6):
+    """
+    Create a locator that places ticks at round hour values.
+
+    Args:
+        dt: Time step in hours (default 1.0)
+        nbins: Approximate number of tick bins (default 6)
+
+    Returns:
+        A matplotlib Locator that picks nice round hour values
+    """
+    class RoundHourLocator(ticker.Locator):
+        def __init__(self, dt, nbins):
+            self.dt = dt
+            self.nbins = nbins
+
+        def __call__(self):
+            vmin, vmax = self.axis.get_view_interval()
+            return self.tick_values(vmin, vmax)
+
+        def tick_values(self, vmin, vmax):
+            # Convert to hours
+            hour_min, hour_max = vmin * self.dt, vmax * self.dt
+            hour_range = hour_max - hour_min
+
+            if hour_range <= 0:
+                return np.array([])
+
+            # Compute a nice step size (multiples of 10, 50, 100, 500, 1000, etc.)
+            raw_step = hour_range / self.nbins
+            # Find the order of magnitude
+            magnitude = 10 ** np.floor(np.log10(max(raw_step, 1)))
+            normalized = raw_step / magnitude
+
+            # Choose a nice multiplier
+            if normalized < 1.5:
+                nice_step = magnitude
+            elif normalized < 3.5:
+                nice_step = 2 * magnitude
+            elif normalized < 7.5:
+                nice_step = 5 * magnitude
+            else:
+                nice_step = 10 * magnitude
+
+            # Ensure minimum step of 10 for cleaner labels
+            nice_step = max(10, nice_step)
+
+            # Generate ticks at multiples of nice_step
+            start = np.ceil(hour_min / nice_step) * nice_step
+            hour_ticks = np.arange(start, hour_max + nice_step / 2, nice_step)
+
+            # Convert back to step space
+            return hour_ticks / self.dt
+
+    return RoundHourLocator(dt, nbins)
 
 
 def add_adaptive_legend(ax, loc: str = 'lower right', max_per_col: int = 5) -> None:
@@ -52,12 +111,13 @@ def apply_time_formatter(fig_or_axes, dt: float = 1.0) -> None:
     """
     Apply hour-scaling formatter to all x-axes in a figure or list of axes.
 
+    Tick labels are rounded to nice values (multiples of 10, 50, 100, 500, etc.)
+    for clean display.
+
     Args:
         fig_or_axes: A matplotlib Figure, single Axes, or array of Axes
         dt: Time step in hours (default 1.0)
     """
-    formatter = get_hour_formatter(dt)
-
     # Handle different input types
     if hasattr(fig_or_axes, 'get_axes'):
         # It's a Figure
@@ -71,7 +131,7 @@ def apply_time_formatter(fig_or_axes, dt: float = 1.0) -> None:
 
     for ax in axes:
         ax.xaxis.set_major_formatter(get_hour_formatter(dt))
-        ax.xaxis.set_major_locator(ticker.AutoLocator())
+        ax.xaxis.set_major_locator(get_hour_locator(dt))
 
 
 def setup_plotting_styles() -> None:

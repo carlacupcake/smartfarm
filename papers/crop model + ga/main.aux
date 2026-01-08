@@ -1,0 +1,177 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\bibstyle{sn-mathphys-num}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{usda-farm-income}
+\citation{verhulst1838}
+\citation{jones2003dssat}
+\citation{holzworth2014apsim}
+\citation{wofost}
+\citation{precision-ag-review}
+\Newlabel{1}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\citation{irrigation-optimization}
+\citation{dp-irrigation}
+\citation{ga-agriculture}
+\citation{goldberg1989ga}
+\citation{ga-irrigation-scheduling}
+\citation{ga-fertilizer}
+\citation{nsrdb}
+\citation{noaa-precip}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Generalized, Coupled-ODE Crop Model}{2}{section.2}\protected@file@percent }
+\newlabel{sec:modeling}{{2}{2}{Generalized, Coupled-ODE Crop Model}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Delayed Absorption via FIR Convolution}{2}{subsection.2.1}\protected@file@percent }
+\newlabel{subsec:fir-conv}{{2.1}{2}{Delayed Absorption via FIR Convolution}{subsection.2.1}{}}
+\newlabel{eqn:erf}{{1}{2}{Delayed Absorption via FIR Convolution}{equation.2.1}{}}
+\newlabel{eqn:gaussian-kernel}{{2}{2}{Delayed Absorption via FIR Convolution}{equation.2.2}{}}
+\newlabel{eqn:L-star}{{3}{3}{Delayed Absorption via FIR Convolution}{equation.2.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Cumulative Stress Tracking via EMA Filtering}{3}{subsection.2.2}\protected@file@percent }
+\newlabel{subsec:ema-smooth}{{2.2}{3}{Cumulative Stress Tracking via EMA Filtering}{subsection.2.2}{}}
+\newlabel{eqn:iir-filter}{{4}{3}{Cumulative Stress Tracking via EMA Filtering}{equation.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Nutrient Factor Calculation}{3}{subsection.2.3}\protected@file@percent }
+\newlabel{subsec:nutrient-factors}{{2.3}{3}{Nutrient Factor Calculation}{subsection.2.3}{}}
+\newlabel{eqn:delayed-trans}{{5}{3}{Nutrient Factor Calculation}{equation.2.5}{}}
+\newlabel{eqn:cum-trans}{{6}{3}{Nutrient Factor Calculation}{equation.2.6}{}}
+\newlabel{eqn:anomaly-trans}{{7}{3}{Nutrient Factor Calculation}{equation.2.7}{}}
+\newlabel{eqn:cum-div-trans}{{8}{3}{Nutrient Factor Calculation}{equation.2.8}{}}
+\newlabel{eqn:nut-fac-trans}{{9}{3}{Nutrient Factor Calculation}{equation.2.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Illustration of the metabolic transformation pipeline. Panel 1: Gaussian FIR kernels with different temporal spreads $\sigma $ demonstrate how water ($\sigma _w = 30$ hr) is absorbed more rapidly than fertilizer ($\sigma _f = 300$ hr). Panel 4: EMA filters with different memory parameters $\beta $ show how cumulative divergence tracking responds to sustained anomalies, with larger $\beta $ providing longer memory of past stress events.}}{4}{figure.1}\protected@file@percent }
+\newlabel{fig:metabolism-transformations}{{1}{4}{Illustration of the metabolic transformation pipeline. Panel 1: Gaussian FIR kernels with different temporal spreads $\sigma $ demonstrate how water ($\sigma _w = 30$ hr) is absorbed more rapidly than fertilizer ($\sigma _f = 300$ hr). Panel 4: EMA filters with different memory parameters $\beta $ show how cumulative divergence tracking responds to sustained anomalies, with larger $\beta $ providing longer memory of past stress events}{figure.1}{}}
+\citation{corn-nitrogen,corn-irrigation,corn-temperature}
+\citation{geometric-mean-growth}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Effects of Inputs on Plant Growth}{5}{subsection.2.4}\protected@file@percent }
+\newlabel{subsec:input-effects}{{2.4}{5}{Effects of Inputs on Plant Growth}{subsection.2.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Effects of irrigation and fertilizer on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect.}}{5}{table.1}\protected@file@percent }
+\newlabel{tab:fert-irr-effects}{{1}{5}{Effects of irrigation and fertilizer on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Effects of temperature and solar radiation on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect, ``--'' indicates a negative effect. For flower size, excess heat and radiation reduce flower development, hence negative effects.}}{5}{table.2}\protected@file@percent }
+\newlabel{tab:temp-rad-effects}{{2}{5}{Effects of temperature and solar radiation on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect, ``--'' indicates a negative effect. For flower size, excess heat and radiation reduce flower development, hence negative effects}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Growth Dynamics}{5}{subsection.2.5}\protected@file@percent }
+\newlabel{subsec:dynamics}{{2.5}{5}{Growth Dynamics}{subsection.2.5}{}}
+\newlabel{eqn:logistic-general}{{10}{5}{Growth Dynamics}{equation.2.10}{}}
+\newlabel{eqn:hats-for-h}{{11}{5}{Growth Dynamics}{equation.2.11}{}}
+\newlabel{eqn:hats-for-A}{{12}{5}{Growth Dynamics}{equation.2.12}{}}
+\newlabel{eqn:hats-for-N}{{13}{5}{Growth Dynamics}{equation.2.13}{}}
+\newlabel{eqn:hats-for-c}{{14}{5}{Growth Dynamics}{equation.2.14}{}}
+\citation{corn-growth-stages}
+\citation{goldberg1989ga}
+\newlabel{eqn:hats-for-P}{{15}{6}{Growth Dynamics}{equation.2.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Model Parameters}{6}{subsection.2.6}\protected@file@percent }
+\newlabel{subsec:parameters}{{2.6}{6}{Model Parameters}{subsection.2.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Baseline model parameters for corn. Growth rates are per hour; initial conditions are set to $k_{x}/K$ where $K \approx 2900$ is the season length in hours.}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:model-params}{{3}{6}{Baseline model parameters for corn. Growth rates are per hour; initial conditions are set to $k_{x}/K$ where $K \approx 2900$ is the season length in hours}{table.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Simulation}{6}{section.3}\protected@file@percent }
+\newlabel{sec:simulation}{{3}{6}{Simulation}{section.3}{}}
+\newlabel{eqn:closed-form-logistic}{{16}{6}{Simulation}{equation.3.16}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Optimization via Genetic Algorithm}{6}{section.4}\protected@file@percent }
+\newlabel{sec:ga}{{4}{6}{Optimization via Genetic Algorithm}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Decision Variables}{7}{subsection.4.1}\protected@file@percent }
+\newlabel{subsec:design-vars}{{4.1}{7}{Decision Variables}{subsection.4.1}{}}
+\newlabel{eqn:design-vars}{{17}{7}{Decision Variables}{equation.4.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Objective Function}{7}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:objective}{{4.2}{7}{Objective Function}{subsection.4.2}{}}
+\newlabel{eqn:cost-function}{{18}{7}{Objective Function}{equation.4.18}{}}
+\newlabel{eqn:crop-value}{{19}{7}{Objective Function}{equation.4.19}{}}
+\newlabel{eqn:input-costs}{{20}{7}{Objective Function}{equation.4.20}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Economic weights for the corn objective function. The fruit biomass weight accounts for approximately 28,350 plants per acre at \$0.157/kg.}}{7}{table.4}\protected@file@percent }
+\newlabel{tab:economic-weights}{{4}{7}{Economic weights for the corn objective function. The fruit biomass weight accounts for approximately 28,350 plants per acre at \$0.157/kg}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Algorithm Description}{7}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:ga-algorithm}{{4.3}{7}{Algorithm Description}{subsection.4.3}{}}
+\newlabel{eqn:crossover}{{21}{7}{Algorithm Description}{equation.4.21}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Genetic Algorithm for Input Optimization}}{8}{algorithm.1}\protected@file@percent }
+\newlabel{alg:ga}{{1}{8}{Algorithm Description}{algorithm.1}{}}
+\citation{fsa-acreage}
+\citation{corn-nutrient-management}
+\citation{corn-growth-stages,corn-physiology}
+\citation{kranz2008irrigation}
+\citation{davies2020nitrogen}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Case Study: Corn in Iowa}{9}{section.5}\protected@file@percent }
+\newlabel{sec:case-study}{{5}{9}{Case Study: Corn in Iowa}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Scenario Configuration}{9}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:scenario}{{5.1}{9}{Scenario Configuration}{subsection.5.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Corn development timeline and typical final values from agronomic literature \cite  {corn-growth-stages,corn-physiology}.}}{9}{table.5}\protected@file@percent }
+\newlabel{tab:corn-development}{{5}{9}{Corn development timeline and typical final values from agronomic literature \cite {corn-growth-stages,corn-physiology}}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Baseline Scenario: Farmer Best Practices Under Drought}{9}{subsection.5.2}\protected@file@percent }
+\newlabel{subsec:baseline}{{5.2}{9}{Baseline Scenario: Farmer Best Practices Under Drought}{subsection.5.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Environmental disturbances and control inputs for the baseline scenario. Top three panels show hourly precipitation (reduced to 50\% of normal), solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1 inch) and fertilizer (monthly, 90 lbs) application strategy.}}{10}{figure.2}\protected@file@percent }
+\newlabel{fig:baseline-inputs}{{2}{10}{Environmental disturbances and control inputs for the baseline scenario. Top three panels show hourly precipitation (reduced to 50\% of normal), solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1 inch) and fertilizer (monthly, 90 lbs) application strategy}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Plant state variable trajectories under the baseline scenario (farmer best practices during drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$859/acre in revenue.}}{11}{figure.3}\protected@file@percent }
+\newlabel{fig:baseline-growth}{{3}{11}{Plant state variable trajectories under the baseline scenario (farmer best practices during drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$859/acre in revenue}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Optimization Configuration}{12}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:opt-config}{{5.3}{12}{Optimization Configuration}{subsection.5.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Optimization Results}{12}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:results}{{5.4}{12}{Optimization Results}{subsection.5.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces GA convergence across 10 independent runs. Each curve shows the best revenue at each generation. All runs exhibit rapid improvement in early generations followed by convergence to near-optimal solutions. The consistency across runs demonstrates algorithm robustness.}}{12}{figure.4}\protected@file@percent }
+\newlabel{fig:ga-convergence}{{4}{12}{GA convergence across 10 independent runs. Each curve shows the best revenue at each generation. All runs exhibit rapid improvement in early generations followed by convergence to near-optimal solutions. The consistency across runs demonstrates algorithm robustness}{figure.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Optimal irrigation and fertilization strategy identified by the GA.}}{12}{table.6}\protected@file@percent }
+\newlabel{tab:optimal-strategy}{{6}{12}{Optimal irrigation and fertilization strategy identified by the GA}{table.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Plant state variable trajectories for the best member from each of the 10 independent GA runs. All optimized strategies achieve similar, near-optimal growth trajectories, and 9 of 10 runs substantially outperform the baseline farmer practices (Figure \ref  {fig:baseline-growth}). The tight clustering of trajectories demonstrates that different GA runs converge to similar optimal strategies.}}{13}{figure.5}\protected@file@percent }
+\newlabel{fig:state-trajectories}{{5}{13}{Plant state variable trajectories for the best member from each of the 10 independent GA runs. All optimized strategies achieve similar, near-optimal growth trajectories, and 9 of 10 runs substantially outperform the baseline farmer practices (Figure \ref {fig:baseline-growth}). The tight clustering of trajectories demonstrates that different GA runs converge to similar optimal strategies}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Economic comparison of GA-optimized versus baseline farmer strategies. The optimized strategy achieves 16\% higher net revenue through both increased crop value and dramatically reduced irrigation costs.}}{14}{table.7}\protected@file@percent }
+\newlabel{tab:economic-comparison}{{7}{14}{Economic comparison of GA-optimized versus baseline farmer strategies. The optimized strategy achieves 16\% higher net revenue through both increased crop value and dramatically reduced irrigation costs}{table.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{14}{section.6}\protected@file@percent }
+\newlabel{sec:discussion}{{6}{14}{Discussion}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Interpretation of Results}{14}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:interpretation}{{6.1}{14}{Interpretation of Results}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Parameter Estimation in Practice}{14}{subsection.6.2}\protected@file@percent }
+\newlabel{subsec:parameter-estimation}{{6.2}{14}{Parameter Estimation in Practice}{subsection.6.2}{}}
+\citation{richards1959}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Limitations and Extensions}{15}{subsection.6.3}\protected@file@percent }
+\newlabel{subsec:limitations}{{6.3}{15}{Limitations and Extensions}{subsection.6.3}{}}
+\newlabel{eqn:richards-growth}{{22}{15}{Limitations and Extensions}{equation.6.22}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{15}{section.7}\protected@file@percent }
+\newlabel{sec:conclusion}{{7}{15}{Conclusion}{section.7}{}}
+\@writefile{toc}{\contentsline {subparagraph}{Supplementary Information}{15}{section*.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption dynamics are evident in the lag between applied inputs and the smoothed absorbed signals. Water absorption ($\sigma _w = 30$ hr) responds more quickly than fertilizer absorption ($\sigma _f = 300$ hr).}}{16}{figure.6}\protected@file@percent }
+\newlabel{fig:supp-applied-absorbed}{{6}{16}{Applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption dynamics are evident in the lag between applied inputs and the smoothed absorbed signals. Water absorption ($\sigma _w = 30$ hr) responds more quickly than fertilizer absorption ($\sigma _f = 300$ hr)}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Cumulative absorbed nutrients (solid) versus expected levels (dashed red). The growing gap between actual and expected water absorption reflects the drought stress accumulating over the season. Fertilizer applications maintain closer alignment with expectations.}}{17}{figure.7}\protected@file@percent }
+\newlabel{fig:supp-cumulative}{{7}{17}{Cumulative absorbed nutrients (solid) versus expected levels (dashed red). The growing gap between actual and expected water absorption reflects the drought stress accumulating over the season. Fertilizer applications maintain closer alignment with expectations}{figure.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress. The water divergence grows throughout the season due to cumulative drought effects.}}{18}{figure.8}\protected@file@percent }
+\newlabel{fig:supp-divergence}{{8}{18}{Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress. The water divergence grows throughout the season due to cumulative drought effects}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Nutrient factor evolution under the baseline scenario. The water factor $\nu _w$ declines due to cumulative drought stress, while fertilizer, temperature, and radiation factors remain closer to 1.0 (no stress). The declining $\nu _w$ reduces effective growth rates and carrying capacities throughout the season.}}{19}{figure.9}\protected@file@percent }
+\newlabel{fig:supp-nutrient-factors}{{9}{19}{Nutrient factor evolution under the baseline scenario. The water factor $\nu _w$ declines due to cumulative drought stress, while fertilizer, temperature, and radiation factors remain closer to 1.0 (no stress). The declining $\nu _w$ reduces effective growth rates and carrying capacities throughout the season}{figure.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Plant state variable trajectories for the worst member from each GA run's final population. Even these suboptimal strategies outperform baseline farmer practices (compare to Figure \ref  {fig:baseline-growth}), demonstrating that the GA successfully identifies the high-performing region of the strategy space and that random strategies are not competitive.}}{20}{figure.10}\protected@file@percent }
+\newlabel{fig:supp-worst}{{10}{20}{Plant state variable trajectories for the worst member from each GA run's final population. Even these suboptimal strategies outperform baseline farmer practices (compare to Figure \ref {fig:baseline-growth}), demonstrating that the GA successfully identifies the high-performing region of the strategy space and that random strategies are not competitive}{figure.10}{}}
+\bibdata{bibliography}
+\bibcite{usda-farm-income}{{1}{2024}{{{Economic Research Service}}}{{}}}
+\bibcite{verhulst1838}{{2}{1838}{{Verhulst}}{{}}}
+\bibcite{jones2003dssat}{{3}{2003}{{Jones et~al.}}{{}}}
+\bibcite{holzworth2014apsim}{{4}{2014}{{Holzworth et~al.}}{{}}}
+\bibcite{wofost}{{5}{1989}{{Van~Diepen et~al.}}{{}}}
+\bibcite{precision-ag-review}{{6}{2012}{{Gebbers and Adamchuk}}{{}}}
+\bibcite{irrigation-optimization}{{7}{2012}{{Singh}}{{}}}
+\bibcite{dp-irrigation}{{8}{1992}{{Raman et~al.}}{{}}}
+\bibcite{ga-agriculture}{{9}{2020}{{Ding and Lin}}{{}}}
+\bibcite{goldberg1989ga}{{10}{1989}{{Goldberg}}{{}}}
+\bibcite{ga-irrigation-scheduling}{{11}{2004}{{Wardlaw and Bhaktikul}}{{}}}
+\bibcite{ga-fertilizer}{{12}{2006}{{Miao et~al.}}{{}}}
+\bibcite{nsrdb}{{13}{2018}{{Sengupta et~al.}}{{}}}
+\bibcite{noaa-precip}{{14}{2024}{{{National Oceanic and Atmospheric Administration}}}{{}}}
+\bibcite{corn-nitrogen}{{15}{2006}{{Sawyer et~al.}}{{}}}
+\bibcite{corn-irrigation}{{16}{2008}{{Payero et~al.}}{{}}}
+\@writefile{toc}{\contentsline {subparagraph}{Acknowledgements}{21}{section*.5}\protected@file@percent }
+\bibcite{corn-temperature}{{17}{2014}{{Sanchez et~al.}}{{}}}
+\bibcite{geometric-mean-growth}{{18}{1969}{{Lewontin and Cohen}}{{}}}
+\bibcite{corn-growth-stages}{{19}{2011}{{Abendroth et~al.}}{{}}}
+\bibcite{fsa-acreage}{{20}{2023}{{{US Department of Agriculture}}}{{}}}
+\bibcite{corn-nutrient-management}{{21}{2006}{{Sawyer et~al.}}{{}}}
+\bibcite{corn-physiology}{{22}{2003}{{White and Johnson}}{{}}}
+\bibcite{kranz2008irrigation}{{23}{2008}{{Kranz et~al.}}{{}}}
+\bibcite{davies2020nitrogen}{{24}{2020}{{Davies et~al.}}{{}}}
+\bibcite{richards1959}{{25}{1959}{{Richards}}{{}}}
+\gdef \@abspage@last{22}
