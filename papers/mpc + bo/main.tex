@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\title[Article Title]{Adaptive Irrigation and Fertilizer Management under Weather Uncertainty using Model Predictive Control with Bayesian-Optimized Parameters}
+\title[Article Title]{Fixed versus Adaptive Irrigation and Fertilizer Management under Weather Uncertainty: A Comparative Study using Genetic Algorithm Optimization and Model Predictive Control}
 
 %======================================================================================%
 %% TARGET JOURNAL: Computers and Electronics in Agriculture
@@ -51,7 +51,7 @@
 %======================================================================================%
 % ABSTRACT
 %======================================================================================%
-\abstract{Climate variability poses significant challenges to agricultural resource management, as fixed irrigation and fertilization strategies optimized for typical conditions may perform poorly under drought, heat waves, or other weather extremes. This paper presents an adaptive approach combining Model Predictive Control (MPC) with Bayesian Optimization (BO) for irrigation and fertilizer scheduling under weather uncertainty. Building on a previously developed crop growth model that captures delayed nutrient absorption via finite impulse response (FIR) convolution and cumulative stress tracking via exponential moving average (EMA) filtering, we formulate a daily receding-horizon control problem that re-optimizes resource allocation based on observed weather conditions. The MPC controller solves a constrained finite-time optimal control (CFTOC) problem at each decision epoch, balancing crop value maximization against input costs and nutrient stress penalties. BO with Tree-structured Parzen Estimators (TPE) tunes the seven MPC weight parameters to maximize performance across a suite of 21 stochastic weather scenarios ranging from normal to extreme conditions. Evaluated on corn production in Iowa, we compare MPC against a genetic algorithm (GA) baseline that optimizes a fixed strategy for typical drought conditions. While the GA achieves higher revenue under normal weather (for which it was optimized), MPC demonstrates superior robustness: its performance advantage increases with weather extremity (correlation $R = 0.485$), and it reduces worst-case losses by 6.4\%. These results suggest that adaptive, closed-loop control offers meaningful risk management benefits for agricultural operations facing increasing climate uncertainty.}
+\abstract{Climate variability poses significant challenges to agricultural resource management, as fixed irrigation and fertilization strategies optimized for expected conditions may perform poorly when actual weather deviates from assumptions. This paper presents a comparative study of fixed versus adaptive resource management strategies under weather uncertainty. We develop an adaptive approach combining Model Predictive Control (MPC) with Bayesian Optimization (BO) for irrigation and fertilizer scheduling, building on a crop growth model that captures delayed nutrient absorption via finite impulse response (FIR) convolution and cumulative stress tracking via exponential moving average (EMA) filtering. The MPC controller solves a constrained finite-time optimal control (CFTOC) problem at each decision epoch, balancing crop value maximization against input costs and nutrient stress penalties, with BO using Tree-structured Parzen Estimators (TPE) to tune controller parameters for robust performance. Evaluated on corn production in Iowa across 21 stochastic weather scenarios ranging from normal to extreme conditions, we compare three strategies: farmer baseline practices, a genetic algorithm (GA) that optimizes a fixed strategy for drought conditions, and adaptive MPC that re-optimizes daily. Results reveal a fundamental tradeoff between mean revenue and consistency. The fixed GA achieves the highest mean revenue (\$796/acre) but with substantial variance, while MPC achieves lower mean revenue (\$750/acre) but with the lowest coefficient of variation (15.4\% vs 16.6\%). MPC outperforms GA in 12 of 21 scenarios---particularly in normal and wet conditions---while GA excels in the drought conditions for which it was optimized. These findings provide practical guidance: when weather patterns are predictable and match optimization assumptions, fixed strategies maximize returns; when weather is uncertain, adaptive MPC provides valuable risk reduction through consistent performance across diverse conditions.}
 
 \keywords{precision agriculture, model predictive control, Bayesian optimization, weather uncertainty, adaptive control, irrigation scheduling}
 \maketitle
@@ -74,12 +74,12 @@ Applying MPC to agricultural systems presents several challenges. First, the non
 Our contributions are:
 \begin{enumerate}
 \item Formulation of a constrained finite-time optimal control (CFTOC) problem for daily irrigation and fertilizer scheduling that accounts for delayed nutrient absorption and cumulative stress effects.
-\item A receding-horizon MPC implementation that adapts resource allocation based on observed weather conditions.
-\item A Bayesian optimization framework using Tree-structured Parzen Estimators (TPE) \cite{bergstra2011algorithms} to tune MPC weights for robustness across stochastic weather scenarios.
-\item Systematic comparison of adaptive MPC against fixed GA-optimized strategies under 21 weather scenarios ranging from normal to extreme conditions.
+\item A receding-horizon MPC implementation that adapts resource allocation based on observed weather conditions, with parameters tuned via Bayesian optimization using Tree-structured Parzen Estimators (TPE) \cite{bergstra2011algorithms}.
+\item Systematic comparison of three resource management strategies---farmer baseline, fixed GA-optimized, and adaptive MPC---across 21 stochastic weather scenarios spanning normal to extreme conditions.
+\item Characterization of the risk-return tradeoff between fixed and adaptive strategies, identifying the conditions under which each approach excels.
 \end{enumerate}
 
-We demonstrate that while the GA achieves higher revenue under normal weather (for which it was optimized), MPC's advantage increases with weather extremity, and it substantially reduces worst-case losses. These results suggest that adaptive control provides meaningful risk management benefits in the face of climate uncertainty.
+Our results reveal that the choice between fixed and adaptive strategies involves a fundamental tradeoff. The GA-optimized fixed strategy achieves higher mean revenue but with greater variance, while MPC sacrifices some peak performance for consistency across diverse weather conditions. These findings provide practical guidance for agricultural decision-making under climate uncertainty.
 
 
 %======================================================================================%
@@ -165,110 +165,292 @@ Full details of the parameter relationships are provided in \cite{becker2025ga}.
 To evaluate controller robustness, we generate a suite of stochastic weather scenarios from historical baseline data. Each scenario applies perturbations representing different climate conditions, from normal variability to extreme events.
 
 %------------------------------------%
-% SCENARIO PARAMETERIZATION
+% WEATHER GENERATION PROCESS
 %------------------------------------%
-\subsection{Scenario Parameterization}\label{subsec:scenario-params}
+\subsection{Generation Process}\label{subsec:weather-generation}
 
-A weather scenario $\mathcal{S}$ is defined by the following parameters:
+Let the historical hourly time series be
+\begin{gather}
+P_{\text{hist}}[k] \geq 0           \\
+-20 \leq T_{\text{hist}}[k] \leq 50 \\
+R_{\text{hist}}[k] \geq 0
+\label{eqn:history}
+\end{gather}
+for $k=0,...,K-1$ where $K$ is the length of the growing season in hours, respectively representing precipitation (inches), temperature (\textdegree C), and solar radiation (W/m\textsuperscript{2}). Then, let a stochastic weather scenario be defined by the parameters
+\begin{equation}
+\theta = (s_{P}, s_{T}, s_{R}, \eta, \mathcal{D}, \mathcal{H}, \mathcal{C})
+\label{eqn:weather-scenario}
+\end{equation}
+where
 \begin{itemize}
-\item \textbf{Precipitation scale} $\gamma_S \in (0, 2]$: Multiplier for baseline precipitation ($\gamma_S < 1$ for drought, $\gamma_S > 1$ for wet conditions).
-\item \textbf{Temperature offset} $\delta_T \in [-5, 5]$ $^\circ$C: Additive shift to baseline temperature.
-\item \textbf{Radiation scale} $\gamma_R \in (0.5, 1.5]$: Multiplier for solar radiation.
-\item \textbf{Noise standard deviation} $\sigma_\epsilon \in [0, 0.1]$: Relative noise magnitude for temporal variability.
-\item \textbf{Extreme event periods}: Lists of (start hour, duration, intensity) tuples for drought periods, heat waves, and cold snaps.
+\item $s_{P}$ is the precipitation scaling factor
+\item $s_{T}$ is the temperature offset
+\item $s_{R}$ is the radiation scaling factor
+\item $\eta$ is the relative noise level (a fraction of the historical standard deviation)
+\item $\mathcal{D}$ is a drought event
+\item $\mathcal{H}$ is a heat wave event
+\item $\mathcal{C}$ is a cold snap event
 \end{itemize}
 
-%------------------------------------%
-% GENERATION PROCEDURE
-%------------------------------------%
-\subsection{Generation Procedure}\label{subsec:generation}
-
-Given baseline historical data $\{S_0[k], T_0[k], R_0[k]\}_{k=1}^K$ from NSRDB and NOAA, synthetic weather is generated as follows:
-
-\textbf{Step 1: Global scaling.}
-\begin{align}
-\tilde{S}[k] &= \gamma_S \cdot S_0[k] \\
-\tilde{T}[k] &= T_0[k] + \delta_T \\
-\tilde{R}[k] &= \gamma_R \cdot R_0[k]
-\end{align}
-
-\textbf{Step 2: Temporally-correlated noise.} To preserve realistic autocorrelation structure, we generate smooth noise by convolving white noise with a Gaussian kernel:
+Each of the event types ($\mathcal{D}, \mathcal{H}, \mathcal{C}$) are defined by three parameters:
 \begin{equation}
-\epsilon[k] = \sigma_\epsilon \cdot (g_\tau * \mathcal{N}(0,1))[k]
+[k_{0}, \kappa, \iota]
+\label{eqn:event}
 \end{equation}
-where $g_\tau$ is a Gaussian with spread $\tau$ (24 hours for temperature, 12 hours for radiation). The noise is applied multiplicatively:
-\begin{align}
-\hat{T}[k] &= \tilde{T}[k] \cdot (1 + \epsilon_T[k]) \\
-\hat{R}[k] &= \tilde{R}[k] \cdot (1 + \epsilon_R[k])
-\end{align}
+where
+\begin{itemize}
+\item $k_{0}$ is the hour when the event begins
+\item $\kappa$ is the duration of the event in number of hours
+\item $\iota\in[0,1]$ is the intensity, with 1 being the most intense
+\end{itemize}
 
-\textbf{Step 3: Extreme event injection.} For each drought period $(t_s, d, \iota)$, precipitation is reduced:
+% STEP 1: Global scaling and offset
+\subsubsection{Global Scaling and Offset}\label{subsubsec:weather-step-1}
+
+Initialize the synthetic environmental disturbance time series after applying the global adjustments $(s_{P}, s_{T}, s_{R})$ for $k=0,...,K-1$ as below
 \begin{equation}
-\hat{S}[k] = \begin{cases}
-\tilde{S}[k] \cdot (1 - \iota \cdot \phi(k)) & \text{if } t_s \leq k < t_s + d \\
-\tilde{S}[k] & \text{otherwise}
-\end{cases}
+\begin{array}{ll}
+P^{(1)}[k] = s_{P}P_{\text{hist}}[k]    & \text{(scaling)} \\[7pt]
+T^{(1)}[k] = T_{\text{hist}}[k] + s_{T} & \text{(offset)}  \\[7pt]
+R^{(1)}[k] = s_{R}R_{\text{hist}}[k]    & \text{(scaling)}
+\end{array}
+\label{eqn:global-scaling}
 \end{equation}
-where $\phi(k)$ is a tapering function providing smooth transitions. Heat waves and cold snaps similarly modify temperature with tapered intensity profiles.
 
-\textbf{Step 4: Physical bounds.} Final values are clipped to physical constraints: $S \geq 0$, $R \geq 0$, $T \in [-20, 50]$ $^\circ$C.
+% STEP 2: Add white noise
+\subsubsection{Add White Noise}\label{subsubsec:weather-step-2}
+
+If $\eta > 0$, draw independent white noise sequences
+\begin{align}
+\varepsilon_{T}[k] \sim \mathcal{N}(0, (\eta\sigma_{T})^{2}) \\
+\varepsilon_{R}[k] \sim \mathcal{N}(0, (\eta\sigma_{R})^{2})
+\label{eqn:varepsilon}
+\end{align}
+where $\sigma_{T}$ and $\sigma_{R}$ are the standard deviations of the historical temperature and radiation time series, respectively.
+
+We then smooth the white noise with a moving average over $m_{T} = 24$ hours for temperature and $m_{R} = 12$ hours for radiation, as we will only apply the noise to the radiation during the day time (when it is not as close to zero).
+\begin{align}
+\bar{\varepsilon}_{T} = \df{1}{m_{T}} \sum_{n=0}^{m_{T} - 1} \varepsilon_{T}[k-n] \\
+\bar{\varepsilon}_{R} = \df{1}{m_{R}} \sum_{n=0}^{m_{R} - 1} \varepsilon_{R}[k-n]
+\label{eqn:smooth-noise}
+\end{align}
+We then add that noise to the signals:
+\begin{align}
+T^{(2)}[k] = T^{(1)}[k] + \bar{\varepsilon}_{T}[k] \\
+R^{(2)}[k] = R^{(1)}[k] + \mathcal{M}_{\text{day}}\bar{\varepsilon}_{R}[k]
+\label{eqn:add-noise}
+\end{align}
+where
+\begin{equation}
+\mathcal{M}_{\text{day}} = \{ k | R_{\text{hist}}[k] > R_{\text{day}} \}
+\label{eqn:daymask}
+\end{equation}
+and we choose the threshold $R_{\text{day}} = 10$ W/m\textsuperscript{2}. Precipitation is unchanged in this step, so
+\begin{equation}
+P^{(2)}[k] = P^{(1)}[k]
+\label{eqn:P2-P1}
+\end{equation}
+If $\eta = 0$, then we let $(P^{(2)}, T^{(2)}, R^{(2)}) = (P^{(1)}, T^{(1)}, R^{(1)})$.
+
+% STEP 3: Drought Injection
+\subsubsection{Drought Injection}\label{subsubsec:drought-injection}
+
+A drought event is
+\begin{equation}
+\mathcal{D} = [k_{0}, \kappa, \iota]
+\label{eqn:drought-event}
+\end{equation}
+For each event, we define the affected hourly index set as
+\begin{equation}
+\mathcal{I} = \{ k_{0}, k_{0}+1,...,\min(k_{0} + \kappa - 1, K-1) \}
+\label{eqn:affected-indices}
+\end{equation}
+and then apply the intensity scaling to those indices with
+\begin{equation}
+P^{(3)}[k] \leftarrow (1 - \iota)P^{(2)}[k] \quad \text{for all } k\in\mathcal{I}
+\label{eqn:P3}
+\end{equation}
+Temperature and radiation are unchanged in this step, so
+\begin{equation}
+T^{(3)}[k] = T^{(2)}[k] \quad \text{and} \quad R^{(3)}[k] = R^{(2)}[k]
+\label{eqn:T3R3-T2R2}
+\end{equation}
+
+% STEP 4a: Heat Wave Injection
+\subsubsection{Heat Wave Injection}\label{subsubsec:heat-wave-injection}
+
+A heat wave event is
+\begin{equation}
+\mathcal{H} = [k_{0}, \kappa, \iota]
+\label{eqn:heatwave-event}
+\end{equation}
+where $k_{0}$ and $\kappa$ have the same meanings they did for the drought event, but now $\iota$ is the peak temperature add (an offset rather than a scaling factor). We then construct a ramp-up, hold, and ramp-down for the heat wave. Let
+\begin{equation}
+\kappa_{\text{ramp}} = \max(1, 0.1\kappa)
+\label{eqn:kappa-ramp}
+\end{equation}
+i.e. either one tenth of the heat wave duration or at least one hour. Then, let
+\begin{equation}
+\kappa_{\text{hold}} = \kappa - 2\kappa_{\text{ramp}}
+\label{eqn:kappa-hold}
+\end{equation}
+to account for the ramp-up and ramp-down.
+
+We can then define
+\begin{itemize}
+\item ramp-up:   $w_{\text{up}}[k]   = \df{k}{\kappa_{\text{ramp}} - 1}$ for $k=0,...,\kappa_{\text{ramp}} - 1$
+\item ramp-up:   $w_{\text{hold}}[k] = 1$
+\item ramp-down: $w_{\text{down}}[k] = \df{k}{\kappa_{\text{ramp}} - 1}$ for $k=0,...,\kappa_{\text{ramp}} - 1$
+\end{itemize}
+and concatenate to form the heat wave window
+\begin{equation}
+w_{\text{heat}} = [w_{\text{up}}, w_{\text{hold}}, w_{\text{down}}]
+\label{eqn:w-heat}
+\end{equation}
+Applying the heat wave to the temperature time series, we obtain
+\begin{equation}
+T^{(4)}[k] \leftarrow T^{(3)}[k] + \iota w_{\text{heat}}[k - k_{0}]
+\label{eqn:T4a}
+\end{equation}
+for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Precipitation and radiation are unchanged in this step, so
+\begin{equation}
+P^{(4)}[k] = P^{(3)}[k] \quad \text{and} \quad R^{(4)}[k] = R^{(3)}[k]
+\label{eqn:P4P3-R4R3}
+\end{equation}
+
+% STEP 4b: Cold Snap Injection
+\subsubsection{Cold Snap Injection}\label{subsubsec:cold-snap-injection}
+
+A cold snap event is
+\begin{equation}
+\mathcal{C} = [k_{0}, \kappa, \iota]
+\label{eqn:coldsnap-event}
+\end{equation}
+where $k_{0}$ and $\kappa$ have the same meanings they did for the heat wave event, but $\iota$ is now the magnitude of the lowest temperature drop. A cold snap window is constructed in the same manner as the heat wave window and the temperature time series becomes
+\begin{equation}
+T^{(4)}[k] \leftarrow T^{(4)}[k] - \iota w_{\text{heat}}[k - k_{0}]
+\label{eqn:T4b}
+\end{equation}
+for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Note: we have used $T^{(4)}[k]$ on the righthand side because we want to reflect that a heat wave may have already been applied.
+
+% STEP 5: Clipping to Physical Bounds
+\subsubsection{Clipping to Physical Bounds}\label{subsubsec:clipping}
+
+Finally, we check to ensure that the transformations above have not violated the bounds on the input disturbances specified in equations \ref{eqn:history}. If they have, we clip the values as below
+\begin{align}
+P_{\text{syn}}[k] &= \max(0, P^{(4)}[k]) \\
+T_{\text{syn}}[k] &= \min(50, \max(-20, T^{(4)}[k])) \\
+R_{\text{syn}}[k] &= \max(0, R^{(4)}[k])
+\label{eqn:PTR-syn}
+\end{align}
+for all $k\in\{ 0,...,K-1 \}$.
 
 %------------------------------------%
 % EXTREMITY INDEX
 %------------------------------------%
 \subsection{Extremity Index}\label{subsec:extremity}
 
-To quantify how far a scenario deviates from normal conditions, we define an extremity index:
+Extremity from precipitation:
 \begin{equation}
-E(\mathcal{S}) = |1 - \gamma_S| + 0.2|\delta_T| + |1 - \gamma_R| + 2\sigma_\epsilon + \sum_i \iota_i
+\mathcal{E}_{\text{precip}} = 2|1 - s_{P}|
+\label{eqn:extreme-precip}
+\end{equation}
+So, $s_{P} = 1$ is the threshold for a drought season vs. a wet season with $s_{P} < 1$ indicating drought and $s_{P} > 1$ indicating wet. 
+
+\noindent Extremity from temperature:
+\begin{equation}
+\mathcal{E}_{\text{temp}} = \df{|s_{T}|}{5}
+\label{eqn:extreme-temp}
+\end{equation}
+indicating that $\pm 5$\textdegree C is the threshold for extreme/not extreme temperature.
+
+\noindent Extremity from a drought event:
+\begin{equation}
+\mathcal{E}_{\text{drought}} = \sum_{(k_{0}, \kappa, \iota)\in\mathcal{D}} \df{\kappa}{500}\iota
+\label{eqn:extreme-drought}
+\end{equation}
+indicating that 500 hours (21 days) constitutes the threshold for long vs. short drought.
+
+\noindent Extremity from a heat wave or cold snap event:
+\begin{align}
+\mathcal{E}_{\text{heat}} &= \sum_{(k_{0}, \kappa, \iota)\in\mathcal{H}} \df{\kappa}{200}\df{\iota}{5} \\[7pt]
+\mathcal{E}_{\text{cold}} &= \sum_{(k_{0}, \kappa, \iota)\in\mathcal{C}} \df{\kappa}{200}\df{\iota}{5}
+\label{eqn:extreme-heatwave}
+\end{align}
+indicating that a long heat wave or cold snap is considered to be $>500$ hours and temperatures are considered to be extreme if 5\textdegree C higher or lower than typical.
+
+\noindent The aggregate extremity score is then
+\begin{equation}
+\mathcal{E} = \mathcal{E}_{\text{precip}} + \mathcal{E}_{\text{temp}} + \mathcal{E}_{\text{drought}} + \mathcal{E}_{\text{heat}} + \mathcal{E}_{\text{cold}}
 \label{eqn:extremity}
 \end{equation}
-where the sum is over all extreme event intensities. Normal scenarios have $E \approx 0$, while our most extreme scenario (combined drought and heat waves) has $E = 8.38$.
-
 
 %======================================================================================%
+% MPC
+%======================================================================================%
+\section{Model Predictive Control}\label{sec:mpc}
+
+%------------------------------------%
 % CFTOC
-%======================================================================================%
-\section{Constrained Finite-Time Optimal Control}\label{sec:cftoc}
-
-At each decision epoch, MPC solves a constrained finite-time optimal control (CFTOC) problem over a planning horizon of $H$ days.
-
 %------------------------------------%
-% PROBLEM FORMULATION
-%------------------------------------%
-\subsection{Problem Formulation}\label{subsec:cftoc-formulation}
+\subsection{Constrained Finite-Time Optimal Control}\label{subsec:cftoc}
 
-Let $\mathbf{x}_d$ denote the plant state at the start of day $d$, and let $\mathbf{u}_d = [w_d, f_d]^T$ denote the daily-average control inputs (irrigation and fertilizer rates). Given an $H$-day forecast of disturbances $\{\hat{\mathbf{d}}_d\}_{d=1}^H$ where $\hat{\mathbf{d}}_d = [\hat{S}_d, \hat{T}_d, \hat{R}_d]^T$, we solve:
-\begin{align}
-\min_{\mathbf{u}_1, \ldots, \mathbf{u}_H} \quad & J = \sum_{d=1}^{H} \ell_d(\mathbf{x}_d, \mathbf{u}_d) + V_H(\mathbf{x}_{H+1}) \label{eqn:cftoc-obj} \\
-\text{s.t.} \quad & \mathbf{x}_{d+1} = \mathcal{F}(\mathbf{x}_d, \mathbf{u}_d, \hat{\mathbf{d}}_d), \quad d = 1, \ldots, H \label{eqn:dynamics-constraint} \\
-& \underline{\mathbf{u}} \leq \mathbf{u}_d \leq \bar{\mathbf{u}}, \quad d = 1, \ldots, H \label{eqn:input-bounds}
-\end{align}
-where $\mathcal{F}$ represents the daily plant state transition (obtained by simulating hourly dynamics over 24 hours using the closed-form solution), and $\underline{\mathbf{u}}, \bar{\mathbf{u}}$ are input bounds.
-
-%------------------------------------%
-% STAGE COST
-%------------------------------------%
-\subsection{Stage Cost}\label{subsec:stage-cost}
-
-The daily stage cost balances input usage against nutrient stress:
+At each decision epoch, MPC solves a constrained finite-time optimal control (CFTOC) problem over a planning horizon of $H$ days. Discrete-time optimal control is concerned with choosing an optimal input sequence over the horizon $K$
 \begin{equation}
-\ell_d(\mathbf{x}_d, \mathbf{u}_d) = \omega_w \cdot w_d + \omega_f \cdot f_d + \omega_{\Delta w} \cdot \Delta_w[d] + \omega_{\Delta f} \cdot \Delta_f[d]
+\mathcal{U}_{0\to K} = \{ u[k] \} \quad \text{for} \quad k=0,...,K-1
+\label{eqn:U0K}
+\end{equation}
+with respect to some objective function over a finite or infinite time horizon in order to apply it to a system with a given initial state $x[0]$. The objective function is often defined as a sum of stage costs $q(x[k], u[k])$ and when the horizon has finite length, a terminal cost $p(x[K])$. That is
+\begin{equation}
+J_{0\to K}(x[0], \mathcal{U}_{0\to K}) = p(x[K]) + \sum_{n=0}^{K-1} q(x[n], u[n])
+\label{eqn:gen-opt-ctrl-cost}
+\end{equation}
+where the states $\mathcal{X}_{0\to K} = \{ x[k] \} \quad \text{for} \quad k=0,...,K-1$ must satisfy the initial condition and system dynamics
+\begin{equation}
+\begin{cases}
+x[0] = x_{0} \\
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1
+\end{cases}
+\label{eqn:dyn-constraint}
+\end{equation}
+and there may be other state or input constraints formulated as inequalities
+\begin{equation}
+h(x[k], u[k]) \leq 0 \quad \text{for} \quad k=0,...,K-1
+\label{eqn:ineq-constraints}
+\end{equation}
+In the finite horizon case, there may also be a terminal constrain requiring the final state to lie in some terminal set $x[K]\in\mathcal{X}_{\text{final}}$.
+
+In our specific case, we define a daily horizon $K_{d}$ in hours and construct the problem as a minimization
+\begin{equation}
+\begin{array}{c}
+J_{0\to K_{d}}^{*}(x[0]) = \min\limits_{\mathcal{U}_{0\to K_{d}}} J_{0\to K_{d}}(x[0], \mathcal{U}_{0\to K_{d}}) \quad \text{s.t.} \\[7pt]
+\begin{cases}
+x[0] = x_{0} \\
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1 \\
+x\in\mathbb{R}^{+} \\
+u\in{\mathcal{U}}
+\end{cases}
+\end{array}
+\label{eqn:minimization-cftoc}
+\end{equation}
+where the stage cost is
+\begin{equation}
+q(x[k], u[k]) = 
+w_{w}\left( \df{u_{w}[k]}{w_{\text{typ}}} \right)^{2} + 
+w_{f}\left( \df{u_{f}[k]}{f_{\text{typ}}} \right)^{2} + 
+w_{\delta w}(\delta_{w}[k])^{2} + 
+w_{\delta f}(\delta_{f}[k])^{2}
 \label{eqn:stage-cost}
 \end{equation}
-where $\omega_w, \omega_f$ are input cost weights, $\omega_{\Delta w}, \omega_{\Delta f}$ are anomaly penalty weights, and $\Delta_w[d], \Delta_f[d]$ are the cumulative divergences for water and fertilizer at day $d$. The anomaly penalties encourage the controller to maintain nutrient factors near 1, avoiding stress accumulation.
-
-%------------------------------------%
-% TERMINAL COST
-%------------------------------------%
-\subsection{Terminal Cost}\label{subsec:terminal-cost}
-
-The terminal cost rewards final crop value:
+and the terminal cost is
 \begin{equation}
-V_H(\mathbf{x}_{H+1}) = -\left(\omega_h \cdot h_{H+1} + \omega_A \cdot A_{H+1} + \omega_P \cdot P_{H+1}\right)
+p(x[K_{d}]) = 
+w_{h}\df{x_{h}[K_{d}]}{k_{h}} +
+w_{A}\df{x_{A}[K_{d}]}{k_{A}} +
+w_{P}\df{x_{P}[K_{d}]}{k_{P}}
 \label{eqn:terminal-cost}
 \end{equation}
-where $\omega_h, \omega_A, \omega_P$ are economic weights for height, leaf area, and fruit biomass. The negative sign converts from cost minimization to value maximization.
+There is no terminal set constraint because we want the plant to grow as much as possible. The terms in the stage cost have been squared in order to encourage sparsity in actuation, more similar to what a farmer might actually implement.
 
 %------------------------------------%
 % SOLUTION METHOD
@@ -277,23 +459,17 @@ where $\omega_h, \omega_A, \omega_P$ are economic weights for height, leaf area,
 
 The CFTOC problem is formulated in Pyomo \cite{bynum2021pyomo} and solved using the IPOPT interior-point nonlinear optimizer \cite{wachter2006ipopt} with the MUMPS linear solver. The nonlinearity arises from the logistic dynamics, FIR convolution, EMA filtering, and exponential nutrient factor computation. We use an adaptive barrier parameter strategy for robust convergence.
 
-
-%======================================================================================%
-% MPC
-%======================================================================================%
-\section{Model Predictive Control}\label{sec:mpc}
-
-MPC implements the CFTOC in a receding-horizon fashion, re-optimizing daily based on updated state and weather observations.
-
 %------------------------------------%
 % ALGORITHM
 %------------------------------------%
 \subsection{Receding-Horizon Algorithm}\label{subsec:mpc-algorithm}
 
+MPC implements the CFTOC in a receding-horizon fashion, re-optimizing daily based on updated state and weather observations.
+
 Algorithm \ref{alg:mpc} presents the MPC procedure. At each decision day $d$:
 \begin{enumerate}
 \item Observe current plant state $\mathbf{x}_d$ and obtain $H$-day weather forecast $\{\hat{\mathbf{d}}_{d+j}\}_{j=0}^{H-1}$.
-\item Solve the CFTOC problem (\ref{eqn:cftoc-obj})--(\ref{eqn:input-bounds}) to obtain optimal control sequence $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$.
+\item Solve the CFTOC problem (\ref{eqn:minimization-cftoc}) to obtain optimal control sequence $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$.
 \item Apply only the first control $\mathbf{u}^*_d$ as constant rates over day $d$.
 \item Simulate hourly plant dynamics using actual (not forecast) weather.
 \item Advance to day $d+1$ and repeat.
@@ -349,9 +525,138 @@ The MPC cost function contains seven tunable weights: $\omega_w, \omega_f, \omeg
 %------------------------------------%
 \subsection{Bayesian Optimization Overview}\label{subsec:bo-overview}
 
-BO is a sample-efficient global optimization method for expensive black-box functions \cite{shahriari2016taking}. Given a parameter vector $\boldsymbol{\theta}$ and objective function $f(\boldsymbol{\theta})$ (here, season-end revenue from MPC simulation), BO maintains a probabilistic surrogate model of $f$ and uses an acquisition function to select the next parameter configuration to evaluate.
+In Gaussian Process Bayesian Optimization, the objective is assumed to be a Gaussian Process
+\begin{equation}
+f(x)\sim \mathcal{GP}(m(x), g(x, x'))
+\label{eqn:another-gp}
+\end{equation}
 
-We employ Tree-structured Parzen Estimators (TPE) \cite{bergstra2011algorithms}, which model $p(\boldsymbol{\theta} | f(\boldsymbol{\theta}) < f^*)$ and $p(\boldsymbol{\theta} | f(\boldsymbol{\theta}) \geq f^*)$ separately, where $f^*$ is a threshold (typically the current best). The acquisition function is the ratio of these densities, favoring regions where good observations are likely.
+where $x$ are the hyperparameter candidates and $f(x)$ is the associated performance metric (like revenue in our application), and you get a posterior over functions
+\begin{equation}
+p(f(x) | \mathcal{D}_{n}) \sim \mathcal{N}(\boldsymbol{\mu}(\mathbf{x}), \boldsymbol{\sigma}_{n}^{2}(\mathbf{x}))
+\label{eqn:another-posterior}
+\end{equation}
+
+that yields a mean surface, an uncertainty surface, and an explicit correlation between sampled points. One then defines an acquisition function like the expected improvement and can maximize to obtain the next data point to sample
+\begin{equation}
+x_{n+1} = \arg\max_{x} \mathbb{E}(\mu(x), \sigma(x))
+\label{eqn:next-x}
+\end{equation}
+
+which is an explicit tradeoff between exploration and exploitation based in probability theory.
+
+In Bayesian Optimization with Tree-structured Parzen Estimation (TPE), instead of directly modeling the objective function's output probability $p(y|x)$ (the posterior), TPE models do the reverse: they model $p(x|y)$ with two density functions.
+
+TPE splits the observed hyperparameter configurations into two groups based on a chosen quantile $\gamma$ of their performance scores (e.g. ``good'' values = top 25\%). Then, say
+\begin{itemize}
+\item $l(x)$: density function for hyperparameter values that resulted in a ``good'' objective score (``less than threshold'').
+\item $g(x)$: density function for hyperparameter values that resulted in a ``bad'' objective score (``greater than threshold'').
+\end{itemize}
+
+Kernel Density Estimation (also known as non-parametric Parzen windows) is used to approximate these density functions.
+
+In TPE, the expected improvement is defined as $l(x)/g(x)$ so that the next hyperparameter sample set has a good change of being ``good.''
+
+To model $p(x|y)$ instead of $p(y|x)$, we need Bayes' rule:
+\begin{equation}
+p(y|x) = \df{p(x|y)p(y)}{p(x)}
+\label{eqn:bayes-rule}
+\end{equation}
+
+We then define a threshold $y^{-}$ such that
+\begin{equation}
+P(y\leq y^{-}) = \gamma, \quad \gamma\in(0, 1)
+\label{eqn:y-plus}
+\end{equation}
+
+but more typically, we constrain the quartile options to something like $\gamma\in(0.1, 0.25)$.
+
+We can then define the two conditional densities as
+\begin{align}
+l(x) &= p(x|y\leq y^{-}) \\
+g(x) &= p(x|y> y^{-})
+\end{align}
+
+The expected improvement is then
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) p(y|x) \,dy \quad \text{(minimization)}
+\label{eqn:EI-TPE}
+\end{equation}
+
+Substituting for Bayes' rule,
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) \df{p(x|y)p(y)}{p(x)} \,dy
+\label{eqn:EI-TPE-bayes}
+\end{equation}
+
+TPE assumes that for $y \leq y^{-}$, $p(x|y)\approx l(x)$, so then
+\begin{equation}
+\mathbb{E}[I(x)] = \df{l(x)}{p(x)} \int_{-\infty}^{y^{-}} (y^{-} - y) p(y) \,dy
+\label{eqn:EI-factor-out-x}
+\end{equation}
+
+Since the integrand is independent of $x$, it is a constant, and thus we know
+\begin{equation}
+\mathbb{E}[(I(x))] \propto \df{l(x)}{p(x)}
+\label{eqn:EI-propto}
+\end{equation}
+
+By the law of total probability, we know
+\begin{equation}
+p(x) = \gamma l(x) + (1 - \gamma)g(x)
+\label{eqn:total-prob}
+\end{equation}
+
+so therefore
+\begin{equation}
+\mathbb{E}[(I(x))] \propto \df{l(x)}{\gamma l(x) + (1 - \gamma)g(x)}
+\label{eqn:EI-propto-total-prob}
+\end{equation}
+
+Since $\gamma$ is fixed, maximizing $\mathbb{E}[I(x)]$ is equivalent to maximizing $l(x)/g(x)$. Thus, we deem $l(x)/g(x)$ to be the TPE acquisition function.
+
+TPE is computationally faster than Gaussian Process BO and does well with mixed hyperparameter spaces (continuous, discrete, categorical). As MPC solvers often produce discontinuities, failures, and flat regions, and we have constrained daily horizon to be an integer while all other hyperparameters are continuous values, TPE is a better choice for our application.
+
+%------------------------------------%
+% KERNEL DENSITY ESTIMATION
+%------------------------------------%
+\subsection{Kernel Density Estimation}\label{sec:kde}
+
+{\bf Idea}: Place a kernel around each data point, sum the kernels, normalize by the number of points, and smooth with some window size h.
+
+Given samples $\{ x_{i} \}_{i=1}^{n}$ the kernel estimator is
+\begin{equation}
+\hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} g(x, x')
+\label{eqn:p-hat}
+\end{equation}
+
+Usually, the kernel choice is Gaussian:
+\begin{equation}
+g(x, x') = \mathcal{N}(x|x', h^{2})
+\label{eqn:another-gaussian-kernel}
+\end{equation}
+
+So for one dimension,
+\begin{equation}
+\hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} \df{1}{\sqrt{2\pi h^{2}}} \exp\left\{ -\df{1}{2}\df{(x - x')^{2}}{h^{2}} \right\}
+\label{eqn:1-dim-p-hat}
+\end{equation}
+
+TPE uses the naive Bayes' assumption that dimensions are independent within both the good and bad sets:
+\begin{equation}
+l(x) \approx \Pi_{j=1}^{d} l_{j}(x_{j}) \quad \text{and} \quad g(x) \approx \Pi_{j=1}^{d} g_{j}(x_{j})
+\label{eqn:lg-kde}
+\end{equation}
+
+Now, TPE does not optimize $l(x)/g(x)$ directly. Instead, it samples many candidates from $l(x)$, then evaluates $l(x)/g(x)$ for each, and picks the best $x$.
+
+The tree-structured part of the Parzen estimator comes from the fact that in real hyperparameter spaces, some parameters only exist if other take on certain values i.e. the parameters are jointly distributed:
+\begin{equation}
+p(x) = p(x_{1})p(x_{2}|x_{2})p(x_{3}|x_{2})...
+\label{eqn:tree-structure}
+\end{equation}
+
+in what we call a tree of conditional distributions.
 
 %------------------------------------%
 % SEARCH SPACE
@@ -396,6 +701,8 @@ where $\mathcal{S}$ is a representative subset of weather scenarios. This encour
 % ALGORITHM
 %------------------------------------%
 \subsection{Algorithm}\label{subsec:bo-algorithm}
+
+Algorithm~\ref{alg:bo} presents the TPE-based parameter tuning procedure. The objective function averages MPC performance across multiple weather scenarios, encouraging parameters that perform well across diverse conditions rather than overfitting to a single scenario.
 
 \begin{algorithm}[h]
 \caption{Bayesian Optimization for MPC Parameter Tuning}
@@ -469,42 +776,34 @@ Fruit biomass $P$    & 125              & 3000              & 0.15--0.36 kg     
 \end{table}
 
 %------------------------------------%
-% BASELINE SCENARIO
+% THREE STRATEGIES
 %------------------------------------%
-\subsection{Baseline Scenario: Farmer Best Practices Under Drought}\label{subsec:baseline}
+\subsection{Three Strategies for Comparison}\label{subsec:strategies}
 
-To establish a performance baseline, we first simulate crop growth under a drought scenario (50\% of typical precipitation) using conventional farmer practices: weekly irrigation of 1 inch \cite{kranz2008irrigation} and monthly fertilizer applications of 90 lbs \cite{davies2020nitrogen}. These values reflect standard agronomic recommendations for corn in the Corn Belt region.
+We compare three irrigation and fertilization strategies representing different approaches to resource management:
 
-Figure \ref{fig:baseline-inputs} shows the environmental disturbances and control inputs over the growing season. The reduced precipitation characteristic of a drought year is clearly visible, along with the periodic irrigation and fertilizer applications.
+\textbf{Farmer Baseline.} Standard agronomic best practices based on published recommendations \cite{kranz2008irrigation,davies2020nitrogen}: weekly irrigation at 1 inch per application, and monthly fertilization at 90 lbs per application. This represents what a well-informed farmer might implement without optimization.
 
-Figure \ref{fig:baseline-growth} shows the resulting plant state trajectories. Under drought conditions with conventional management, the plant reaches the following final values: height of 2.6 m (vs.\ 3.0 m capacity), leaf area of 0.57 m$^2$ (vs.\ 0.65 m$^2$), and fruit biomass of 0.22 kg (vs.\ 0.25 kg). The net revenue under this baseline scenario is \$859/acre.
+\textbf{Fixed GA.} A strategy optimized via genetic algorithm \cite{becker2025ga} for drought conditions (50\% of normal precipitation). The GA searches over four parameters---irrigation frequency, irrigation amount, fertilizer frequency, and fertilizer amount---to maximize net revenue. The optimal strategy applies irrigation every 52 days at 5.0 inches per application, and fertilizer every 33 days at 77 lbs per application. This represents the best fixed strategy when drought is anticipated.
 
-\pagebreak
-\begin{figure}[h]
+\textbf{Adaptive MPC.} Model Predictive Control that re-optimizes daily based on observed weather and current plant state. Unlike the fixed strategies, MPC adjusts resource allocation throughout the growing season in response to actual conditions.
+
+Table~\ref{tab:strategy-params} summarizes the control parameters for each strategy.
+
+\begin{table}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_hourly_controls_and_disturbances.png}
-\caption{Environmental disturbances and control inputs for the baseline scenario. Top three panels show hourly precipitation (reduced to 50\% of normal), solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1 inch) and fertilizer (monthly, 90 lbs) application strategy.}
-\label{fig:baseline-inputs}
-\end{figure}
-
-\pagebreak
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_crop_growth.png}
-\caption{Plant state variable trajectories under the baseline scenario (farmer best practices during drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$859/acre in revenue.}
-\label{fig:baseline-growth}
-\end{figure}
-
-The baseline scenario demonstrates how the model captures stress effects: despite regular irrigation, the mismatch between applied water and the plant's metabolic expectations under drought conditions leads to sustained nutrient factor depression and reduced growth potential. Detailed visualizations of the applied vs.\ absorbed nutrients, cumulative values, and nutrient factors are provided in the Supplementary Information.
-
-%------------------------------------%
-% GA COMPARISON
-%------------------------------------%
-\subsection{Genetic Algorithm Baseline}\label{subsec:ga}
-
-As a comparison point for MPC, we use the genetic algorithm (GA) optimization developed in \cite{becker2025ga}. The GA searches over four parameters---irrigation frequency, irrigation amount, fertilizer frequency, and fertilizer amount---to find a \emph{fixed} strategy that maximizes revenue under drought conditions. Unlike MPC, the GA-optimized strategy does not adapt during the season; the same control parameters are applied regardless of actual weather.
-
-The GA was optimized for the baseline drought scenario (50\% precipitation) and achieves \$999/acre---a 16\% improvement over farmer best practices. However, this strategy is specifically tuned for the assumed weather conditions. When actual weather deviates from assumptions, the fixed strategy cannot adapt.
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Strategy & Irrig. Freq. (days) & Irrig. Amt. (in) & Fert. Freq. (days) & Fert. Amt. (lbs) \\
+\hline\hline
+Farmer Baseline & 7 & 1.0 & 30 & 90 \\
+Fixed GA & 52 & 5.0 & 33 & 77 \\
+Adaptive MPC & Daily re-opt. & Variable & Daily re-opt. & Variable \\
+\hline
+\end{tabular}
+\caption{Control parameters for the three strategies compared in this study.}
+\label{tab:strategy-params}
+\end{table}
 
 %------------------------------------%
 % MPC SETUP
@@ -552,55 +851,124 @@ Extreme     & 2     & 5.60--8.38      \\
 %------------------------------------%
 \subsection{Results}\label{subsec:results}
 
-Table \ref{tab:main-results} compares GA and MPC performance across the 21 scenarios. Both methods substantially outperform farmer best practices, but their relative performance depends on weather conditions.
+Table~\ref{tab:main-results} presents summary statistics for all three strategies across the 21 weather scenarios. Both optimization-based methods substantially outperform farmer baseline practices, with the Fixed GA achieving the highest mean revenue and MPC achieving the lowest variance.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|}
 \hline
-Metric & GA & MPC & Difference \\
+Strategy & Mean (\$/acre) & Std Dev & CV (\%) & Min & Max \\
 \hline\hline
-Mean revenue (\$/acre) & 882.55 & 855.11 & $-27.44$ \\
-Best case (\$/acre) & 1033.63 & 1005.00 & $-28.63$ \\
-Worst case (\$/acre) & 491.50 & 522.91 & $+31.41$ \\
-Scenarios where better & 12/21 & 9/21 & -- \\
+Farmer Baseline & 626 & 135 & 21.6 & 385 & 853 \\
+Fixed GA & 796 & 132 & 16.6 & 550 & 997 \\
+Adaptive MPC & 750 & 115 & 15.4 & 445 & 886 \\
 \hline
 \end{tabular}
-\caption{Overall performance comparison between GA and MPC across 21 weather scenarios.}
+\caption{Summary statistics for the three strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean).}
 \label{tab:main-results}
 \end{table}
 
-On average, GA outperforms MPC by \$27.44/acre. This is expected: the GA strategy was optimized for drought conditions, and many scenarios involve some degree of drought (the baseline uses 50\% precipitation). However, the more interesting finding concerns the relationship between performance and weather extremity.
+Both the Fixed GA and MPC outperform farmer baseline in all scenarios, with mean advantages of \$170/acre and \$123/acre, respectively. When comparing GA to MPC directly, MPC wins in 12 of 21 scenarios, while GA wins in the remaining 9. The key insight is \emph{which} scenarios favor each strategy.
+
+Table~\ref{tab:scenario-results} presents results for representative scenarios spanning the extremity range. MPC outperforms GA in normal and wet conditions, where the GA's drought-optimized strategy applies more resources than necessary. Conversely, GA outperforms MPC in drought scenarios, where its optimization assumptions match actual conditions.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+Scenario & Extremity & Farmer & Fixed GA & MPC & MPC$-$GA \\
+\hline\hline
+normal\_1 (baseline) & 0.00 & 587 & 784 & 848 & +64 \\
+moderate\_wet & 0.70 & 453 & 629 & 716 & +87 \\
+moderate\_dry & 0.80 & 721 & 913 & 796 & $-$116 \\
+wet\_year & 1.10 & 385 & 551 & 633 & +82 \\
+mild\_drought & 1.30 & 853 & 997 & 717 & $-$280 \\
+summer\_drought & 1.70 & 752 & 944 & 746 & $-$197 \\
+heat\_stress & 1.70 & 669 & 855 & 795 & $-$60 \\
+extreme\_drought\_heat & 4.97 & 768 & 836 & 518 & $-$317 \\
+worst\_case & 8.38 & 659 & 734 & 445 & $-$289 \\
+\hline
+\end{tabular}
+\caption{Revenue (\$/acre) for representative scenarios. MPC outperforms GA in normal/wet conditions; GA outperforms MPC in drought conditions.}
+\label{tab:scenario-results}
+\end{table}
+
+Figure~\ref{fig:revenue-comparison} visualizes revenue across all 21 scenarios, sorted by increasing extremity index. The divergence between strategies is evident: MPC (green) consistently outperforms in the left portion of the plot (normal conditions), while Fixed GA (orange) dominates in the right portion (drought and extreme conditions).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/three_way_revenue_comparison.png}
+\caption{Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right).}
+\label{fig:revenue-comparison}
+\end{figure}
 
 %------------------------------------%
-% EXTREMITY ANALYSIS
+% PERFORMANCE BY WEATHER TYPE
 %------------------------------------%
-\subsection{Effect of Weather Extremity}\label{subsec:extremity-analysis}
+\subsection{Performance by Weather Type}\label{subsec:weather-type-analysis}
 
-Figure \ref{fig:extremity-advantage} shows MPC's revenue advantage (MPC revenue minus GA revenue) as a function of weather extremity index. A clear positive trend emerges: MPC's relative performance improves as conditions become more extreme.
+To better understand when each strategy excels, we categorize scenarios by their dominant characteristic and compute mean revenue within each category (Table~\ref{tab:category-results}).
 
-Stratifying by extremity level:
-\begin{itemize}
-\item \textbf{Normal weather} ($E < 0.5$): MPC disadvantage = \$86.07/acre
-\item \textbf{Moderate weather} ($0.5 \leq E < 1.0$): MPC disadvantage = \$43.22/acre
-\item \textbf{Extreme weather} ($E > 1.0$): MPC advantage = \$18.74/acre
-\end{itemize}
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Weather Type & $n$ & Farmer & Fixed GA & MPC \\
+\hline\hline
+Normal/Baseline & 7 & 571 & 764 & 829 \\
+Wet/Cool & 4 & 419 & 590 & 681 \\
+Drought & 4 & 814 & 981 & 723 \\
+Heat Stress & 4 & 685 & 851 & 762 \\
+Extreme Combined & 2 & 713 & 785 & 482 \\
+\hline
+\end{tabular}
+\caption{Mean revenue (\$/acre) by weather category. MPC excels in normal and wet conditions; GA excels in drought conditions.}
+\label{tab:category-results}
+\end{table}
 
-Linear regression yields a correlation coefficient of $R = 0.485$ ($p < 0.05$), indicating a statistically significant positive relationship between extremity and MPC advantage. This confirms the intuition that adaptive control provides greater benefit when conditions deviate more from baseline assumptions.
+The pattern is clear: MPC outperforms the Fixed GA by \$65/acre on average in normal conditions and by \$91/acre in wet/cool conditions. However, the Fixed GA outperforms MPC by \$258/acre in drought scenarios and by \$303/acre in the most extreme combined scenarios. This divergence reflects the fundamental difference in approach: the GA was optimized for drought and performs best when those assumptions hold, while MPC adapts to observed conditions but cannot anticipate future drought stress as effectively. Figure~\ref{fig:by-category} illustrates this pattern visually.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/three_way_by_category.png}
+\caption{Mean revenue by weather category. MPC (green) outperforms Fixed GA (orange) in normal and moderate conditions, while Fixed GA dominates in drought and extreme scenarios. Both optimization methods substantially outperform Farmer Baseline (blue) across all categories.}
+\label{fig:by-category}
+\end{figure}
 
 %------------------------------------%
-% RISK MANAGEMENT
+% VARIANCE AND RISK
 %------------------------------------%
-\subsection{Risk Management Benefits}\label{subsec:risk}
+\subsection{Variance and Risk Analysis}\label{subsec:risk}
 
-Beyond average performance, MPC provides meaningful risk management benefits. The worst-case scenario (combined severe drought and heat waves, $E = 8.38$) produces:
-\begin{itemize}
-\item GA revenue: \$491.50/acre
-\item MPC revenue: \$522.91/acre
-\item MPC improvement: \$31.41/acre (6.4\%)
-\end{itemize}
+The coefficient of variation (CV), defined as the ratio of standard deviation to mean, provides a normalized measure of consistency:
+\begin{equation}
+\text{CV} = \frac{\sigma}{\mu} \times 100\%
+\label{eqn:cv}
+\end{equation}
 
-This worst-case improvement is particularly relevant for risk-averse farmers or operations with significant fixed costs. While GA may maximize expected returns, MPC provides insurance against catastrophic outcomes.
+As shown in Table~\ref{tab:main-results}, MPC achieves the lowest CV (15.4\%) compared to the Fixed GA (16.6\%) and Farmer Baseline (21.6\%). This indicates that MPC delivers the most consistent relative performance across the diverse weather scenarios, even though its mean revenue is lower than the Fixed GA.
+
+The risk-return tradeoff becomes apparent when examining the full distribution. The Fixed GA achieves the highest maximum revenue (\$997/acre in mild drought) but also experiences larger swings: its revenue ranges from \$550 to \$997, a spread of \$447. MPC's range is tighter at \$441 (\$445 to \$886), despite having a lower floor.
+
+For risk-averse decision-makers, this tradeoff is significant. Consider a farmer who must meet fixed costs of \$600/acre. The Fixed GA falls below this threshold in 2 scenarios (wet\_year and cool\_wet), while MPC falls below in 3 scenarios (the same two plus worst\_case). However, when conditions are uncertain---when the farmer cannot predict whether drought or flooding is more likely---MPC's lower variance may be preferable because it reduces exposure to large deviations from expected performance.
+
+Figure~\ref{fig:boxplot} shows the revenue distribution for each strategy as a box plot. The Fixed GA has the highest median and mean (red diamond), but also exhibits greater spread. MPC's distribution is more compact, reflecting its consistent performance across diverse conditions.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/three_way_revenue_boxplot.png}
+\caption{Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance.}
+\label{fig:boxplot}
+\end{figure}
+
+Figure~\ref{fig:cv-comparison} directly compares the coefficient of variation for each strategy. MPC achieves a 7\% reduction in relative variability compared to the Fixed GA (15.4\% vs 16.6\%), and a 29\% reduction compared to Farmer Baseline (15.4\% vs 21.6\%). This consistency is a key advantage for operations that prioritize predictable outcomes over maximum expected returns.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/three_way_cv_comparison.png}
+\caption{Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%).}
+\label{fig:cv-comparison}
+\end{figure}
 
 %------------------------------------%
 % RESOURCE ADAPTATION
@@ -620,11 +988,15 @@ MPC's adaptive nature is evident in its resource usage across scenarios. While G
 %------------------------------------%
 \subsection{Interpretation of Results}\label{subsec:interpretation}
 
-The results reveal a fundamental trade-off between optimization for expected conditions and robustness to uncertainty. The GA achieves higher revenue on average because it was optimized for drought conditions representative of the scenario ensemble. Under normal weather, the GA's aggressive irrigation strategy (designed for drought) actually provides excess water that, given the model's stress dynamics, does not harm the crop.
+Our results reveal that the choice between fixed and adaptive strategies depends critically on the nature of weather uncertainty. This finding has important practical implications.
 
-MPC, in contrast, adapts its irrigation to observed conditions. Under normal weather, this adaptation is unnecessary and the daily re-optimization overhead manifests as slight suboptimality. However, when conditions become extreme---more extreme than the GA's optimization assumptions---MPC's ability to respond becomes valuable. The positive correlation between extremity and MPC advantage ($R = 0.485$) quantifies this relationship.
+\textbf{When fixed optimization excels.} If climate trends are predictable---for example, if a region is experiencing increasing drought frequency due to climate change---then optimizing a fixed strategy for those expected conditions can be highly effective. In our study, the GA-optimized strategy achieved \$997/acre under mild drought, the highest revenue of any strategy in any scenario. For farmers in regions where drought is the dominant concern, such a strategy may be optimal.
 
-The 6.4\% worst-case improvement highlights MPC's risk management value. For a 1000-acre corn operation, this represents approximately \$31,410 in additional revenue under the most adverse conditions. Whether this insurance value justifies MPC's computational overhead depends on the operation's risk tolerance and climate outlook.
+\textbf{When adaptive control excels.} If weather patterns are uncertain or variable---if both drought and flooding are plausible within the planning horizon---then MPC provides valuable insurance. MPC achieved \$633--716/acre in wet conditions, compared to only \$550--630 for the Fixed GA. The GA's drought-optimized parameters (infrequent, heavy irrigation) are poorly suited to wet conditions, where lighter, more frequent applications would be preferable.
+
+\textbf{The value of adaptability.} MPC's adaptive behavior is evident in its resource usage patterns. While the Fixed GA applies the same total irrigation in every scenario, MPC varies its irrigation from approximately 3.9 inches in the wettest scenario to 6.3 inches in the driest. This responsiveness allows MPC to conserve resources when conditions are favorable and apply additional inputs when stress threatens crop development.
+
+\textbf{Risk-return tradeoff.} The comparison reveals a classic risk-return tradeoff. The Fixed GA maximizes expected revenue but with higher variance; MPC achieves lower expected revenue but with the most consistent performance (lowest CV). For operations with significant fixed costs or limited financial reserves, MPC's consistency may be preferable despite the lower mean. For operations that can absorb year-to-year variability, the Fixed GA's higher expected return may be more attractive.
 
 %------------------------------------%
 % COMPUTATIONAL CONSIDERATIONS
@@ -658,13 +1030,25 @@ Several limitations suggest directions for future work:
 %======================================================================================%
 \section{Conclusion}\label{sec:conclusion}
 
-This paper developed an adaptive irrigation and fertilization framework combining Model Predictive Control with Bayesian-optimized parameters. Building on a crop growth model that captures delayed nutrient absorption and cumulative stress effects, we formulated a daily receding-horizon CFTOC problem and used TPE-based Bayesian optimization to tune the controller weights for robust performance across diverse weather scenarios.
+This paper presented a comparative study of fixed versus adaptive irrigation and fertilization strategies under weather uncertainty. We developed an MPC framework with Bayesian-optimized parameters and evaluated it against both farmer baseline practices and a GA-optimized fixed strategy across 21 stochastic weather scenarios.
 
-Evaluated on corn production in Iowa under 21 stochastic weather scenarios, we found that while a genetic algorithm achieves higher average revenue (for which it was optimized), MPC provides superior robustness to weather extremity. The correlation between extremity index and MPC advantage ($R = 0.485$) demonstrates that adaptive control becomes increasingly valuable as conditions deviate from baseline assumptions. MPC also reduces worst-case losses by 6.4\%, providing meaningful risk management benefits.
+Our key findings are:
 
-These results suggest that as climate change increases the frequency and severity of extreme weather events, adaptive control strategies like MPC will become increasingly important for agricultural resource management. The computational overhead is modest (daily optimization solves in under one second), and the framework is generalizable to other crops through re-parameterization.
+\begin{enumerate}
+\item Both optimization-based methods (GA and MPC) substantially outperform farmer baseline practices, with mean advantages of \$170/acre and \$123/acre, respectively.
 
-Future work will incorporate forecast uncertainty through stochastic MPC, extend to field-scale spatial heterogeneity, and validate against field trial data.
+\item The Fixed GA achieves the highest mean revenue (\$796/acre) but with higher variance, while MPC achieves lower mean revenue (\$750/acre) but with the lowest coefficient of variation (15.4\% vs 16.6\%).
+
+\item MPC outperforms the Fixed GA in 12 of 21 scenarios---primarily in normal and wet conditions---while the Fixed GA excels in drought scenarios for which it was optimized.
+
+\item The choice between strategies involves a risk-return tradeoff: fixed optimization maximizes expected returns when conditions match assumptions; adaptive control provides consistency when weather is uncertain.
+\end{enumerate}
+
+These findings have practical implications for agricultural decision-making. In regions with predictable climate trends (e.g., increasing drought frequency), optimizing a fixed strategy for those expected conditions can be highly effective. In regions with variable or uncertain weather patterns, adaptive MPC provides valuable risk reduction through consistent performance.
+
+The computational overhead of MPC is modest---daily optimization solves complete in under one second---making real-time implementation feasible. The framework is generalizable to other crops through re-parameterization of the underlying growth model.
+
+Future work will incorporate forecast uncertainty through stochastic MPC, extend to field-scale spatial heterogeneity, and validate against field trial data. Additionally, exploring hybrid strategies that combine fixed optimization with adaptive adjustments may capture benefits of both approaches.
 
 
 %======================================================================================%
@@ -673,45 +1057,6 @@ Future work will incorporate forecast uncertainty through stochastic MPC, extend
 \backmatter
 \bmhead{Supplementary Information}
 
-This supplementary section provides additional visualizations of the baseline scenario and MPC operation.
-
-\subsection*{S1. Detailed Baseline Scenario Analysis}
-
-Figure \ref{fig:supp-applied-absorbed} shows the applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption via FIR convolution is visible in the lag between applied inputs and smoothed absorbed signals.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{figures/no_opt_applied_absorbed.png}
-\caption{Applied versus absorbed nutrients under the baseline farmer strategy. Water absorption ($\sigma_w = 30$ hr) responds more quickly than fertilizer absorption ($\sigma_f = 300$ hr).}
-\label{fig:supp-applied-absorbed}
-\end{figure}
-
-Figure \ref{fig:supp-cumulative} shows cumulative absorbed nutrients compared to expected levels. Under drought conditions, actual water absorption falls progressively below expectations.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{figures/no_opt_cum_values.png}
-\caption{Cumulative absorbed nutrients (solid) versus expected levels (dashed). The growing gap between actual and expected water absorption reflects cumulative drought stress.}
-\label{fig:supp-cumulative}
-\end{figure}
-
-Figure \ref{fig:supp-divergence} shows instantaneous divergence from expected cumulative levels.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{figures/no_opt_cum_div.png}
-\caption{Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress.}
-\label{fig:supp-divergence}
-\end{figure}
-
-Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The water factor $\nu_w$ declines throughout the season as drought stress accumulates.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{figures/no_opt_nutrient_factors.png}
-\caption{Nutrient factor evolution under the baseline scenario. The declining $\nu_w$ reduces effective growth rates and carrying capacities.}
-\label{fig:supp-nutrient-factors}
-\end{figure}
 
 
 %======================================================================================%

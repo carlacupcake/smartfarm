@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  8 JAN 2026 00:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  9 JAN 2026 12:39
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -539,7 +539,7 @@ File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count316
 \l__pdf_internal_box=\box70
 )
-No file main.aux.
+(./main.aux)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
@@ -560,6 +560,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
 LaTeX Font Info:    ... okay on input line 35.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
 LaTeX Font Info:    ... okay on input line 35.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -639,6 +640,7 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 35.
 LaTeX Info: Redefining \pageref on input line 35.
 LaTeX Info: Redefining \nameref on input line 35.
+ (./main.out) (./main.out)
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
@@ -646,7 +648,8 @@ LaTeX Info: Redefining \nameref on input line 35.
 LaTeX Font Info:    Calculating math sizes for size <12.045> on input line 58.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 58.
 
- (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 58.
@@ -671,340 +674,210 @@ LaTeX Font Info:    Calculating math sizes for size <11.04124> on input line 58
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <5.52061> not available
 (Font)              size <6> substituted on input line 58.
 
-LaTeX Font Info:    Calculating math sizes for size <9.03374> on input line 58.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <4.51686> not available
-(Font)              size <5> substituted on input line 58.
-
 LaTeX Font Info:    Calculating math sizes for size <10.03749> on input line 58
 .
-
-Package natbib Warning: Citation `ipcc2021' on page 1 undefined on input line 6
-4.
-
-
-Package natbib Warning: Citation `becker2025ga' on page 1 undefined on input li
-ne 66.
-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [1
 
 {/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-
-Package natbib Warning: Citation `rawlings2017mpc' on page 2 undefined on input
- line 70.
-
-
-Package natbib Warning: Citation `shahriari2016taking' on page 2 undefined on i
-nput line 72.
-
-
-Package natbib Warning: Citation `bergstra2011algorithms' on page 2 undefined o
-n input line 78.
-
-
-Package natbib Warning: Citation `becker2025ga' on page 2 undefined on input li
-ne 90.
+Underfull \hbox (badness 1281) in paragraph at lines 78--79
+[]\OT1/cmr/m/n/10 Systematic com-par-i-son of three resource man-age-ment strat
+egies---farmer base-line, fixed GA-
+ []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [2]
-
-Package natbib Warning: Citation `becker2025ga' on page 3 undefined on input li
-ne 157.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [3]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [4]
-
-Package natbib Warning: Citation `bynum2021pyomo' on page 5 undefined on input 
-line 278.
-
-
-Package natbib Warning: Citation `wachter2006ipopt' on page 5 undefined on inpu
-t line 278.
-
-
-LaTeX Warning: Reference `alg:mpc' on page 5 undefined on input line 293.
-
-
-LaTeX Warning: Reference `eqn:cftoc-obj' on page 5 undefined on input line 296.
-
-
-
-LaTeX Warning: Reference `eqn:input-bounds' on page 5 undefined on input line 2
-96.
-
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 303.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [5]
-
-Package natbib Warning: Citation `shahriari2016taking' on page 6 undefined on i
-nput line 352.
-
-
-Package natbib Warning: Citation `bergstra2011algorithms' on page 6 undefined o
-n input line 354.
-
-
-LaTeX Warning: Reference `tab:search-space' on page 6 undefined on input line 3
-61.
-
-LaTeX Font Info:    Calculating math sizes for size <8.03> on input line 365.
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <4.015> not available
-(Font)              size <5> substituted on input line 365.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [6]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7pdfTeX warning (ext4): destination with the same identifier (name{table.1}) 
-has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.435 \section
-              {Case Study: Corn in Iowa}\label{sec:case-study}]
+ [7]
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 479.
 
-Package natbib Warning: Citation `fsa-acreage' on page 8 undefined on input lin
-e 437.
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
+ [8]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-Package natbib Warning: Citation `corn-nutrient-management' on page 8 undefined
- on input line 449.
+ [9]
+LaTeX Font Info:    Calculating math sizes for size <8.03> on input line 670.
 
 
-LaTeX Warning: Reference `tab:corn-development' on page 8 undefined on input li
-ne 452.
-
-
-Package natbib Warning: Citation `corn-growth-stages' on page 8 undefined on in
-put line 467.
-
-
-Package natbib Warning: Citation `corn-physiology' on page 8 undefined on input
- line 467.
-
-
-Package natbib Warning: Citation `kranz2008irrigation' on page 8 undefined on i
-nput line 476.
-
-
-Package natbib Warning: Citation `davies2020nitrogen' on page 8 undefined on in
-put line 476.
-
-
-LaTeX Warning: Reference `fig:baseline-inputs' on page 8 undefined on input lin
-e 478.
-
-
-LaTeX Warning: Reference `fig:baseline-growth' on page 8 undefined on input lin
-e 480.
+LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <4.015> not available
+(Font)              size <5> substituted on input line 670.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [8pdfTeX warning (ext4): destination with the same identifier (name{table.2}) 
-has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.483 \begin
-            {figure}[h]]
-<figures/no_opt_hourly_controls_and_disturbances.png, id=123, 638.8668pt x 979.
-2585pt>
-File: figures/no_opt_hourly_controls_and_disturbances.png Graphic file (type pn
-g)
-<use figures/no_opt_hourly_controls_and_disturbances.png>
-Package pdftex.def Info: figures/no_opt_hourly_controls_and_disturbances.png  u
-sed on input line 485.
-(pdftex.def)             Requested size: 339.72592pt x 520.73784pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [9pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
+ [10pdfTeX warning (ext4): destination with the same identifier (name{table.1})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.491 \begin
-            {figure}[h] <./figures/no_opt_hourly_controls_and_disturbances.png>
-]
-<figures/no_opt_crop_growth.png, id=131, 641.7576pt x 979.2585pt>
-File: figures/no_opt_crop_growth.png Graphic file (type png)
-<use figures/no_opt_crop_growth.png>
-Package pdftex.def Info: figures/no_opt_crop_growth.png  used on input line 493
-.
-(pdftex.def)             Requested size: 339.72592pt x 518.39189pt.
+l.697 \end{equation}
+                    ]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [11]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [12pdfTeX warning (ext4): destination with the same identifier (name{table.2})
+ has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.817 \item I
+             nput costs: $\omega_w = 0.177$ \$/inch, $\omega_f = 0.002$ \$/lbpd
+fTeX warning (ext4): destination with the same identifier (name{table.3}) has b
+een already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.817 \item I
+             nput costs: $\omega_w = 0.177$ \$/inch, $\omega_f = 0.002$ \$/lb]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figures/three_way_revenue_comparison.png, id=387, 704.6325pt x 209.583pt>
+File: figures/three_way_revenue_comparison.png Graphic file (type png)
+<use figures/three_way_revenue_comparison.png>
+Package pdftex.def Info: figures/three_way_revenue_comparison.png  used on inpu
+t line 900.
+(pdftex.def)             Requested size: 452.9679pt x 134.72748pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Package natbib Warning: Citation `becker2025ga' on page 10 undefined on input l
-ine 505.
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [10pdfTeX warning (ext4): destination with the same identifier (name{figure.2}
+ [13pdfTeX warning (ext4): destination with the same identifier (name{table.4})
+ has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.930 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.5
+}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.930 
+      ]
+<figures/three_way_by_category.png, id=403, 633.0852pt x 209.583pt>
+File: figures/three_way_by_category.png Graphic file (type png)
+<use figures/three_way_by_category.png>
+Package pdftex.def Info: figures/three_way_by_category.png  used on input line 
+933.
+(pdftex.def)             Requested size: 452.9679pt x 149.95943pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [14pdfTeX warning (ext4): destination with the same identifier (name{table.6})
+ has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.954 
+      pdfTeX warning (ext4): destination with the same identifier (name{figure.
+1}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.954 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.7
+}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.954 
+       <./figures/three_way_revenue_comparison.png>]
+<figures/three_way_revenue_boxplot.png, id=414, 642.4803pt x 208.8603pt>
+File: figures/three_way_revenue_boxplot.png Graphic file (type png)
+<use figures/three_way_revenue_boxplot.png>
+Package pdftex.def Info: figures/three_way_revenue_boxplot.png  used on input l
+ine 959.
+(pdftex.def)             Requested size: 452.9679pt x 147.2529pt.
+<figures/three_way_cv_comparison.png, id=416, 498.663pt x 426.393pt>
+File: figures/three_way_cv_comparison.png Graphic file (type png)
+<use figures/three_way_cv_comparison.png>
+Package pdftex.def Info: figures/three_way_cv_comparison.png  used on input lin
+e 968.
+(pdftex.def)             Requested size: 452.9679pt x 387.32207pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [15pdfTeX warning (ext4): destination with the same identifier (name{figure.2}
 ) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.507 T
-       he GA was optimized for the baseline drought scenario (50\% precipita...
- <./figures/no_opt_crop_growth.png>]
-
-LaTeX Warning: Reference `tab:scenario-categories' on page 11 undefined on inpu
-t line 530.
-
-
-LaTeX Warning: Reference `tab:main-results' on page 11 undefined on input line 
-555.
-
-
-LaTeX Warning: Reference `fig:extremity-advantage' on page 11 undefined on inpu
-t line 580.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [11pdfTeX warning (ext4): destination with the same identifier (name{table.3})
- has been already used, duplicate ignored
+l.993 \textbf{When fixed optimization excels.}
+                                               If climate trends are predict...
+pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
+s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.584 \item \textbf
-                   {Normal weather} ($E < 0.5$): MPC disadvantage = \$86.07/...
-pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has
- been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.584 \item \textbf
-                   {Normal weather} ($E < 0.5$): MPC disadvantage = \$86.07/...
-]
+l.993 \textbf{When fixed optimization excels.}
+                                               If climate trends are predict...
+ <./figures/three_way_by_category.png> <./figures/three_way_revenue_boxplot.png
+>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [12]
+ [16pdfTeX warning (ext4): destination with the same identifier (name{figure.4}
+) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  
+l.1004 \subsection
+                  {Computational Considerations}\label{subsec:computational} <.
+/figures/three_way_cv_comparison.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [17]
 
 Package hyperref Warning: Difference (4) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 676.
+(hyperref)                than one, level fixed on input line 1066.
 
-
-LaTeX Warning: Reference `fig:supp-applied-absorbed' on page 13 undefined on in
-put line 680.
-
-<figures/no_opt_applied_absorbed.png, id=161, 648.9846pt x 784.1295pt>
-File: figures/no_opt_applied_absorbed.png Graphic file (type png)
-<use figures/no_opt_applied_absorbed.png>
-Package pdftex.def Info: figures/no_opt_applied_absorbed.png  used on input lin
-e 684.
-(pdftex.def)             Requested size: 407.66833pt x 492.56842pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: Reference `fig:supp-cumulative' on page 13 undefined on input li
-ne 689.
-
-<figures/no_opt_cum_values.png, id=162, 641.7576pt x 784.1295pt>
-File: figures/no_opt_cum_values.png Graphic file (type png)
-<use figures/no_opt_cum_values.png>
-Package pdftex.def Info: figures/no_opt_cum_values.png  used on input line 693.
-
-(pdftex.def)             Requested size: 407.66833pt x 498.10814pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: Reference `fig:supp-divergence' on page 13 undefined on input li
-ne 698.
-
-<figures/no_opt_cum_div.png, id=163, 647.5392pt x 784.1295pt>
-File: figures/no_opt_cum_div.png Graphic file (type png)
-<use figures/no_opt_cum_div.png>
-Package pdftex.def Info: figures/no_opt_cum_div.png  used on input line 702.
-(pdftex.def)             Requested size: 407.66833pt x 493.65723pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: Reference `fig:supp-nutrient-factors' on page 13 undefined on in
-put line 707.
-
-<figures/no_opt_nutrient_factors.png, id=164, 647.5392pt x 784.1295pt>
-File: figures/no_opt_nutrient_factors.png Graphic file (type png)
-<use figures/no_opt_nutrient_factors.png>
-Package pdftex.def Info: figures/no_opt_nutrient_factors.png  used on input lin
-e 711.
-(pdftex.def)             Requested size: 407.66833pt x 493.65723pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [13]
 
 Package hyperref Warning: Difference (3) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 723.
+(hyperref)                than one, level fixed on input line 1068.
 
-No file main.bbl.
+(./main.bbl
+Underfull \hbox (badness 7099) in paragraph at lines 159--166
+[]\OT1/cmr/m/n/10 USDA Farm Ser-vice Agency: Acreage Data. [][]$https : / / www
+ . fsa . usda . gov / news-[]room / efoia /
+ []
 
-Package natbib Warning: There were undefined citations.
 
+Underfull \hbox (badness 10000) in paragraph at lines 159--166
+\OT1/cmr/m/n/10 electronic-[]reading-[]room / frequently-[]requested-[]informat
+ion / crop-[]acreage-[]data$[][]. Accessed: 2024
+ []
 
+)
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [14pdfTeX warning (ext4): destination with the same identifier (name{figure.3}
-) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.741 \end{document}
-                     <./figures/no_opt_applied_absorbed.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [15pdfTeX warning (ext4): destination with the same identifier (name{figure.4}
-) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.741 \end{document}
-                     <./figures/no_opt_cum_values.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [16pdfTeX warning (ext4): destination with the same identifier (name{figure.5}
-) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.741 \end{document}
-                     <./figures/no_opt_cum_div.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [17pdfTeX warning (ext4): destination with the same identifier (name{figure.6}
-) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  
-l.741 \end{document}
-                     <./figures/no_opt_nutrient_factors.png>] (./main.aux)
+ [18]
+(./main.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.985pt have occurred.
-
-
-LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
@@ -1015,48 +888,100 @@ Package rerunfilecheck Warning: File `main.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  319D7DE6F8D9C35DCC2E9B253A73A191;6879.
+(rerunfilecheck)             Before: EF7D4DE869059C4C6F328F1E47113331;7249
+(rerunfilecheck)             After:  00733BBDD2435688BE26D219E8319690;7243.
  ) 
 Here is how much of TeX's memory you used:
- 13586 strings out of 478994
- 197553 string characters out of 5858184
- 519651 words of memory out of 5000000
- 30724 multiletter control sequences out of 15000+600000
- 439553 words of font info for 165 fonts, out of 8000000 for 9000
+ 13804 strings out of 478994
+ 200699 string characters out of 5858184
+ 528610 words of memory out of 5000000
+ 30853 multiletter control sequences out of 15000+600000
+ 430946 words of font info for 131 fonts, out of 8000000 for 9000
  1151 hyphenation exceptions out of 8191
- 98i,12n,102p,1771b,455s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
-}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
-</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
-/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></u
+ 98i,14n,102p,2047b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{equation.5.47} has been referenced but does not e
+xist, replaced by a fixed one
+
+pdfTeX warning (dest): name{equation.4.10} has been referenced but does not exi
+st, replaced by a fixed one
+
+pdfTeX warning (dest): name{section.9} has been referenced but does not exist, 
+replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.8.3} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.8.2} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.8.1} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.7.8} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.7.7} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.7.6} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.7.5} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.7.4} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.6} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.5} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.4} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.3} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsubsection.4.0.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}<
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></
+usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></u
 sr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr
 /local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/l
 ocal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/lo
 cal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/loc
 al/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local
-/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/t
-exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/tex
-live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texli
-ve/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texli
-ve/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb></usr/local/t
-exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/tex
-live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texli
-ve/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive
-/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/20
-21/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2021/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2021/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2021/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2021/texmf-d
+/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/t
+exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/tex
+live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/tex
+live/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb></usr/local
+/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/t
+exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/tex
+live/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texli
+ve/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/
+2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/202
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2021/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2021/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2021/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2021/texmf-d
 ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2021/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2021/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2021/texmf-dist/f
-onts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2021/texmf-dist/fon
-ts/type1/public/cm-super/sfrm1000.pfb>
-Output written on main.pdf (17 pages, 1045999 bytes).
+onts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2021/texmf-di
+st/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2021/texmf-dist
+/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2021/texmf-dist/f
+onts/type1/public/cm-super/sfrm1000.pfb>
+Output written on main.pdf (18 pages, 466158 bytes).
 PDF statistics:
- 306 PDF objects out of 1000 (max. 8388607)
- 246 compressed objects within 3 object streams
- 103 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 584 PDF objects out of 1000 (max. 8388607)
+ 523 compressed objects within 6 object streams
+ 189 named destinations out of 1000 (max. 500000)
+ 357 words of extra memory for PDF output out of 10000 (max. 10000000)
 
