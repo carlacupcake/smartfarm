@@ -87,7 +87,7 @@ Our results reveal that the choice between fixed and adaptive strategies involve
 %======================================================================================%
 \section{Crop Growth Model}\label{sec:dynamics}
 
-We employ the crop growth model developed in \cite{becker2025ga}, which we briefly summarize here. The model treats the plant as a dynamic system with state vector $\mathbf{x} = [h, A, N, c, P]^T$ representing plant height (m), leaf area per leaf (m$^2$), number of leaves, flower size (spikelets), and fruit biomass (kg). Control inputs are irrigation $w$ (inches/hour) and fertilizer $f$ (lbs/hour), while disturbances include precipitation $S$ (inches/hour), temperature $T$ ($^\circ$C), and solar radiation $R$ (W/m$^2$).
+We employ the crop growth model developed in \cite{becker2025ga}, which we briefly summarize here. The model treats the plant as a dynamic system with state vector $x = [x_{h}, x_{A}, x_{N}, x_{c}, x_{P}]^T$ representing plant height (m), leaf area per leaf (m$^2$), number of leaves, flower size (spikelets), and fruit biomass (kg). Control inputs are irrigation $u_w$ (inches/hour) and fertilizer $u_f$ (lbs/hour), while disturbances include precipitation $d_{S}$ (inches/hour), temperature $d_{T}$ ($^\circ$C), and solar radiation $d_{R}$ (W/m$^2$).
 
 %------------------------------------%
 % LOGISTIC GROWTH
@@ -171,19 +171,19 @@ To evaluate controller robustness, we generate a suite of stochastic weather sce
 
 Let the historical hourly time series be
 \begin{gather}
-P_{\text{hist}}[k] \geq 0           \\
--20 \leq T_{\text{hist}}[k] \leq 50 \\
-R_{\text{hist}}[k] \geq 0
+d_{S}^{\text{hist}}[k] \geq 0           \\
+-20 \leq d_{T}^{\text{hist}}[k] \leq 50 \\
+d_{R}^{\text{hist}}[k] \geq 0
 \label{eqn:history}
 \end{gather}
 for $k=0,...,K-1$ where $K$ is the length of the growing season in hours, respectively representing precipitation (inches), temperature (\textdegree C), and solar radiation (W/m\textsuperscript{2}). Then, let a stochastic weather scenario be defined by the parameters
 \begin{equation}
-\theta = (s_{P}, s_{T}, s_{R}, \eta, \mathcal{D}, \mathcal{H}, \mathcal{C})
+\theta = (s_{S}, s_{T}, s_{R}, \eta, \mathcal{D}, \mathcal{H}, \mathcal{C})
 \label{eqn:weather-scenario}
 \end{equation}
 where
 \begin{itemize}
-\item $s_{P}$ is the precipitation scaling factor
+\item $s_{S}$ is the precipitation scaling factor
 \item $s_{T}$ is the temperature offset
 \item $s_{R}$ is the radiation scaling factor
 \item $\eta$ is the relative noise level (a fraction of the historical standard deviation)
@@ -207,12 +207,12 @@ where
 % STEP 1: Global scaling and offset
 \subsubsection{Global Scaling and Offset}\label{subsubsec:weather-step-1}
 
-Initialize the synthetic environmental disturbance time series after applying the global adjustments $(s_{P}, s_{T}, s_{R})$ for $k=0,...,K-1$ as below
+Initialize the synthetic environmental disturbance time series after applying the global adjustments $(s_{S}, s_{T}, s_{R})$ for $k=0,...,K-1$ as below
 \begin{equation}
 \begin{array}{ll}
-P^{(1)}[k] = s_{P}P_{\text{hist}}[k]    & \text{(scaling)} \\[7pt]
-T^{(1)}[k] = T_{\text{hist}}[k] + s_{T} & \text{(offset)}  \\[7pt]
-R^{(1)}[k] = s_{R}R_{\text{hist}}[k]    & \text{(scaling)}
+d_{S}^{(1)}[k] = s_{S}d_{S}^{\text{hist}}[k]    & \text{(scaling)} \\[7pt]
+d_{T}^{(1)}[k] = d_{T}^{\text{hist}}[k] + s_{T} & \text{(offset)}  \\[7pt]
+d_{R}^{(1)}[k] = s_{R}d_{R}^{\text{hist}}[k]    & \text{(scaling)}
 \end{array}
 \label{eqn:global-scaling}
 \end{equation}
@@ -236,21 +236,21 @@ We then smooth the white noise with a moving average over $m_{T} = 24$ hours for
 \end{align}
 We then add that noise to the signals:
 \begin{align}
-T^{(2)}[k] = T^{(1)}[k] + \bar{\varepsilon}_{T}[k] \\
-R^{(2)}[k] = R^{(1)}[k] + \mathcal{M}_{\text{day}}\bar{\varepsilon}_{R}[k]
+d_{T}^{(2)}[k] = d_{T}^{(1)}[k] + \bar{\varepsilon}_{T}[k] \\
+d_{R}^{(2)}[k] = d_{R}^{(1)}[k] + \mathcal{M}_{\text{day}}\bar{\varepsilon}_{R}[k]
 \label{eqn:add-noise}
 \end{align}
 where
 \begin{equation}
-\mathcal{M}_{\text{day}} = \{ k | R_{\text{hist}}[k] > R_{\text{day}} \}
+\mathcal{M}_{\text{day}} = \{ k | d_{R}^{\text{hist}}[k] > d_{R}^{\text{day}} \}
 \label{eqn:daymask}
 \end{equation}
-and we choose the threshold $R_{\text{day}} = 10$ W/m\textsuperscript{2}. Precipitation is unchanged in this step, so
+and we choose the threshold $d_{R}^{\text{day}} = 10$ W/m\textsuperscript{2}. Precipitation is unchanged in this step, so
 \begin{equation}
-P^{(2)}[k] = P^{(1)}[k]
+d_{S}^{(2)}[k] = d_{S}^{(1)}[k]
 \label{eqn:P2-P1}
 \end{equation}
-If $\eta = 0$, then we let $(P^{(2)}, T^{(2)}, R^{(2)}) = (P^{(1)}, T^{(1)}, R^{(1)})$.
+If $\eta = 0$, then we let $(d_{S}^{(2)}, d_{T}^{(2)}, d_{R}^{(2)}) = (d_{S}^{(1)}, d_{T}^{(1)}, d_{R}^{(1)})$.
 
 % STEP 3: Drought Injection
 \subsubsection{Drought Injection}\label{subsubsec:drought-injection}
@@ -267,12 +267,12 @@ For each event, we define the affected hourly index set as
 \end{equation}
 and then apply the intensity scaling to those indices with
 \begin{equation}
-P^{(3)}[k] \leftarrow (1 - \iota)P^{(2)}[k] \quad \text{for all } k\in\mathcal{I}
+d_{S}^{(3)}[k] \leftarrow (1 - \iota)d_{S}^{(2)}[k] \quad \text{for all } k\in\mathcal{I}
 \label{eqn:P3}
 \end{equation}
 Temperature and radiation are unchanged in this step, so
 \begin{equation}
-T^{(3)}[k] = T^{(2)}[k] \quad \text{and} \quad R^{(3)}[k] = R^{(2)}[k]
+d_{T}^{(3)}[k] = d_{T}^{(2)}[k] \quad \text{and} \quad d_{R}^{(3)}[k] = d_{R}^{(2)}[k]
 \label{eqn:T3R3-T2R2}
 \end{equation}
 
@@ -309,12 +309,12 @@ w_{\text{heat}} = [w_{\text{up}}, w_{\text{hold}}, w_{\text{down}}]
 \end{equation}
 Applying the heat wave to the temperature time series, we obtain
 \begin{equation}
-T^{(4)}[k] \leftarrow T^{(3)}[k] + \iota w_{\text{heat}}[k - k_{0}]
+d_{T}^{(4)}[k] \leftarrow d_{T}^{(3)}[k] + \iota w_{\text{heat}}[k - k_{0}]
 \label{eqn:T4a}
 \end{equation}
 for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Precipitation and radiation are unchanged in this step, so
 \begin{equation}
-P^{(4)}[k] = P^{(3)}[k] \quad \text{and} \quad R^{(4)}[k] = R^{(3)}[k]
+d_{S}^{(4)}[k] = d_{S}^{(3)}[k] \quad \text{and} \quad d_{R}^{(4)}[k] = d_{R}^{(3)}[k]
 \label{eqn:P4P3-R4R3}
 \end{equation}
 
@@ -328,19 +328,19 @@ A cold snap event is
 \end{equation}
 where $k_{0}$ and $\kappa$ have the same meanings they did for the heat wave event, but $\iota$ is now the magnitude of the lowest temperature drop. A cold snap window is constructed in the same manner as the heat wave window and the temperature time series becomes
 \begin{equation}
-T^{(4)}[k] \leftarrow T^{(4)}[k] - \iota w_{\text{heat}}[k - k_{0}]
+d_{T}^{(4)}[k] \leftarrow d_{T}^{(4)}[k] - \iota w_{\text{heat}}[k - k_{0}]
 \label{eqn:T4b}
 \end{equation}
-for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Note: we have used $T^{(4)}[k]$ on the righthand side because we want to reflect that a heat wave may have already been applied.
+for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Note: we have used $d_{T}^{(4)}[k]$ on the righthand side because we want to reflect that a heat wave may have already been applied.
 
 % STEP 5: Clipping to Physical Bounds
 \subsubsection{Clipping to Physical Bounds}\label{subsubsec:clipping}
 
 Finally, we check to ensure that the transformations above have not violated the bounds on the input disturbances specified in equations \ref{eqn:history}. If they have, we clip the values as below
 \begin{align}
-P_{\text{syn}}[k] &= \max(0, P^{(4)}[k]) \\
-T_{\text{syn}}[k] &= \min(50, \max(-20, T^{(4)}[k])) \\
-R_{\text{syn}}[k] &= \max(0, R^{(4)}[k])
+d_{S}^{\text{syn}}[k] &= \max(0, d_{S}^{(4)}[k]) \\
+d_{T}^{\text{syn}}[k] &= \min(50, \max(-20, d_{T}^{(4)}[k])) \\
+d_{R}^{\text{syn}}[k] &= \max(0, d_{R}^{(4)}[k])
 \label{eqn:PTR-syn}
 \end{align}
 for all $k\in\{ 0,...,K-1 \}$.
@@ -352,10 +352,10 @@ for all $k\in\{ 0,...,K-1 \}$.
 
 Extremity from precipitation:
 \begin{equation}
-\mathcal{E}_{\text{precip}} = 2|1 - s_{P}|
+\mathcal{E}_{\text{precip}} = 2|1 - s_{S}|
 \label{eqn:extreme-precip}
 \end{equation}
-So, $s_{P} = 1$ is the threshold for a drought season vs. a wet season with $s_{P} < 1$ indicating drought and $s_{P} > 1$ indicating wet. 
+So, $s_{S} = 1$ is the threshold for a drought season vs. a wet season with $s_{S} < 1$ indicating drought and $s_{S} > 1$ indicating wet. 
 
 \noindent Extremity from temperature:
 \begin{equation}
@@ -395,61 +395,62 @@ indicating that a long heat wave or cold snap is considered to be $>500$ hours a
 %------------------------------------%
 \subsection{Constrained Finite-Time Optimal Control}\label{subsec:cftoc}
 
-At each decision epoch, MPC solves a constrained finite-time optimal control (CFTOC) problem over a planning horizon of $H$ days. Discrete-time optimal control is concerned with choosing an optimal input sequence over the horizon $K$
+At each decision epoch, MPC solves a constrained finite-time optimal control (CFTOC) problem over a planning horizon of $K_{d}$ days. Discrete-time optimal control is concerned with choosing an optimal input sequence over the horizon $K_{d}$
 \begin{equation}
-\mathcal{U}_{0\to K} = \{ u[k] \} \quad \text{for} \quad k=0,...,K-1
+\mathcal{U}_{0\to K_{d}} = \{ u[k] \} \quad \text{for} \quad k=0,...,K_{d}-1
 \label{eqn:U0K}
 \end{equation}
-with respect to some objective function over a finite or infinite time horizon in order to apply it to a system with a given initial state $x[0]$. The objective function is often defined as a sum of stage costs $q(x[k], u[k])$ and when the horizon has finite length, a terminal cost $p(x[K])$. That is
+with respect to some objective function over a finite or infinite time horizon in order to apply it to a system with a given initial state $x[0]$. The objective function is often defined as a sum of stage costs $q(x[k], u[k])$ and when the horizon has finite length, a terminal cost $p(x[K_{d}])$. That is
 \begin{equation}
-J_{0\to K}(x[0], \mathcal{U}_{0\to K}) = p(x[K]) + \sum_{n=0}^{K-1} q(x[n], u[n])
+J_{0\to K_{d}}(x[0], \mathcal{U}_{0\to K_{d}}) = p(x[K_{d}]) + \sum_{n=0}^{K_{d}-1} q(x[n], u[n])
 \label{eqn:gen-opt-ctrl-cost}
 \end{equation}
-where the states $\mathcal{X}_{0\to K} = \{ x[k] \} \quad \text{for} \quad k=0,...,K-1$ must satisfy the initial condition and system dynamics
+where the states $\mathcal{X}_{0\to K_{d}} = \{ x[k] \} \quad \text{for} \quad k=0,...,K_{d}-1$ must satisfy the initial condition and system dynamics
 \begin{equation}
 \begin{cases}
 x[0] = x_{0} \\
-x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K_{d}-1
 \end{cases}
 \label{eqn:dyn-constraint}
 \end{equation}
 and there may be other state or input constraints formulated as inequalities
 \begin{equation}
-h(x[k], u[k]) \leq 0 \quad \text{for} \quad k=0,...,K-1
+h(x[k], u[k]) \leq 0 \quad \text{for} \quad k=0,...,K_{d}-1
 \label{eqn:ineq-constraints}
 \end{equation}
-In the finite horizon case, there may also be a terminal constrain requiring the final state to lie in some terminal set $x[K]\in\mathcal{X}_{\text{final}}$.
+In the finite horizon case, there may also be a terminal constraint requiring the final state to lie in some terminal set $x[K]\in\mathcal{X}_{\text{final}}$.
 
-In our specific case, we define a daily horizon $K_{d}$ in hours and construct the problem as a minimization
+In our specific case, we construct the problem as a minimization
 \begin{equation}
 \begin{array}{c}
 J_{0\to K_{d}}^{*}(x[0]) = \min\limits_{\mathcal{U}_{0\to K_{d}}} J_{0\to K_{d}}(x[0], \mathcal{U}_{0\to K_{d}}) \quad \text{s.t.} \\[7pt]
 \begin{cases}
 x[0] = x_{0} \\
-x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1 \\
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K_{d}-1 \\
 x\in\mathbb{R}^{+} \\
 u\in{\mathcal{U}}
 \end{cases}
 \end{array}
 \label{eqn:minimization-cftoc}
 \end{equation}
-where the stage cost is
+where the stage cost penalizes input usage and nutrient anomalies:
 \begin{equation}
-q(x[k], u[k]) = 
-w_{w}\left( \df{u_{w}[k]}{w_{\text{typ}}} \right)^{2} + 
-w_{f}\left( \df{u_{f}[k]}{f_{\text{typ}}} \right)^{2} + 
-w_{\delta w}(\delta_{w}[k])^{2} + 
-w_{\delta f}(\delta_{f}[k])^{2}
+q(x[k], u[k]) =
+\omega_{w}\left( \df{u_{w}[k]}{u_{w,\text{typ}}} \right)^{2} +
+\omega_{f}\left( \df{u_{f}[k]}{u_{f,\text{typ}}} \right)^{2} +
+\omega_{\Delta w}(\Delta_{w}[k])^{2} +
+\omega_{\Delta f}(\Delta_{f}[k])^{2}
 \label{eqn:stage-cost}
 \end{equation}
-and the terminal cost is
+Here $\omega_w$ and $\omega_f$ are weights on normalized irrigation and fertilizer inputs, $u_{w,\text{typ}}$ and $u_{f,\text{typ}}$ are typical application rates, and $\omega_{\Delta w}$ and $\omega_{\Delta f}$ penalize the cumulative nutrient anomalies $\Delta_w$ and $\Delta_f$ defined in (\ref{eqn:ema}). The terminal cost rewards crop development:
 \begin{equation}
-p(x[K_{d}]) = 
-w_{h}\df{x_{h}[K_{d}]}{k_{h}} +
-w_{A}\df{x_{A}[K_{d}]}{k_{A}} +
-w_{P}\df{x_{P}[K_{d}]}{k_{P}}
+p(x[K_{d}]) =
+-\omega_{h}\df{x_{h}[K_{d}]}{k_{h}} -
+\omega_{A}\df{x_{A}[K_{d}]}{k_{A}} -
+\omega_{P}\df{x_{P}[K_{d}]}{k_{P}}
 \label{eqn:terminal-cost}
 \end{equation}
+where $\omega_h$, $\omega_A$, and $\omega_P$ weight the normalized final height, leaf area, and fruit biomass, respectively.
 There is no terminal set constraint because we want the plant to grow as much as possible. The terms in the stage cost have been squared in order to encourage sparsity in actuation, more similar to what a farmer might actually implement.
 
 %------------------------------------%
@@ -464,37 +465,37 @@ The CFTOC problem is formulated in Pyomo \cite{bynum2021pyomo} and solved using 
 %------------------------------------%
 \subsection{Receding-Horizon Algorithm}\label{subsec:mpc-algorithm}
 
-MPC implements the CFTOC in a receding-horizon fashion, re-optimizing daily based on updated state and weather observations.
+MPC implements the CFTOC in a receding-horizon fashion, re-optimizing daily based on updated state and weather observations. Let $k$ index the decision day, and let $u[k] = (u_{w}[k], u_{f}[k])$ denote the daily irrigation and fertilizer rates. Let $\hat{d_{S}}, \hat{d_{T}}, \hat{d_{R}}$ denote forecast weather and $d_S, d_T, d_R$ denote actual observed weather (precipitation, temperature, radiation).
 
-Algorithm \ref{alg:mpc} presents the MPC procedure. At each decision day $d$:
+Algorithm \ref{alg:mpc} presents the MPC procedure. At each decision day $k$:
 \begin{enumerate}
-\item Observe current plant state $\mathbf{x}_d$ and obtain $H$-day weather forecast $\{\hat{\mathbf{d}}_{d+j}\}_{j=0}^{H-1}$.
-\item Solve the CFTOC problem (\ref{eqn:minimization-cftoc}) to obtain optimal control sequence $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$.
-\item Apply only the first control $\mathbf{u}^*_d$ as constant rates over day $d$.
-\item Simulate hourly plant dynamics using actual (not forecast) weather.
-\item Advance to day $d+1$ and repeat.
+\item Observe current plant state $x[k]$ and obtain $K_{d}$-day weather forecast $\{(\hat{d_{S}}, \hat{d_{T}}, \hat{d_{R}})_{k+i}\}_{i=0}^{K_{d}-1}$.
+\item Solve the CFTOC problem (\ref{eqn:minimization-cftoc}) to obtain optimal control sequence $\{u^*[k+j]\}_{i=0}^{K_{d}-1}$.
+\item Apply only the first control $u^*[k] = (u_{w}[k], u_{f}[k])$ as constant rates over day $k$.
+\item Simulate hourly plant dynamics over the day using actual (not forecast) weather.
+\item Advance to day $k+1$ and repeat.
 \end{enumerate}
 
 \begin{algorithm}[h]
 \caption{Model Predictive Control for Irrigation and Fertilization}
 \label{alg:mpc}
 \begin{algorithmic}[1]
-\State \textbf{Input:} Initial state $\mathbf{x}_0$, horizon $H$, season length $D$ days, weather data
-\State \textbf{Output:} Control history $\{w_d, f_d\}_{d=0}^{D-1}$, final state $\mathbf{x}_D$
+\State \textbf{Input:} Initial state $x[0]$, horizon $K_{d}$, season length $K$ days, weather data
+\State \textbf{Output:} Control history $\{u[k]\}_{k=0}^{K-1}$, final state $x[K]$
 \State
 \State Initialize FIR kernel buffers, EMA state variables
-\For{$d = 0$ to $D-1$}
-    \State Aggregate hourly weather forecast into daily averages for days $d, \ldots, d+H-1$
-    \State Solve CFTOC$(\mathbf{x}_d, \{\hat{\mathbf{d}}_{d+j}\}_{j=0}^{H-1})$ $\rightarrow$ $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$
-    \State Extract first control: $(w_d, f_d) \leftarrow \mathbf{u}^*_d$
-    \For{$h = 0$ to $23$} \Comment{Hourly simulation}
-        \State Apply $(w_d, f_d)$ with actual weather $(S_{24d+h}, T_{24d+h}, R_{24d+h})$
+\For{$k = 0$ to $K-1$}
+    \State Aggregate hourly weather forecast into daily averages for days $k, \ldots, k+K_{d}-1$
+    \State Solve CFTOC$(x[k], \{(\hat{d_{S}}, \hat{d_{T}}, \hat{d_{R}})_{k+i}\}_{i=0}^{K_{d}-1})$ $\rightarrow$ $\{u^*[k+i]\}_{i=0}^{K_{d}-1}$
+    \State Extract first control: $(u_{w}[k], u_{f}[k]) \leftarrow u^*[k]$
+    \For{$t = 0$ to $23$} \Comment{Hourly simulation within day $k$}
+        \State Apply $(u_{w}[k], u_{f}[k])$ with actual weather $(d_{S, 24k+t}, d_{T, 24k+t}, d_{R, 24k+t})$
         \State Update FIR buffers, EMA states, nutrient factors
-        \State Advance plant state using closed-form logistic solution
+        \State Advance plant state using closed-form logistic solution (\ref{eqn:closed-form})
     \EndFor
-    \State $\mathbf{x}_{d+1} \leftarrow$ current plant state
+    \State $x_{k+1} \leftarrow$ current plant state
 \EndFor
-\State \Return $\{w_d, f_d\}_{d=0}^{D-1}$, $\mathbf{x}_D$
+\State \Return $\{u[k]\}_{k=0}^{K-1}$, $x[K_{d}]$
 \end{algorithmic}
 \end{algorithm}
 
@@ -525,138 +526,91 @@ The MPC cost function contains seven tunable weights: $\omega_w, \omega_f, \omeg
 %------------------------------------%
 \subsection{Bayesian Optimization Overview}\label{subsec:bo-overview}
 
-In Gaussian Process Bayesian Optimization, the objective is assumed to be a Gaussian Process
+Standard Gaussian Process (GP) Bayesian Optimization models the objective function as a GP:
 \begin{equation}
 f(x)\sim \mathcal{GP}(m(x), g(x, x'))
 \label{eqn:another-gp}
 \end{equation}
-
-where $x$ are the hyperparameter candidates and $f(x)$ is the associated performance metric (like revenue in our application), and you get a posterior over functions
+where $x$ represents hyperparameter candidates and $f(x)$ is the performance metric. Given observations $\mathcal{D}_n$, the posterior
 \begin{equation}
 p(f(x) | \mathcal{D}_{n}) \sim \mathcal{N}(\boldsymbol{\mu}(\mathbf{x}), \boldsymbol{\sigma}_{n}^{2}(\mathbf{x}))
 \label{eqn:another-posterior}
 \end{equation}
-
-that yields a mean surface, an uncertainty surface, and an explicit correlation between sampled points. One then defines an acquisition function like the expected improvement and can maximize to obtain the next data point to sample
+provides mean and uncertainty estimates that guide acquisition. The next sample is chosen by maximizing an acquisition function:
 \begin{equation}
 x_{n+1} = \arg\max_{x} \mathbb{E}(\mu(x), \sigma(x))
 \label{eqn:next-x}
 \end{equation}
+balancing exploration (high uncertainty) against exploitation (high predicted value).
 
-which is an explicit tradeoff between exploration and exploitation based in probability theory.
-
-In Bayesian Optimization with Tree-structured Parzen Estimation (TPE), instead of directly modeling the objective function's output probability $p(y|x)$ (the posterior), TPE models do the reverse: they model $p(x|y)$ with two density functions.
-
-TPE splits the observed hyperparameter configurations into two groups based on a chosen quantile $\gamma$ of their performance scores (e.g. ``good'' values = top 25\%). Then, say
-\begin{itemize}
-\item $l(x)$: density function for hyperparameter values that resulted in a ``good'' objective score (``less than threshold'').
-\item $g(x)$: density function for hyperparameter values that resulted in a ``bad'' objective score (``greater than threshold'').
-\end{itemize}
-
-Kernel Density Estimation (also known as non-parametric Parzen windows) is used to approximate these density functions.
-
-In TPE, the expected improvement is defined as $l(x)/g(x)$ so that the next hyperparameter sample set has a good change of being ``good.''
-
-To model $p(x|y)$ instead of $p(y|x)$, we need Bayes' rule:
-\begin{equation}
-p(y|x) = \df{p(x|y)p(y)}{p(x)}
-\label{eqn:bayes-rule}
-\end{equation}
-
-We then define a threshold $y^{-}$ such that
+Tree-structured Parzen Estimation (TPE) takes an alternative approach: rather than modeling $p(y|x)$ directly, TPE models the inverse $p(x|y)$ using two density functions. Observations are partitioned by a quantile threshold $\gamma$ (typically 0.1--0.25) into ``good'' and ``bad'' sets, with corresponding densities $l(x) = p(x|y\leq y^{-})$ and $g(x) = p(x|y > y^{-})$, where $y^{-}$ satisfies
 \begin{equation}
 P(y\leq y^{-}) = \gamma, \quad \gamma\in(0, 1)
 \label{eqn:y-plus}
 \end{equation}
 
-but more typically, we constrain the quartile options to something like $\gamma\in(0.1, 0.25)$.
-
-We can then define the two conditional densities as
-\begin{align}
-l(x) &= p(x|y\leq y^{-}) \\
-g(x) &= p(x|y> y^{-})
-\end{align}
-
-The expected improvement is then
+To derive the TPE acquisition function, we begin with expected improvement for minimization:
 \begin{equation}
-\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) p(y|x) \,dy \quad \text{(minimization)}
+\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) p(y|x) \,dy
 \label{eqn:EI-TPE}
 \end{equation}
-
-Substituting for Bayes' rule,
+Applying Bayes' rule $p(y|x) = p(x|y)p(y)/p(x)$:
 \begin{equation}
 \mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) \df{p(x|y)p(y)}{p(x)} \,dy
 \label{eqn:EI-TPE-bayes}
 \end{equation}
-
-TPE assumes that for $y \leq y^{-}$, $p(x|y)\approx l(x)$, so then
+Under the TPE assumption that $p(x|y) \approx l(x)$ for $y \leq y^{-}$:
 \begin{equation}
 \mathbb{E}[I(x)] = \df{l(x)}{p(x)} \int_{-\infty}^{y^{-}} (y^{-} - y) p(y) \,dy
 \label{eqn:EI-factor-out-x}
 \end{equation}
-
-Since the integrand is independent of $x$, it is a constant, and thus we know
+Since the integral is constant with respect to $x$:
 \begin{equation}
 \mathbb{E}[(I(x))] \propto \df{l(x)}{p(x)}
 \label{eqn:EI-propto}
 \end{equation}
-
-By the law of total probability, we know
+Expanding $p(x)$ via the law of total probability:
 \begin{equation}
 p(x) = \gamma l(x) + (1 - \gamma)g(x)
 \label{eqn:total-prob}
 \end{equation}
-
-so therefore
+yields:
 \begin{equation}
 \mathbb{E}[(I(x))] \propto \df{l(x)}{\gamma l(x) + (1 - \gamma)g(x)}
 \label{eqn:EI-propto-total-prob}
 \end{equation}
+For fixed $\gamma$, maximizing expected improvement is equivalent to maximizing $l(x)/g(x)$, which serves as the TPE acquisition function.
 
-Since $\gamma$ is fixed, maximizing $\mathbb{E}[I(x)]$ is equivalent to maximizing $l(x)/g(x)$. Thus, we deem $l(x)/g(x)$ to be the TPE acquisition function.
-
-TPE is computationally faster than Gaussian Process BO and does well with mixed hyperparameter spaces (continuous, discrete, categorical). As MPC solvers often produce discontinuities, failures, and flat regions, and we have constrained daily horizon to be an integer while all other hyperparameters are continuous values, TPE is a better choice for our application.
+TPE offers computational advantages over GP-based methods and handles mixed parameter spaces (continuous, discrete, categorical) naturally. These properties make TPE well-suited for MPC parameter tuning, where the objective landscape may contain discontinuities from solver failures and the search space includes both continuous weights and integer horizon length.
 
 %------------------------------------%
 % KERNEL DENSITY ESTIMATION
 %------------------------------------%
 \subsection{Kernel Density Estimation}\label{sec:kde}
 
-{\bf Idea}: Place a kernel around each data point, sum the kernels, normalize by the number of points, and smooth with some window size h.
-
-Given samples $\{ x_{i} \}_{i=1}^{n}$ the kernel estimator is
+TPE approximates the densities $l(x)$ and $g(x)$ using kernel density estimation (KDE). Given samples $\{ x_{i} \}_{i=1}^{n}$, the kernel density estimator is:
 \begin{equation}
 \hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} g(x, x')
 \label{eqn:p-hat}
 \end{equation}
-
-Usually, the kernel choice is Gaussian:
-\begin{equation}
-g(x, x') = \mathcal{N}(x|x', h^{2})
-\label{eqn:another-gaussian-kernel}
-\end{equation}
-
-So for one dimension,
+with Gaussian kernel $g(x, x') = \mathcal{N}(x|x', h^{2})$ and bandwidth $h$. In one dimension:
 \begin{equation}
 \hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} \df{1}{\sqrt{2\pi h^{2}}} \exp\left\{ -\df{1}{2}\df{(x - x')^{2}}{h^{2}} \right\}
 \label{eqn:1-dim-p-hat}
 \end{equation}
 
-TPE uses the naive Bayes' assumption that dimensions are independent within both the good and bad sets:
+For multivariate parameters, TPE assumes independence across dimensions (naive Bayes):
 \begin{equation}
 l(x) \approx \Pi_{j=1}^{d} l_{j}(x_{j}) \quad \text{and} \quad g(x) \approx \Pi_{j=1}^{d} g_{j}(x_{j})
 \label{eqn:lg-kde}
 \end{equation}
+Rather than optimizing $l(x)/g(x)$ directly, TPE samples candidates from $l(x)$ and selects the one maximizing $l(x)/g(x)$.
 
-Now, TPE does not optimize $l(x)/g(x)$ directly. Instead, it samples many candidates from $l(x)$, then evaluates $l(x)/g(x)$ for each, and picks the best $x$.
-
-The tree-structured part of the Parzen estimator comes from the fact that in real hyperparameter spaces, some parameters only exist if other take on certain values i.e. the parameters are jointly distributed:
+The ``tree-structured'' aspect of TPE accommodates conditional parameter dependencies---where some parameters are only relevant given certain values of others---by modeling the joint distribution as:
 \begin{equation}
 p(x) = p(x_{1})p(x_{2}|x_{2})p(x_{3}|x_{2})...
 \label{eqn:tree-structure}
 \end{equation}
-
-in what we call a tree of conditional distributions.
 
 %------------------------------------%
 % SEARCH SPACE
@@ -708,7 +662,7 @@ Algorithm~\ref{alg:bo} presents the TPE-based parameter tuning procedure. The ob
 \caption{Bayesian Optimization for MPC Parameter Tuning}
 \label{alg:bo}
 \begin{algorithmic}[1]
-\State \textbf{Input:} Search space $\Theta$, weather scenarios $\mathcal{S}$, budget $N$, startup trials $N_0$
+\State \textbf{Input:} Search space $\Theta$ (Table \ref{tab:search-space}), weather scenarios $\mathcal{S}$, budget $N$, startup trials $N_0$
 \State \textbf{Output:} Optimal parameters $\boldsymbol{\theta}^*$
 \State
 \State Initialize TPE surrogate model
@@ -756,25 +710,6 @@ The simulation covers a typical growing season from late April to early October 
 \item \textbf{Typical nutrient expectations:} Based on agronomic recommendations \cite{corn-nutrient-management}, the model expects 28 inches of water and 355 lbs of NPK fertilizer over the season ($w_{\text{typ}} \approx 0.01$ in/hr, $f_{\text{typ}} \approx 0.12$ lb/hr).
 \end{itemize}
 
-Table \ref{tab:corn-development} summarizes expected corn development timelines used to calibrate model parameters.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|c|c|c|c|}
-\hline
-State variable       & Days to maturity & Hours to maturity & Typical final value \\
-\hline\hline
-Plant height $h$     & 65--70           & 1560--1680        & 2.7--3.7 m          \\
-Leaf area $A$        & 55--65           & 1320--1560        & 0.6--0.7 m$^{2}$    \\
-Number of leaves $N$ & 65               & 1560              & 18--20              \\
-Spikelets $c$        & 65--70           & 1560--1680        & $\sim$1000          \\
-Fruit biomass $P$    & 125              & 3000              & 0.15--0.36 kg       \\
-\hline
-\end{tabular}
-\caption{Corn development timeline and typical final values from agronomic literature \cite{corn-growth-stages,corn-physiology}.}
-\label{tab:corn-development}
-\end{table}
-
 %------------------------------------%
 % THREE STRATEGIES
 %------------------------------------%
@@ -810,7 +745,7 @@ Adaptive MPC & Daily re-opt. & Variable & Daily re-opt. & Variable \\
 %------------------------------------%
 \subsection{MPC Configuration}\label{subsec:mpc-config}
 
-The MPC controller uses a 9-day planning horizon ($H = 9$) with daily re-optimization. Control bounds are set to $w \in [0, 0.7]$ inches/hour and $f \in [0, 12]$ lbs/hour, reflecting practical application rate limits.
+The MPC controller uses a 9-day planning horizon ($K_{d} = 9$) with daily re-optimization. Control bounds are set to $u_w \in [0, 0.7]$ inches/hour and $u_f \in [0, 12]$ lbs/hour, reflecting practical application rate limits.
 
 MPC weight parameters were tuned using Bayesian optimization (100 trials) to maximize robust performance across 5 representative weather scenarios. The optimal parameters are:
 \begin{itemize}
@@ -965,7 +900,7 @@ Figure~\ref{fig:cv-comparison} directly compares the coefficient of variation fo
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{figures/three_way_cv_comparison.png}
+\includegraphics[width=0.7\textwidth]{figures/three_way_cv_comparison.png}
 \caption{Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%).}
 \label{fig:cv-comparison}
 \end{figure}
@@ -1003,7 +938,7 @@ Our results reveal that the choice between fixed and adaptive strategies depends
 %------------------------------------%
 \subsection{Computational Considerations}\label{subsec:computational}
 
-Each CFTOC solve requires approximately 0.5--1.0 seconds on a modern workstation using IPOPT. Over a 121-day growing season with daily re-optimization, total computation time is approximately 1--2 minutes. This is negligible compared to GA optimization (which requires thousands of full-season simulations) and well within practical limits for real-time control.
+Each CFTOC solve requires approximately 0.5--1.0 seconds on a modern workstation using IPOPT. Over a 121-day growing season with daily re-optimization, total computation time is approximately 1--2 minutes.
 
 The Bayesian optimization for parameter tuning requires 100 trials, each involving multiple full-season MPC simulations. Total tuning time is approximately 2--4 hours, but this is a one-time offline computation. Once parameters are tuned, MPC operates with minimal computational burden.
 
@@ -1055,14 +990,13 @@ Future work will incorporate forecast uncertainty through stochastic MPC, extend
 % SUPPLEMENTARY INFORMATION
 %======================================================================================%
 \backmatter
-\bmhead{Supplementary Information}
+%\bmhead{Supplementary Information}
 
 
 
 %======================================================================================%
 % ACKNOWLEDGEMENTS
 %======================================================================================%
-\pagebreak
 \bmhead{Acknowledgements}
 
 This work has been partially supported by the UC Berkeley College of Engineering and the USDA AI Institute for Next Generation Food Systems (AIFS), USDA award number 2020-67021-32855.
