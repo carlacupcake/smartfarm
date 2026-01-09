@@ -1,0 +1,923 @@
+% Math and Physical Sciences Numbered Reference Style
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+% Standard Packages
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[title]{appendix}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cancel}
+\raggedbottom
+\newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
+
+\begin{document}
+%======================================================================================%
+%% EXTRA NOTES: For MPC + BO paper
+%======================================================================================%
+
+%------------------------------------%
+% MOVING AVERAGE KERNEL
+%------------------------------------%
+\section{Moving Average Kernel}\label{subsec:ma-kernel}
+
+How do we instantaneously apply a moving average with window size $m$ to a signal $x[k]$? Start with a discrete time series
+\begin{equation}
+x[k] \quad \text{for} \quad k=0,...,K-1
+\label{eqn:xk}
+\end{equation}
+
+By definition, we would calculate the moving average at time step $k$, $y[k]$, with window size $m$ as
+\begin{equation}
+y[k] = \df{1}{m} \sum_{n=0}^{m-1} x[k-n]
+\label{eqn:yk}
+\end{equation}
+
+which is equivalent to convolving with the kernel
+\begin{equation}
+g[k] =
+\begin{cases}
+\df{1}{m}, & k=0,...,K-1, \\
+0, & \text{otherwise}
+\end{cases}
+\label{eqn:ma-kernel}
+\end{equation}
+
+That is,
+\begin{equation}
+y[k] = (x * g)[k] = \sum_{n=-\infty}^{\infty} x[k-n]g[n] = \df{1}{m} \sum_{n=0}^{m-1} x[k-n]
+\label{eqn:x-conv-g}
+\end{equation}
+
+Note: the moving average preserves the mean because the kernel has finite support and unit area:
+\begin{equation}
+\sum_{k} g[k] = 1
+\end{equation}
+
+%------------------------------------%
+% STOCHASTIC WEATHER
+%------------------------------------%
+\section{Stochastic Weather Scenario Generation}\label{subsec:stochastic-weather}
+
+Let the historical hourly time series be
+\begin{gather}
+P_{\text{hist}}[k] \geq 0           \\
+-20 \leq T_{\text{hist}}[k] \leq 50 \\
+R_{\text{hist}}[k] \geq 0
+\label{eqn:history}
+\end{gather}
+
+for $k=0,...,K-1$ where $K$ is the length of the growing season in hours, respectively representing precipitation (inches), temperature (\textdegree C), and solar radiation (W/m\textsuperscript{2}). Then, let a stochastic weather scenario be defined by the parameters
+\begin{equation}
+\theta = (s_{P}, s_{T}, s_{R}, \eta, \mathcal{D}, \mathcal{H}, \mathcal{C})
+\label{eqn:weather-scenario}
+\end{equation}
+
+where
+\begin{itemize}
+\item $s_{P}$ is the precipitation scaling factor
+\item $s_{T}$ is the temperature offset
+\item $s_{R}$ is the radiation scaling factor
+\item $\eta$ is the relative noise level (a fraction of the historical standard deviation)
+\item $\mathcal{D}$ is a drought event
+\item $\mathcal{H}$ is a heat wave event
+\item $\mathcal{C}$ is a cold snap event
+\end{itemize}
+
+Each of the event types ($\mathcal{D}, \mathcal{H}, \mathcal{C}$) are defined by three parameters:
+\begin{equation}
+[k_{0}, \kappa, \iota]
+\label{eqn:event}
+\end{equation}
+
+where
+\begin{itemize}
+\item $k_{0}$ is the hour when the event begins
+\item $\kappa$ is the duration of the event in number of hours
+\item $\iota\in[0,1]$ is the intensity, with 1 being the most intense
+\end{itemize}
+
+% STEP 1: Global scaling and offset
+\subsection{Global Scaling and Offset}\label{subsubsec:weather-step-1}
+
+Initialize the synthetic environmental disturbance time series after applying the global adjustments $(s_{P}, s_{T}, s_{R})$ for $k=0,...,K-1$ as below
+\begin{equation}
+\begin{array}{ll}
+P^{(1)}[k] = s_{P}P_{\text{hist}}[k]    & \text{(scaling)} \\[7pt]
+T^{(1)}[k] = T_{\text{hist}}[k] + s_{T} & \text{(offset)}  \\[7pt]
+R^{(1)}[k] = s_{R}R_{\text{hist}}[k]    & \text{(scaling)}
+\end{array}
+\label{eqn:global-scaling}
+\end{equation}
+
+% STEP 2: Add white noise
+\subsection{Add White Noise}\label{subsubsec:weather-step-2}
+
+If $\eta > 0$, draw independent white noise sequences
+\begin{align}
+\varepsilon_{T}[k] \sim \mathcal{N}(0, (\eta\sigma_{T})^{2}) \\
+\varepsilon_{R}[k] \sim \mathcal{N}(0, (\eta\sigma_{R})^{2})
+\label{eqn:varepsilon}
+\end{align}
+
+where $\sigma_{T}$ and $\sigma_{R}$ are the standard deviations of the historical temperature and radiation time series, respectively.
+
+We then smooth the white noise with a moving average over $m_{T} = 24$ hours for temperature and $m_{R} = 12$ hours for radiation, as we will only apply the noise to the radiation during the day time (when it is not as close to zero).
+\begin{align}
+\bar{\varepsilon}_{T} = \df{1}{m_{T}} \sum_{n=0}^{m_{T} - 1} \varepsilon_{T}[k-n] \\
+\bar{\varepsilon}_{R} = \df{1}{m_{R}} \sum_{n=0}^{m_{R} - 1} \varepsilon_{R}[k-n]
+\label{eqn:smooth-noise}
+\end{align}
+
+We then add that noise to the signals:
+\begin{align}
+T^{(2)}[k] = T^{(1)}[k] + \bar{\varepsilon}_{T}[k] \\
+R^{(2)}[k] = R^{(1)}[k] + \mathcal{M}_{\text{day}}\bar{\varepsilon}_{R}[k]
+\label{eqn:add-noise}
+\end{align}
+
+where
+\begin{equation}
+\mathcal{M}_{\text{day}} = \{ k | R_{\text{hist}}[k] > R_{\text{day}} \}
+\label{eqn:daymask}
+\end{equation}
+
+and we choose the threshold $R_{\text{day}} = 10$ W/m\textsuperscript{2}.
+
+Precipitation is unchanged in this step, so
+\begin{equation}
+P^{(2)}[k] = P^{(1)}[k]
+\label{eqn:P2-P1}
+\end{equation}
+
+If $\eta = 0$, then we let $(P^{(2)}, T^{(2)}, R^{(2)}) = (P^{(1)}, T^{(1)}, R^{(1)})$.
+
+% STEP 3: Drought Injection
+\subsection{Drought Injection}\label{subsubsec:drought-injection}
+
+A drought event is
+\begin{equation}
+\mathcal{D} = [k_{0}, \kappa, \iota]
+\label{eqn:drought-event}
+\end{equation}
+
+For each event, we define the affected hourly index set as
+\begin{equation}
+\mathcal{I} = \{ k_{0}, k_{0}+1,...,\min(k_{0} + \kappa - 1, K-1) \}
+\label{eqn:affected-indices}
+\end{equation}
+
+and then apply the intensity scaling to those indices with
+\begin{equation}
+P^{(3)}[k] \leftarrow (1 - \iota)P^{(2)}[k] \quad \text{for all } k\in\mathcal{I}
+\label{eqn:P3}
+\end{equation}
+
+Temperature and radiation are unchanged in this step, so
+\begin{equation}
+T^{(3)}[k] = T^{(2)}[k] \quad \text{and} \quad R^{(3)}[k] = R^{(2)}[k]
+\label{eqn:T3R3-T2R2}
+\end{equation}
+
+% STEP 4a: Heat Wave Injection
+\subsection{Heat Wave Injection}\label{subsubsec:heat-wave-injection}
+
+A heat wave event is
+\begin{equation}
+\mathcal{H} = [k_{0}, \kappa, \iota]
+\label{eqn:heatwave-event}
+\end{equation}
+
+where $k_{0}$ and $\kappa$ have the same meanings they did for the drought event, but now $\iota$ is the peak temperature add (an offset rather than a scaling factor).
+
+We then construct a ramp-up, hold, and ramp-down for the heat wave. Let
+\begin{equation}
+\kappa_{\text{ramp}} = \max(1, 0.1\kappa)
+\label{eqn:kappa-ramp}
+\end{equation}
+
+i.e. either one tenth of the heat wave duration or at least one hour. Then, let
+\begin{equation}
+\kappa_{\text{hold}} = \kappa - 2\kappa_{\text{ramp}}
+\label{eqn:kappa-hold}
+\end{equation}
+
+to account for the ramp-up and ramp-down.
+
+We can then define
+\begin{itemize}
+\item ramp-up:   $w_{\text{up}}[k]   = \df{k}{\kappa_{\text{ramp}} - 1}$ for $k=0,...,\kappa_{\text{ramp}} - 1$
+\item ramp-up:   $w_{\text{hold}}[k] = 1$
+\item ramp-down: $w_{\text{down}}[k] = \df{k}{\kappa_{\text{ramp}} - 1}$ for $k=0,...,\kappa_{\text{ramp}} - 1$
+\end{itemize}
+
+and concatenate to form the heat wave window
+\begin{equation}
+w_{\text{heat}} = [w_{\text{up}}, w_{\text{hold}}, w_{\text{down}}]
+\label{eqn:w-heat}
+\end{equation}
+
+Applying the heat wave to the temperature time series, we obtain
+\begin{equation}
+T^{(4)}[k] \leftarrow T^{(3)}[k] + \iota w_{\text{heat}}[k - k_{0}]
+\label{eqn:T4a}
+\end{equation}
+
+for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$.
+
+Precipitation and radiation are unchanged in this step, so
+\begin{equation}
+P^{(4)}[k] = P^{(3)}[k] \quad \text{and} \quad R^{(4)}[k] = R^{(3)}[k]
+\label{eqn:P4P3-R4R3}
+\end{equation}
+
+% STEP 4b: Cold Snap Injection
+\subsection{Cold Snap Injection}\label{subsubsec:cold-snap-injection}
+
+A cold snap event is
+\begin{equation}
+\mathcal{C} = [k_{0}, \kappa, \iota]
+\label{eqn:coldsnap-event}
+\end{equation}
+
+where $k_{0}$ and $\kappa$ have the same meanings they did for the heat wave event, but $\iota$ is now the magnitude of the lowest temperature drop. A cold snap window is constructed in the same manner as the heat wave window and the temperature time series becomes
+\begin{equation}
+T^{(4)}[k] \leftarrow T^{(4)}[k] - \iota w_{\text{heat}}[k - k_{0}]
+\label{eqn:T4b}
+\end{equation}
+
+for $k=k_{0}, k_{0}+1,...,\min(k_{0}+ \kappa - 1, K-1)$. Note: we have used $T^{(4)}[k]$ on the righthand side because we want to reflect that a heat wave may have already been applied.
+
+% STEP 5: Clipping to Physical Bounds
+\subsection{Clipping to Physical Bounds}\label{subsubsec:clipping}
+
+Finally, we check to ensure that the transformations above have not violated the bounds on the input disturbances specified in equations \ref{eqn:history}. If they have, we clip the values as below
+\begin{align}
+P_{\text{syn}}[k] &= \max(0, P^{(4)}[k]) \\
+T_{\text{syn}}[k] &= \min(50, \max(-20, T^{(4)}[k])) \\
+R_{\text{syn}}[k] &= \max(0, R^{(4)}[k])
+\label{eqn:PTR-syn}
+\end{align}
+
+for all $k\in\{ 0,...,K-1 \}$.
+
+%------------------------------------%
+% EXTREMITY INDEX
+%------------------------------------%
+\section{Extremity Index}\label{subsec:extremity}
+
+Extremity from precipitation:
+\begin{equation}
+\mathcal{E}_{\text{precip}} = 2|1 - s_{P}|
+\label{eqn:extreme-precip}
+\end{equation}
+
+So, $s_{P} = 1$ is the threshold for a drought season vs. a wet season with $s_{P} < 1$ indicating drought and $s_{P} > 1$ indicating wet. 
+
+Extremity from temperature:
+\begin{equation}
+\mathcal{E}_{\text{temp}} = \df{|s_{T}|}{5}
+\label{eqn:extreme-temp}
+\end{equation}
+
+indicating that $\pm 5$\textdegree C is the threshold for extreme/not extreme temperature.
+
+Extremity from a drought event:
+\begin{equation}
+\mathcal{E}_{\text{drought}} = \sum_{(k_{0}, \kappa, \iota)\in\mathcal{D}} \df{\kappa}{500}\iota
+\label{eqn:extreme-drought}
+\end{equation}
+
+denoting that 500 hours (21 days) constitutes the threshold for long vs. short drought.
+
+Extremity from a heat wave or cold snap event:
+\begin{align}
+\mathcal{E}_{\text{heat}} &= \sum_{(k_{0}, \kappa, \iota)\in\mathcal{H}} \df{\kappa}{200}\df{\iota}{5} \\[7pt]
+\mathcal{E}_{\text{cold}} &= \sum_{(k_{0}, \kappa, \iota)\in\mathcal{C}} \df{\kappa}{200}\df{\iota}{5}
+\label{eqn:extreme-heatwave}
+\end{align}
+
+indicating that a long heat wave or cold snap is considered to be $>500$ hours and temperatures are considered to be extreme if 5\textdegree C higher or lower than typical.
+
+The aggregate extremity score is then
+\begin{equation}
+\mathcal{E} = \mathcal{E}_{\text{precip}} + \mathcal{E}_{\text{temp}} + \mathcal{E}_{\text{drought}} + \mathcal{E}_{\text{heat}} + \mathcal{E}_{\text{cold}}
+\label{eqn:extremity}
+\end{equation}
+
+%------------------------------------%
+% CFTOC
+%------------------------------------%
+\section{Constrained Finite Time Optimal Control}\label{sec:optimal-control}
+
+Discrete-time optimal control is concerned with choosing an optimal input sequence over the horizon $K$
+\begin{equation}
+\mathcal{U}_{0\to K} = \{ u[k] \} \quad \text{for} \quad k=0,...,K-1
+\label{eqn:U0K}
+\end{equation}
+
+with respect to some objective function over a finite or infinite time horizon in order to apply it to a system with a given initial state $x[0]$.
+
+The objective function is often defined as a sum of stage costs $q(x[k], u[k])$ and when the horizon has finite length, a terminal cost $p(x[K])$. That is
+\begin{equation}
+J_{0\to K}(x[0], \mathcal{U}_{0\to K}) = p(x[K]) + \sum_{n=0}^{K-1} q(x[n], u[n])
+\label{eqn:gen-opt-ctrl-cost}
+\end{equation}
+
+where the states $\mathcal{X}_{0\to K} = \{ x[k] \} \quad \text{for} \quad k=0,...,K-1$ must satisfy the initial condition and system dynamics
+\begin{equation}
+\begin{cases}
+x[0] = x_{0} \\
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1
+\end{cases}
+\label{eqn:dyn-constraint}
+\end{equation}
+
+and there may be other state or input constraints formulated as inequalities
+\begin{equation}
+h(x[k], u[k]) \leq 0 \quad \text{for} \quad k=0,...,K-1
+\label{eqn:ineq-constraints}
+\end{equation}
+
+In the finite horizon case, there may also be a terminal constrain requiring the final state to lie in some terminal set $x[K]\in\mathcal{X}_{\text{final}}$.
+
+In our specific case, we define a daily horizon $K_{d}$ in hours and construct the problem as a minimization
+\begin{equation}
+\begin{array}{c}
+J_{0\to K_{d}}^{*}(x[0]) = \min\limits_{\mathcal{U}_{0\to K_{d}}} J_{0\to K_{d}}(x[0], \mathcal{U}_{0\to K_{d}}) \quad \text{s.t.} \\[7pt]
+\begin{cases}
+x[0] = x_{0} \\
+x[k+1] = g(x[k], u[k]) & \text{for } k=0,...,K-1 \\
+x\in\mathbb{R}^{+} \\
+u\in{\mathcal{U}}
+\end{cases}
+\end{array}
+\label{eqn:minimization-cftoc}
+\end{equation}
+
+where the stage cost is
+\begin{equation}
+q(x[k], u[k]) = 
+w_{w}\left( \df{u_{w}[k]}{w_{\text{typ}}} \right)^{2} + 
+w_{f}\left( \df{u_{f}[k]}{f_{\text{typ}}} \right)^{2} + 
+w_{\delta w}(\delta_{w}[k])^{2} + 
+w_{\delta f}(\delta_{f}[k])^{2}
+\label{eqn:stage-cost}
+\end{equation}
+
+and the terminal cost is
+\begin{equation}
+p(x[K_{d}]) = 
+w_{h}\df{x_{h}[K_{d}]}{k_{h}} +
+w_{A}\df{x_{A}[K_{d}]}{k_{A}} +
+w_{P}\df{x_{P}[K_{d}]}{k_{P}}
+\label{eqn:terminal-cost}
+\end{equation}
+
+There is no terminal set constraint because we want the plant to grow as much as possible. The terms in the stage cost have been squared in order to encourage sparsity in actuation, more similar to what a farmer might actually implement.
+
+%------------------------------------%
+% Automatic Relevance Determination
+%------------------------------------%
+\section{Automatic Relevance Determination for Kernel Fitting}\label{sec:ard}
+
+Given an objective function $f: \mathcal{X}\subset\mathbb{R}^{d} \rightarrow \mathbb{R}$, if we evaluate at a set of $n$ points $\mathcal{X}_{n} = \{ x_{i} \}_{i=1}^{n}$, then we can construct the vector
+\begin{equation}
+\mathbf{f} = 
+\begin{bmatrix}
+f(x_{1}) \\ \vdots \\ f(x_{n})
+\end{bmatrix}
+\label{eqn:f-vector}
+\end{equation}
+
+Given this collection of points, we can construct a Gaussian Process, which is a finite collection of points that has a joint Gaussian distribution which encodes properties like smoothness, length scales, and periodicity. Mathematically, we describe a Gaussian Process with
+\begin{equation}
+\mathbf{f}\sim \mathcal{GP}(\mathbf{m}(\mathbf{x}), g(\mathbf{x}, \mathbf{x}'))
+\label{eqn:GP-prior}
+\end{equation}
+
+where $\mathbf{m}(\mathbf{x}) = \mathbb{E}[f(\mathbf{x})]\mathbf{1}_{n}$ is the expected value of the random function $f(\mathbf{x})$ and $g(\mathbf{x}, \mathbf{x}')$ is a kernel which describes the structure of the distribution. It is typical to use the radial basis function kernel
+\begin{equation}
+g(\mathbf{x}, \mathbf{x}') = \sigma_{f}^{2}\exp\left\{ -\df{1}{2}\sum_{j=1}^{d} \df{(x_{j} - x_{j}')^{2}}{l_{j}^{2}} \right\}
+\label{eqn:rbf-kernel}
+\end{equation}
+
+where
+\begin{itemize}
+\item $\sigma_{f}^{2}$ is the variance of the function $f(x)$
+\item $\{l_{j}\}_{j=0}^{d}$ are the length scales for the $d$ dimensions of $f(\mathbf{x})$
+\end{itemize}
+
+The function is sensitive in dimension $j$ is $l_{j}$ is small and varies slowly in dimension $j$ is $l_{j}$ is large. If $l_{j} \to\infty$ then dimension $j$ is irrelevant. That these properties are encoded in the $\mathcal{GP}$ kernel is what defines Automatic Relevance Determination (ARD).
+
+Given the training inputs $\mathcal{X}_{n}$, we can build the Gram matrix (kernel matrix), which is a set of inner product vectors
+\begin{equation}
+\mathbf{K}_{f}\in\mathbb{R}^{n\times n}, \quad (\mathbf{K}_{f})_{ij} = g(x_{i}, x_{j})
+\label{eqn:Kf}
+\end{equation}
+
+and represents what the $\mathcal{GP}$ prior thinks the covariance between $f(x_{i})$ and $f(x_{j})$ should be.
+
+If observations are noisy, then
+\begin{equation}
+y_{i} = f(x_{i}) + \epsilon_{i}, \quad \epsilon_{i}\sim\mathcal{N}(0, \sigma_{n}^{2})
+\label{eqn:noisy-evaluation}
+\end{equation}
+
+Thus, the mean of $y$ is
+\begin{equation}
+\mathbb{E}[\mathbf{y}] = \mathbb{E}[\mathbf{f}] + \mathbb{E}[\boldsymbol{\epsilon}] = \mathbf{m}
+\end{equation}
+
+and the covariance of $y$ is
+\begin{equation}
+\text{Cov}(\mathbf{y}) = \text{Cov}(\mathbf{f}) + \text{Cov}(\boldsymbol{\epsilon}) = \mathbf{K}_{f} + \sigma_{n}^{2}\mathbf{I} \triangleq \mathbf{K}
+\label{eqn:cov-y}
+\end{equation}
+
+So, $\mathbf{y}\sim\mathcal{N}(\mathbf{m}, \mathbf{K})$. That implies that the marginal likelihood is the multivariate normal density
+\begin{equation}
+p(\mathbf{y}|\mathcal{X}_{n}, \boldsymbol{\theta}) = \df{1}{(2\pi)^{n/2}|\mathbf{K}|^{1/2}} \exp\left\{ -\df{1}{2}(\mathbf{y}-\mathbf{m})^{T}\mathbf{K}^{-1}(\mathbf{y}-\mathbf{m}) \right\}
+\label{eqn:marg-likelihood}
+\end{equation}
+
+where the parameters $\boldsymbol{\theta}$ are the kernel variance, the dimensions of $\mathbf{x}$, and the variance of the samples:
+\begin{equation}
+\boldsymbol{\theta} =
+\begin{bmatrix}
+\sigma_{f}^{2} \\
+l_{1} \\
+\vdots \\
+l_{d} \\
+\sigma_{n}^{2}
+\end{bmatrix}
+\end{equation}
+
+Taking the log of the likelihood
+\begin{equation}
+\log p(\mathbf{y}|\mathcal{X}_{n}, \boldsymbol{\theta}) = -\df{n}{2}\log(2\pi) - \df{1}{2}(\mathbf{y}-\mathbf{m})^{T}\mathbf{K}^{-1}(\mathbf{y}-\mathbf{m}) - \df{1}{2}\log|\mathbf{K}|
+\label{eqn:log-likelihood}
+\end{equation}
+
+Letting $\boldsymbol{\delta} = \mathbf{y} - \mathbf{m}$ and $\boldsymbol{\alpha} = \mathbf{K}^{-1}\boldsymbol{\delta}$, we can then write the log likelihood as
+\begin{equation}
+\mathcal{L}(\boldsymbol{\theta}) = -\df{1}{2}\boldsymbol{\delta}^{T}\mathbf{K}^{-1}\boldsymbol{\delta} - \df{1}{2}\log|\mathbf{K}| - \df{n}{2}\log(2\pi)
+\label{eqn:mod-log-like}
+\end{equation}
+
+Knowing that
+\begin{equation}
+\df{\partial\mathbf{K}^{-1}}{\partial\theta_{j}} = -\mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}}\mathbf{K}^{-1}
+\label{eqn:partial-K-partial-thetaj}
+\end{equation}
+
+and
+\begin{equation}
+\df{\partial}{\partial\theta_{j}}\log|\mathbf{K}| = \text{tr}\left( \mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta+{j}} \right)
+\label{eqn:partial-logK-partial-thetaj}
+\end{equation}
+
+and the identity $\mathbf{a}^{T}\mathbf{B}\mathbf{a} = \text{tr}(\mathbf{B}\mathbf{a}\mathbf{a}^{T})$, as well as that $\mathbf{K}^{T} = \mathbf{K}$, then the gradient of the log likelihood is
+\begin{align}
+\df{\partial\mathcal{L}}{\partial\theta_{j}}
+&= -\df{1}{2}\df{\partial}{\partial\theta_{j}}\left( \boldsymbol{\delta}^{T}\mathbf{K}^{-1}\boldsymbol{\delta} \right) 
+   - \df{\partial}{\partial\theta_{j}}\left( \df{1}{2}\log|\mathbf{K}| \right)
+   - \cancelto{0}{\df{\partial}{\partial\theta_{j}}\left( \df{n}{2}\log(2\pi) \right)} \\
+&= - \df{1}{2}\boldsymbol{\delta}^{T}\df{\partial\mathbf{K}^{-1}}{\partial\theta_{j}}\boldsymbol{\delta}
+   - \df{1}{2}\text{tr}\left( \mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}} \right) \\
+&= - \df{1}{2}\boldsymbol{\delta}^{T}\left( -\mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}}\mathbf{K}^{-1} \right)\boldsymbol{\delta}
+   - \df{1}{2}\text{tr}\left( \mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}} \right) \\
+&= \df{1}{2}\boldsymbol{\alpha}^{T}\df{\partial\mathbf{K}}{\partial\theta_{j}}\boldsymbol{\alpha}
+   - \df{1}{2}\text{tr}\left( \mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}} \right) \\
+&= \df{1}{2}\text{tr}\left( \df{\partial\mathbf{K}}{\partial\theta_{j}} \boldsymbol{\alpha}\boldsymbol{\alpha}^{T}\right)
+   - \df{1}{2}\text{tr}\left( \mathbf{K}^{-1}\df{\partial\mathbf{K}}{\partial\theta_{j}} \right) \\
+&= \df{1}{2}\text{tr}\left[ (\boldsymbol{\alpha}\boldsymbol{\alpha}^{T} - \mathbf{K}^{-1}) \df{\partial\mathbf{K}}{\partial\theta_{j}} \right]
+\label{eqn:grad-log-like-deriv}
+\end{align}
+
+For a Gaussian kernel, as in equation \ref{eqn:rbf-kernel}, say
+\begin{equation}
+(\mathbf{K}_{f})_{ab} = \sigma_{f}^{2}\exp\left\{ -\df{1}{2}\sum_{j=1}^{d} \df{\Delta_{ab}^{(j)}}{l_{j}^{2}} \right\}
+\label{eqn:Kfab}
+\end{equation}
+
+then
+\begin{equation}
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial\sigma_{f}^{2}}
+= \exp\left\{ -\df{1}{2}\sum_{j=1}^{d} \df{\Delta_{ab}^{(j)}}{l_{j}^{2}} \right\}
+= \df{1}{\sigma_{f}^{2}}(\mathbf{K}_{f})_{ab}
+\label{eqn:partial-Kf-partial-sigmaf}
+\end{equation}
+
+and, if we define
+\begin{equation}
+E_{ab} = \df{1}{2}\sum_{j=1}^{d} \df{\Delta_{ab}^{(j)}}{l_{j}^{2}}
+\label{eqn:Eab}
+\end{equation}
+
+then
+\begin{equation}
+\df{\partial E_{ab}}{\partial l_{j}} = \df{\Delta_{ab}^{(j)}}{l_{j}^{3}}
+\label{eqn:partial-Eab-partial-lj}
+\end{equation}
+
+By the chain rule,
+\begin{equation}
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial l_{j}} 
+= \df{\partial(\mathbf{K}_{f})_{ab}}{\partial E_{ab}} \cdot \df{\partial E_{ab}}{\partial l_{j}}
+= (\mathbf{K}_{f})_{ab}\cdot\df{\Delta_{ab}^{(j)}}{l_{j}^{3}}
+\label{eqn:partial-Kf-partial-lj}
+\end{equation}
+
+Finally, since $\mathbf{K} = \mathbf{K}_{f} + \sigma_{n}^{2}\mathbf{I}$,
+\begin{equation}
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial \sigma_{n}^{2}} =  \mathbf{I}
+\label{eqn:partial-Kf-partial-sigman}
+\end{equation}
+
+With the partial derivatives
+\begin{equation}
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial\sigma_{f}^{2}} = \df{1}{\sigma_{f}^{2}}(\mathbf{K}_{f})_{ab}, \quad
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial l_{j}} = (\mathbf{K}_{f})_{ab}\cdot\df{\Delta_{ab}^{(j)}}{l_{j}^{3}} \quad
+\df{\partial(\mathbf{K}_{f})_{ab}}{\partial \sigma_{n}^{2}} =  \mathbf{I}
+\label{eqn:all-the-partials}
+\end{equation}
+
+we can construct the full gradient of the log likelihood $\nabla_{\boldsymbol{\theta}}\mathcal{L}$ and, using a method like L-BFGS or Adam\footnote{L-BFGS = Limited-memory Broyden-Fletcher-Goldfarb-Shanno algorithm, a second-order quasi-Newton method; Adam = Adaptive Moment Estimation, a first-order adaptive method that is an extension to Stochastic Gradient Descent.}, determine the parameters $\boldsymbol{\theta}$ that maximize the log likelihood i.e.
+\begin{equation}
+\boldsymbol{\theta}^{*} = \arg\max_{\boldsymbol\theta} \log p(\mathbf{y}|\mathcal{X}_{n}, \boldsymbol{\theta})
+\label{eqn:max-log-like}
+\end{equation}
+
+Conditioning the joint Gaussian with the optimal $\boldsymbol\theta$ yields the posterior $\mathcal{GP}$ with mean
+\begin{equation}
+\boldsymbol{\mu}(\mathbf{x}) = \mathbf{m}(\mathbf{x}) + g(\mathbf{x}, \mathcal{X}_{n})(\mathbf{K}^{*})^{-1}(\mathbf{y} - \mathbf{m}(\mathcal{X}_{n}))
+\label{eqn:posterior-mean}
+\end{equation}
+
+and variance
+\begin{equation}
+\boldsymbol{\sigma}^2(\mathbf{x}) = g(\mathbf{x}, \mathbf{x}) - (g(\mathbf{x}, \mathcal{X}_{n}))^{T} (\mathbf{K}^{*})^{-1}g(\mathcal{X}_{n}, \mathbf{x})
+\label{eqn:posterior-variance}
+\end{equation}
+
+At this point, we have a belief distribution over the objective surface, where $\mu(x)$ (the mean evaluated at a single point) is our best guess for $f(\mathbf{x})$ and the variance is the uncertainty due to lack of data. 
+
+
+%------------------------------------%
+% Bayesian Optimization (GP)
+%------------------------------------%
+\section{Gaussian Process Bayesian Optimization}\label{sec:bo-gp}
+
+Bayesian Optimization is in the ``high cost of evaluation, low number of evaluations'' regime of optimization. We are not fitting a model and then optimizing it -- we are maintaining uncertainty and deciding what to do next, and the posterior variance is the decision signal.
+
+In Bayesian Optimization (BO), we start with an objective function
+\begin{equation}
+f: \mathcal{X} \subset \mathbb{R}^{d} \rightarrow \mathbb{R}
+\label{eqn:bo-obj}
+\end{equation}
+
+that we want to maximize (or minimize).
+
+The catch:
+\begin{itemize}
+\item Evaluating $f(x)$ is expensive
+\item We do not have gradients
+\item We can only afford tens or hundreds of evaluations
+\item $f(x)$ might be noisy
+\end{itemize}
+
+Typical applications:
+\begin{itemize}
+\item Hyperparameter tuning
+\item Physical experiments
+\item Black box simulations
+\end{itemize}
+
+{\bf Core idea:} Treat the unknown objective function as a random function, update beliefs as data is collected, choose the next evaluation point by trading off between exploration and exploration. That is, we do not assume a parametric form for $f(x)$ -- we simply assume structure.
+
+In BO, we place a prior over functions, assuming that $f(x)$ is a Gaussian Process, as in equation \ref{eqn:GP-prior}. We then observe $n$ noisy evaluations
+\begin{equation}
+y_{i} = f(x_{i}) + \epsilon_{i}, \quad \epsilon_{i}\sim\mathcal{N}(0, \sigma_{n}^{2})
+\label{eqn:sample-GP}
+\end{equation}
+
+and then condition the $\mathcal{GP}$ prior on the observed data $\mathcal{D}_{n} = \{ (x_{i}, y_{i}) \}_{i=0}^{n}$ to yield the posterior $\mathcal{GP}$:
+\begin{equation}
+f(x)| \mathcal{D}_{n} \sim \mathcal{N}(\mu_{n}(x), \sigma_{n}^{2}(x))
+\label{eqn:GP-posterior}
+\end{equation}
+
+At this point, everything we know about $f(x)$ is contained in the two scalars $\mu(x)$ and $\sigma_{n}(x)$, which we find with Automatic Relevance Determination.
+
+We must now make a decision about where to sample next, and we do that by maximizing an ``acquisition function.'' A typical choice for the acquisition function is the ``expected improvement,'' or the expected value of the improvement, defined as
+\begin{equation}
+I(x) = \max(0, f(x) - f^{+})
+\label{eqn:Ix}
+\end{equation}
+
+where
+\begin{equation}
+f^{+} = \max_{i\leq n} y_{i}
+\label{eqn:f-plus}
+\end{equation}
+
+{\bf Key idea:} Improvement $I(x)$ is random because $f(x)$ is random. Our goal is to choose $x$ to maximize the expected improvement. Writing the expected improvement as an integral using the definition of expected value
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{-infty}^{infty} I(x)p(I(x))\,dI
+\label{eqn:EI-int}
+\end{equation}
+
+and noting that $p(I(x)) = p(f(x))$ and the improvement is zero when $f\leq f^{+}$, the expected improvement becomes
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{f^{+}}^{\infty} (f - f^{+})p(f|x, \mathcal{D}_{n})\, df
+\label{eqn:EI-int-pf}
+\end{equation}
+
+Since we assume $f(x)$ is a Gaussian Process,
+\begin{equation}
+p(f) = \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ \df{(f - \mu)^{2}}{\sigma^{2}} \right\}
+\label{eqn:pf}
+\end{equation}
+
+By substitution,
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{f^{+}}^{\infty} (f - f^{+})\df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{(f - \mu)^{2}}{\sigma^{2}} \right\}\, df
+\label{eqn:EI-int-f}
+\end{equation}
+
+Defining
+\begin{equation}
+z = \df{f - \mu}{\sigma}
+\label{eqn:z-for-bo}
+\end{equation}
+
+the lower integration bound and differential become
+\begin{equation}
+z_{0} = \df{f^{+} - \mu}{\sigma} \quad \text{and} \quad dz = \df{1}{\sigma}df
+\label{eqn:z0-dz}
+\end{equation}
+
+and the expected improvement becomes
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{z_{0}}^{\infty} (z\sigma + \mu - f^{+}) \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}z^{2} \right\}\, \sigma\,dz
+\label{eqn:EI-int-z}
+\end{equation}
+
+Letting the standard normal be
+\begin{equation}
+\phi(z) = \df{1}{\sqrt{2\pi}}\exp\left\{ -\df{1}{2}z^{2} \right\}
+\label{eqn:phi-z}
+\end{equation}
+
+the expected improvement becomes
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{z_{0}}^{\infty} (z\sigma + \mu - f^{+}) \phi(z)\,dz
+\label{eqn:EI-int-phi}
+\end{equation}
+
+Since
+\begin{equation}
+\int_{z_{0}}^{\infty} \phi(z)\,dz = \df{1}{2}\text{erf}\left( \df{z_{0}}{\sqrt{2}} \right) \triangleq \Phi(z_{0})
+\label{eqn:Phi}
+\end{equation}
+
+and
+\begin{equation}
+\int_{z_{0}}^{\infty}z\phi(z)\,dz = \df{1}{\sqrt{2\pi}}\exp\left\{ -\df{1}{2}z_{0}^{2} \right\} = \phi(z_{0})
+\label{eqn:phi-z0}
+\end{equation}
+
+then by substitution
+\begin{align}
+\mathbb{E}[I(x)]
+&= \int_{z_{0}}^{\infty} (z\sigma + \mu - f^{+}) \phi(z)\,dz \\
+&= \sigma\int_{z_{0}}^{\infty} z\phi(z)\,dz + (\mu - f^{+})\int_{z_{0}}^{\infty} \phi(z)\,dz \\
+&= \underbrace{\sigma(x)\phi(z_{0})}_{\text{exploration}} + \underbrace{(\mu(x) - f^{+})\Phi(z_{0})}_{\text{exploitation}}
+\label{eqn:explore-exploit}
+\end{align}
+
+From which we see that exploration is not added heuristically -- it falls out of probability theory.
+
+{\bf Key observations:}
+\begin{itemize}
+\item If $\sigma = 0$, $\mathbb{E}[I(x)] = \max(0, \mu - f^{+})$, which is in line with expectation
+\item If $\mu << f^{+}$, $\mathbb{E}[I(x)] \neq 0$ if $\sigma$ is large, so even though the current guess is off, there is still chance that ``good'' solutions can be found
+\end{itemize}
+
+Now, a standard gradient descent method can be used to solve for
+\begin{equation}
+x^{*} = \arg\max_{x\in\mathcal{X}} \mathbb{E}[I(x)]
+\label{eqn:x-star}
+\end{equation}
+
+With the next choice of data point to sample ($x_{n+1} = x^{*}$), we can perform the ``expensive'' evaluation
+\begin{equation}
+y_{n+1} = f(x_{n+1})
+\label{eqn:sample-next-point}
+\end{equation}
+
+and update the dataset
+\begin{equation}
+\mathcal{D}_{n} \leftarrow \mathcal{D}_{n+1} = \mathcal{D}_{n} \cup (x_{n+1}, y_{n+1})
+\label{eqn:update-dataset}
+\end{equation}
+
+and return
+\begin{equation}
+\max_{i} y_{i}
+\label{eqn:bo-return}
+\end{equation}
+
+We then perform this optimization loop either until convergence or some set number of data points has been collected.
+
+%------------------------------------%
+% Bayesian Optimization (TPE)
+%------------------------------------%
+\section{Bayesian Optimization with Tree-structured Parzen Estimation}\label{sec:bo-tpe}
+
+In Gaussian Process Bayesian Optimization, the objective is assumed to be a Gaussian Process
+\begin{equation}
+f(x)\sim \mathcal{GP}(m(x), g(x, x'))
+\label{eqn:another-gp}
+\end{equation}
+
+where $x$ are the hyperparameter candidates and $f(x)$ is the associated performance metric (like revenue in our application), and you get a posterior over functions
+\begin{equation}
+p(f(x) | \mathcal{D}_{n}) \sim \mathcal{N}(\boldsymbol{\mu}(\mathbf{x}), \boldsymbol{\sigma}_{n}^{2}(\mathbf{x}))
+\label{eqn:another-posterior}
+\end{equation}
+
+that yields a mean surface, an uncertainty surface, and an explicit correlation between sampled points. One then defines an acquisition function like the expected improvement and can maximize to obtain the next data point to sample
+\begin{equation}
+x_{n+1} = \arg\max_{x} \mathbb{E}(\mu(x), \sigma(x))
+\label{eqn:next-x}
+\end{equation}
+
+which is an explicit tradeoff between exploration and exploitation based in probability theory.
+
+In Bayesian Optimization with Tree-structured Parzen Estimation (TPE), instead of directly modeling the objective function's output probability $p(y|x)$ (the posterior), TPE models do the reverse: they model $p(x|y)$ with two density functions.
+
+TPE splits the observed hyperparameter configurations into two groups based on a chosen quantile $\gamma$ of their performance scores (e.g. ``good'' values = top 25\%). Then, say
+\begin{itemize}
+\item $l(x)$: density function for hyperparameter values that resulted in a ``good'' objective score (``less than threshold'').
+\item $g(x)$: density function for hyperparameter values that resulted in a ``bad'' objective score (``greater than threshold'').
+\end{itemize}
+
+Kernel Density Estimation (also known as non-parametric Parzen windows) is used to approximate these density functions.
+
+In TPE, the expected improvement is defined as $l(x)/g(x)$ so that the next hyperparameter sample set has a good change of being ``good.''
+
+To model $p(x|y)$ instead of $p(y|x)$, we need Bayes' rule:
+\begin{equation}
+p(y|x) = \df{p(x|y)p(y)}{p(x)}
+\label{eqn:bayes-rule}
+\end{equation}
+
+We then define a threshold $y^{-}$ such that
+\begin{equation}
+P(y\leq y^{-}) = \gamma, \quad \gamma\in(0, 1)
+\label{eqn:y-plus}
+\end{equation}
+
+but more typically, we constrain the quartile options to something like $\gamma\in(0.1, 0.25)$.
+
+We can then define the two conditional densities as
+\begin{align}
+l(x) &= p(x|y\leq y^{-}) \\
+g(x) &= p(x|y> y^{-})
+\end{align}
+
+The expected improvement is then
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) p(y|x) \,dy \quad \text{(minimization)}
+\label{eqn:EI-TPE}
+\end{equation}
+
+Substituting for Bayes' rule,
+\begin{equation}
+\mathbb{E}[I(x)] = \int_{-\infty}^{y^{-}} (y^{-} - y) \df{p(x|y)p(y)}{p(x)} \,dy
+\label{eqn:EI-TPE-bayes}
+\end{equation}
+
+TPE assumes that for $y \leq y^{-}$, $p(x|y)\approx l(x)$, so then
+\begin{equation}
+\mathbb{E}[I(x)] = \df{l(x)}{p(x)} \int_{-\infty}^{y^{-}} (y^{-} - y) p(y) \,dy
+\label{eqn:EI-factor-out-x}
+\end{equation}
+
+Since the integrand is independent of $x$, it is a constant, and thus we know
+\begin{equation}
+\mathbb{E}[(I(x))] \propto \df{l(x)}{p(x)}
+\label{eqn:EI-propto}
+\end{equation}
+
+By the law of total probability, we know
+\begin{equation}
+p(x) = \gamma l(x) + (1 - \gamma)g(x)
+\label{eqn:total-prob}
+\end{equation}
+
+so therefore
+\begin{equation}
+\mathbb{E}[(I(x))] \propto \df{l(x)}{\gamma l(x) + (1 - \gamma)g(x)}
+\label{eqn:EI-propto-total-prob}
+\end{equation}
+
+Since $\gamma$ is fixed, maximizing $\mathbb{E}[I(x)]$ is equivalent to maximizing $l(x)/g(x)$. Thus, we deem $l(x)/g(x)$ to be the TPE acquisition function.
+
+TPE is computationally faster than Gaussian Process BO and does well with mixed hyperparameter spaces (continuous, discrete, categorical). As MPC solvers often produce discontinuities, failures, and flat regions, and we have constrained daily horizon to be an integer while all other hyperparameters are continuous values, TPE is a better choice for our application.
+
+%------------------------------------%
+% KERNEL DENSITY ESTIMATION
+%------------------------------------%
+\section{Kernel Density Estimation}\label{sec:kde}
+
+{\bf Idea}: Place a kernel around each data point, sum the kernels, normalize by the number of points, and smooth with some window size h.
+
+Given samples $\{ x_{i} \}_{i=1}^{n}$ the kernel estimator is
+\begin{equation}
+\hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} g(x, x')
+\label{eqn:p-hat}
+\end{equation}
+
+Usually, the kernel choice is Gaussian:
+\begin{equation}
+g(x, x') = \mathcal{N}(x|x', h^{2})
+\label{eqn:another-gaussian-kernel}
+\end{equation}
+
+So for one dimension,
+\begin{equation}
+\hat{p}(x) = \df{1}{n}\sum_{i=1}^{n} \df{1}{\sqrt{2\pi h^{2}}} \exp\{ -\df{1}{2}\df{(x - x')^{2}}{h^{2}} \}
+\label{eqn:1-dim-p-hat}
+\end{equation}
+
+TPE uses the naive Bayes' assumption that dimensions are independent within both the good and bad sets:
+\begin{equation}
+l(x) \approx \Pi_{j=1}^{d} l_{j}(x_{j}) \quad \text{and} \quad g(x) \approx \Pi_{j=1}^{d} g_{j}(x_{j})
+\label{eqn:lg-kde}
+\end{equation}
+
+Now, TPE does not optimize $l(x)/g(x)$ directly. Instead, it samples many candidates from $l(x)$, then evaluates $l(x)/g(x)$ for each, and picks the best $x$.
+
+The tree-structured part of the Parzen estimator comes from the fact that in real hyperparameter spaces, some parameters only exist if other take on certain values i.e. the parameters are jointly distributed:
+\begin{equation}
+p(x) = p(x_{1})p(x_{2}|x_{2})p(x_{3}|x_{2})...
+\label{eqn:tree-structure}
+\end{equation}
+
+in what we call a tree of conditional distributions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

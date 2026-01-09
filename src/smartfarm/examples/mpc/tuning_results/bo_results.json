@@ -1,0 +1,22 @@
+{
+  "best_value": 1103.393191681425,
+  "best_params": {
+    "weight_irrigation": 4.532074733553012,
+    "weight_fertilizer": 0.0024837513594291546,
+    "weight_height": 536.2538563431059,
+    "weight_leaf_area": 848.5803299916998,
+    "weight_fruit_biomass": 1603.9486654671646,
+    "weight_water_anomaly": 0.00791231530937201,
+    "weight_fertilizer_anomaly": 1.4763025176177993,
+    "daily_horizon": 6
+  },
+  "best_trial_attrs": {
+    "fruit_biomass": 0.2333596645675808,
+    "height": 2.8849555200502706,
+    "leaf_area": 0.6147094078266404,
+    "total_irrigation": 0.25198158537404736,
+    "total_fertilizer": 273.10963901962356
+  },
+  "n_trials": 100,
+  "elapsed_time": 2198.4764688014984
+}

@@ -1,0 +1,378 @@
+% Math and Physical Sciences Numbered Reference Style
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+% Standard Packages
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\raggedbottom
+\newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
+
+\begin{document}
+%======================================================================================%
+%% EXTRA NOTES: For crop model + GA paper
+%======================================================================================%
+
+%------------------------------------%
+% FIR CONVOLUTION
+%------------------------------------%
+\section{Finite Impulse Response Convolution}\label{subsec:fir-conv}
+
+Note: FIR encodes memory of past inputs without changing the LTI nature of the ODE model. Saturation is modeled via the time-dependent carrying capacities of each of the state variables in the plant model.
+
+The finite impulse response (FIR) filter is the simplest kind of linear, time-invariant system: the output $y$ at time $n$ is a finite-weighted sum of past and present inputs $x$. That is, the FIR filter has an impulse response $g$ that is zero outside of a finite window, usually $n=0,...,L-1$, that is
+\begin{equation}
+g[n] = 0 \quad \text{for} \, n\geq0 \,\text{and}\, n<L.
+\label{eqn:fir-horizon}
+\end{equation}
+
+Then, the convolution sum collapses to finitely many terms
+\begin{equation}
+y[n] = \sum_{k=0}^{L-1} g[k]x[n-k].
+\label{eqn:fir-sum}
+\end{equation}
+
+Canonically, we say ``tap" $k$ multiplies the input delayed by $k$.
+
+A plant does not immediately process (``absorb" or ``metabolize") the input nutrients water, fertilizer, temperature, and radiation. Instead, there is a delayed response, and thus FIR convolution is a natural way to process the raw inputs.
+
+Since we expect plants to absorb the nutrients in a sigmoid fashion, with
+\begin{itemize}
+\item Slow initial uptake due to transport lag,
+\item A rapid increase once pathways are activated,
+\item Eventual deceleration due to nutrient saturation or depletion of nutrient supply,
+\end{itemize}
+
+we might say that if the cumulative uptake of a nutrient like fertilizer $f(t)$ follows
+\begin{equation}
+f(t) = \text{sigmoid}
+\label{eqn:sigmoid}
+\end{equation}
+
+then the instantaneous absorption is
+\begin{equation}
+\df{df}{dt} \propto \text{bell-shaped curve}.
+\label{eqn:bell-shaped}
+\end{equation}
+
+A Gaussian is the least assumptive choice for a bell-shaped curve, as all we need to model are
+\begin{itemize}
+\item The typical delay in peak absorption, $\mu$
+\item The temporal spread of the absorption, $\sigma$.
+\end{itemize}
+
+In this work, the only value specified a priori for each nutrient is the temporal spread. We then ask what typical delay $\mu$ would ensure 95\% of a zero-mean Gaussian with standard deviation $\sigma$ lies within $[-\mu, \mu]$. That is, given $\sigma$, what $\mu$ achieves
+\begin{equation}
+\int_{-\mu}^{\mu} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{x^{2}}{\sigma^{2}} \right\} dx = 0.95.
+\label{eqn:mu-problem}
+\end{equation}
+
+Shifting the Gaussian from zero-mean to $\mu$-mean and applying symmetry, we can rewrite as
+\begin{equation}
+2\int_{0}^{\mu} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{(x-\mu)^{2}}{\sigma^{2}} \right\} dx = 0.95.
+\label{eqn:mu-symm}
+\end{equation}
+
+By defining
+\begin{equation}
+\chi^{2} = \df{1}{2}\df{(x-\mu)^{2}}{\sigma^{2}}
+\label{eqn:mu-chi2}
+\end{equation}
+
+we can apply a change of variables such that upper integration bound becomes
+\begin{equation}
+\chi_{\text{upper}} = \df{\mu}{\sigma\sqrt{2}},
+\label{eqn:mu-upper}
+\end{equation}
+
+the differential becomes
+\begin{equation}
+d\chi = \df{1}{\sigma\sqrt{2}}dx,
+\label{eqn:mu-differential}
+\end{equation}
+
+and the integral becomes
+\begin{equation}
+2\int_{0}^{\mu/\sigma\sqrt{2}} \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\{ -\chi^{2} \} (\sigma\sqrt{2})d\chi = 0.95
+\label{eqn:mu-chi}
+\end{equation}
+
+or
+\begin{equation}
+\text{erf}\left(\df{\mu}{\sigma\sqrt{2}}\right) = 0.95,
+\label{eqn:erf}
+\end{equation}
+
+which is ultimately solved with a root finder.
+
+Armed with $\mu$ and $\sigma$, we construct the Gaussian kernel
+\begin{equation}
+g[k] = \df{1}{\sqrt{2\pi\sigma^{2}}} \exp\left\{ -\df{1}{2}\df{(k-\mu)^{2}}{\sigma^{2}} \right\}.
+\label{eqn:gaussian-kernel}
+\end{equation}
+
+We then find an FIR horizon $L^{*}$ such that 95\% (not related to the 95\% above...both are arbitrary choices in a sense) of the kernel mass lies within the horizon and convolve with the history of how much input has been applied and when in order to obtain the delayed absorption signal for the nutrient. That is, we must solve
+\begin{equation}
+L^{*} = \min_{L\in\{ 1,...,K \}} L \quad \text{s.t.} \, C(L) \geq 0.95
+\label{eqn:L-star}
+\end{equation}
+
+where $K$ is the simulation length (length of the growing season in hours) and $C(L)$ is the normalized cumulative kernel
+\begin{equation}
+C(L) = \df{\sum_{k=0}^{L-1} g[k]}{\sum_{k=0}^{K-1} g[k]}.
+\label{eqn:CL}
+\end{equation}
+
+%------------------------------------%
+% EMA SMOOTHING
+%------------------------------------%
+\section{Infinite Impulse Response Convolution and Exponential Moving Average}\label{subsec:ema-smooth}
+
+The exponential moving average (EMA) is equivalent to a first-order linear, time-invariant infinite-impulse response filter. In continuous time, the defining property of an exponential is that it is proportional to its derivative by a constant factor:
+\begin{equation}
+\df{d}{dt} e^{\beta t} = \beta e^{\beta t}.
+\label{eqn:continuous-exp}
+\end{equation}
+
+In discrete time, however, the defining property is that for adjacent time steps, the function values are proportional by a constant factor:
+\begin{equation}
+g[k+1] = \beta g[k].
+\label{eqn:discrete-exp}
+\end{equation}
+
+For an exponential moving average, we know that for a constant input $x[k] = c$ for all $k$, it should output an identical constant output $y[k] = c$ for all $k$. For a linear, time-invariant system with impulse response $g[k]$, since
+\begin{equation}
+y[k] = \sum_{n=0}^{\infty} g[n]x[k-n] \rightarrow c \mapsto c\sum_{n=0}^{\infty} g[n],
+\label{eqn:ema-conv}
+\end{equation}
+
+a property of an EMA-equivalent filter would be that its kernel adheres to
+\begin{equation}
+1 = \sum_{n=0}^{\infty} g[n].
+\label{eqn:ema-unity}
+\end{equation}
+
+Applying the recursion formula required by the exponential property for discrete time, the kernel requirement becomes
+\begin{equation}
+1 = \sum_{n=0}^{\infty} g_{0}\beta^{n}.
+\label{eqn:ema-recursion}
+\end{equation}
+
+For convergence, we would then require $|\beta| < 1$, and for smoothing, we would more strictly require $\beta\in[0,1)$. By geometric series, the requirement becomes
+\begin{equation}
+1 = g_{0}\df{1}{1 - \beta} \quad \text{or} \quad g_{0} = 1 - \beta
+\label{eqn:ema-g0}
+\end{equation}
+
+and, thus, the EMA-equivalent kernel is
+\begin{equation}
+g[k] = (1-\beta)\beta^{k}.
+\label{eqn:ema-kernel}
+\end{equation}
+
+By the definition of convolution, it follows that for an EMA-equivalent filter,
+\begin{align}
+y[k]
+&= \sum_{n=0}^{\infty} g[n]x[k-n] \\
+&= \sum_{n=0}^{\infty} (1 - \beta)\beta^{k}x[k-n] \\
+&= (1 - \beta)x[k] + \sum_{n=1}^{\infty} (1 - \beta)\beta^{k}x[k-n].
+\label{eqn:ema-almost}
+\end{align}
+
+Considering the expression for $\beta y[k-1]$, we see
+\begin{equation}
+\beta y[k-1] = \sum_{n=0}^{\infty} (1 - \beta)\beta^{k}x[k-n-1].
+\label{eqn:ema-pre-reindex}
+\end{equation}
+
+Reindexing with $m=n+1$, we find
+\begin{equation}
+\beta y[k-1] = \sum_{m=0}^{\infty} (1 - \beta)\beta^{k}x[k-m]
+\label{eqn:ema-reindex}
+\end{equation}
+
+and so, by substitution, the EMA-equivalent filter becomes
+\begin{equation}
+\beta y[k] = (1 - \beta)x[k] + \beta y[k-1]
+\label{eqn:iir-filter}
+\end{equation}
+
+which we recognize as the infinite impulse response filter.
+
+%------------------------------------%
+% TRANSFORMED INPUTS AND NUTRIENT FACTORS
+%------------------------------------%
+\section{Metabolism and Delayed, Cumulative, and Anomaly Values}\label{subsec:transformations}
+
+See metabolism\_analysis.ipynb
+
+Crops constantly experience radiation and temperature, and thus, in a sense, they have short-term memory of these input disturbances, or a quick metabolism of these disturbances. That said, crops do still have a memory for these disturbances. For example, even though a plant will easily recover from a single hour of high temperatures, we do not expect the plant to bounce-back after a several-day-long heat wave, and, in fact, we may expect there to be long term damage to the plant after the heat wave even if temperatures return to normal.
+
+Crops experience water and fertilizer, however, only for the period from application to full absorption and usage of the resources. We might say that plants have adapted to metabolize the water and fertilizer input more slowly, since they receive those inputs more infrequently. 
+
+The goal is to use a similar model for how the plant uses each of the input disturbances and control inputs, capturing the differences in metabolism of each. The authors propose the following series of ``nutrient transformations" that account for the plants metabolism and memory of nutrients. The transformations result in nutrient factors that in turn affect the growth rates and carrying capacities of typically logistic state variables such that they are time-varying.
+\begin{itemize}
+\item Delayed absorption transformation
+\item Cumulative absorption transformation
+\item Instantaneous anomaly transformation
+\item Cumulative divergence transformation
+\item Nutrient factor calculation
+\end{itemize}
+
+We use fertilizer as an example nutrient to demonstrate the series of transformations, but the same transformations are applied to all nutrients (inputs and disturbances).
+
+Delayed absorption transformation: 
+FIR enables distributed delay, not a simple delay in the fertilizer signal itself.
+If the raw, discrete fertilizer applied is $f[k]$, then the fertilizer absorbed is
+\begin{equation}
+\bar{f}[k] = \sum_{n=k}^{k+L_{f}-1} g_{f}[n-k]f[k]
+\label{eqn:delayed-trans}
+\end{equation}
+
+where $g_{f}$ is the Gaussian FIR kernel for fertilizer, found from the empirically found temporal spread $\sigma_{f}$, and $L_{f}$ is the FIR kernel for fertilizer metabolism, both found according to section \ref{subsec:fir-conv}. 
+
+Cumulative absorption transformation:
+\begin{equation}
+F[k] = \sum_{n=0}^{k} \bar{f}[n]
+\label{eqn:cum-trans}
+\end{equation}
+
+Instantaneous anomaly transformation:
+\begin{equation}
+\delta_{f}[k] = \biggl\vert \df{k f_{\text{typ}} - F[k]}{k f_{\text{typ}}} \biggr\vert
+\label{eqn:anomaly-trans}
+\end{equation}
+
+where $f_{\text{typ}}$ is the typical fertilizer level the plant ``expects" to see at a given hourly time step.
+
+Cumulative divergence transformation:
+Apply EMA smoothing so that there is some tolerance to anomalies. Apply the IIR filter from section \ref{subsec:ema-smooth}.
+\begin{equation}
+\Delta_{f}[k] = \beta \Delta_{f}[k-1] + (1 - \beta) \delta_{f}[k]
+\label{eqn:cum-div-trans}
+\end{equation}
+
+Nutrient factor calculation: Goal is to have the nutrient factors $\nu\in[0,1]$ and behave such that when $\Delta = 0$, $\nu=1$ and when $\Delta\geq 1$, $\nu=0$. A smooth function that achieves this is a decaying exponential. Additionally, we once more apply EMA smoothing so that the nutrient factors have some capacity to accumulate anomalies before the plant majorly reacts.
+\begin{equation}
+\nu_{f}[k] = \beta \exp\{ -\alpha\Delta_{f}[k] \} + (1 - \beta) \nu_{f}[k-1] % check this formula...this is what's in the code but coefficients seem swapped
+\label{eqn:nut-fac-trans}
+\end{equation}
+
+where in order for $\nu_{f} = 0.05$ when $\Delta_{f} = 1$, then we choose $\alpha = 3$. In this paper we use $\beta = 0.95$, which corresponds to a fairly long memory.
+
+%------------------------------------%
+% DYNAMICS
+%------------------------------------%
+\section{Dynamics}\label{subsec:dynamics}
+
+State variables:
+\begin{itemize}
+\item Plant height (m)
+\item Leaf area (m2)
+\item Number of leaves (count)
+\item Flower size (count of spikelets)
+\item Fruit biomass (kg)
+\end{itemize}
+
+Initial conditions: since time steps are on order of thousands, I chose 1/1000th, but this was kind of an arbitrary choice...looking for justification.
+\begin{itemize}
+\item $h_{0} = 0.001$ m
+\item $A_{0} = 0.001$ m\textsuperscript{2}
+\item $N_{0} = 0.001$ leaves
+\item $c_{0} = 0.001$ flower spikelets
+\item $P_{0} = 0.001$ kg
+\end{itemize}
+
+Baseline growth rates from fitting model from data:
+\begin{itemize}
+\item $a_{h} = 0.01/\text{hr}$, plant height growth rate, for corn
+\item $a_{A} = 0.0105/\text{hr}$, leaf area growth rate, for corn
+\item $a_{N} = 0.011/\text{hr}$, number of leaves growth rate, for corn
+\item $a_{c} = 0.01/\text{hr}$, flower size growth rate, for corn
+\item $a_{A} = 0.0105/\text{hr}$, leaf area growth rate, for corn
+\end{itemize}
+
+Baseline carrying capacities from fitting model from data:
+\begin{itemize}
+\item $k_{h} = 3.0$ m, plant height carrying capacity, for corn
+\item $k_{A} = 0.65$ m\textsuperscript{2}, leaf area carrying capacity, for corn
+\item $k_{N} = 20$, number of leaves carrying capacity, for corn
+\item $k_{c} = 1000$ spikelets, flower size carrying capacity, for corn
+\item $k_{A} = 0.25$ kg, leaf area carrying capacity, for corn
+\end{itemize}
+
+Plant height:
+\begin{equation}
+\df{dh}{dt} = \hat{a}_{h}(t)h(t) \left( 1 - \df{h(t)}{\hat{k}_{h}(t)} \right)
+\label{eqn:plant-height-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{h}(t) = a_{h}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3} \quad \text{and} \quad \hat{k}_{h}(t) = k_{h}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3}
+\label{eqn:hats-for-h}
+\end{equation}
+
+as meeting the expected nutrient levels for fertilizer, temperature, and solar radiation have a positive on growth of the cornstalk, see Tables \ref{tab:fert-irr-effects} and \ref{tab:temp-rad-effects}. Growth Rates: When dealing with percentages or rates that are compounded over time (like investment returns), the geometric mean is more accurate than the arithmetic mean, according to Investopedia. https://www.investopedia.com/terms/g/geometricmean.asp
+
+Leaf area:
+\begin{equation}
+\df{dA}{dt} = \hat{a}_{A}(t)A(t) \left( 1 - \df{A(t)}{\hat{k}_{A}(t)} \right)
+\label{eqn:leaf-area-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{A}(t) = a_{A}(\nu_{f}(t)\nu_{T}(t)\nu_{R}(t))^{1/3} \quad \text{and} \quad \hat{k}_{A}(t) = k_{A}(\nu_{w}(t)\nu_{f}(t)\nu_{T}(t)\nu_{R}(t)(\hat{k}_{h}/k_{h}))^{1/5}
+\label{eqn:hats-for-A}
+\end{equation}
+
+Number of leaves:
+\begin{equation}
+\df{dN}{dt} = \hat{a}_{N}(t)N(t) \left( 1 - \df{N(t)}{\hat{k}_{N}(t)} \right)
+\label{eqn:number-leaves-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{N}(t) = a_{N} \quad \text{and} \quad \hat{k}_{N}(t) = k_{N}(\nu_{T}(t)\nu_{R}(t))^{1/2}
+\label{eqn:hats-for-N}
+\end{equation}
+
+Flower size:
+\begin{equation}
+\df{dc}{dt} = \hat{a}_{c}(t)c(t) \left( 1 - \df{c(t)}{\hat{k}_{c}(t)} \right)
+\label{eqn:flower-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{c}(t) = a_{c} \quad \text{and} \quad \hat{k}_{c}(t) = k_{c}(\nu_{w}(t)(1/\nu_{T}(t))(1/\nu_{R}(t)))^{1/3}
+\label{eqn:hats-for-c}
+\end{equation}
+
+Fruit biomass:
+\begin{equation}
+\df{dP}{dt} = \hat{a}_{P}(t)P(t) \left( 1 - \df{P(t)}{\hat{k}_{P}(t)} \right)
+\label{eqn:fruit-dynamics}
+\end{equation}
+
+where
+\begin{equation}
+\hat{a}_{P}(t) = a_{P} \quad \text{and} \quad \hat{k}_{P}(t) = k_{P}(\nu_{w}(t)\nu_{f}(t)\nu_{T}(t)\nu_{R}(t)(\hat{k}_{h}/k_{h})(\hat{k}_{A}/k_{A})(\hat{k}_{c}/k_{c}))^{1/7}
+\label{eqn:hats-for-P}
+\end{equation}
+
+\end{document}

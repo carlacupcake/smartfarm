@@ -1,0 +1,22 @@
+{
+  "best_value": 834.3402737148729,
+  "best_params": {
+    "weight_irrigation": 1.4307210083920605,
+    "weight_fertilizer": 0.0048089162661440156,
+    "weight_height": 322.86148555271956,
+    "weight_leaf_area": 628.872868709983,
+    "weight_fruit_biomass": 1949.283467571648,
+    "weight_water_anomaly": 1.881293256867135,
+    "weight_fertilizer_anomaly": 0.4497638279136364,
+    "daily_horizon": 12
+  },
+  "best_trial_attrs": {
+    "revenue_normal_1": 1002.8723375264648,
+    "revenue_moderate_dry": 925.1586149106768,
+    "revenue_summer_drought": 886.8437629408389,
+    "revenue_wet_year": 752.3411044732812,
+    "revenue_extreme_drought_heat": 604.4855487231025
+  },
+  "n_trials": 50,
+  "elapsed_time": 7725.591125965118
+}

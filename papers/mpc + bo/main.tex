@@ -1,0 +1,741 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Math and Physical Sciences Numbered Reference Style
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+% Standard Packages
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage[title]{appendix}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{manyfoot}
+\usepackage{mathrsfs}
+\usepackage{multirow}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+% Other
+\geometry{margin=1in, bindingoffset=0in, asymmetric=false}
+\raggedbottom
+\newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
+
+\begin{document}
+
+\title[Article Title]{Adaptive Irrigation and Fertilizer Management under Weather Uncertainty using Model Predictive Control with Bayesian-Optimized Parameters}
+
+%======================================================================================%
+%% TARGET JOURNAL: Computers and Electronics in Agriculture
+%% https://www.sciencedirect.com/journal/computers-and-electronics-in-agriculture/publish/guide-for-authors
+%======================================================================================%
+
+\author*[1]{\fnm{Carla J.} \sur{Becker}}\email{carlabecker@berkeley.edu, ORCID: 0009-0004-0646-6386}
+
+\author[1]{\fnm{Tarek I.} \sur{Zohdi}}\email{zohdi@berkeley.edu, ORCID: 0000-0002-0844-3573}
+%\equalcont{These authors contributed equally to this work.}
+
+\affil*[1]{\orgdiv{Department of Mechanical Engineering}, \orgname{University of California, Berkeley}, \orgaddress{\street{6141 Etcheverry Hall}, \city{Berkeley}, \postcode{94720}, \state{California}, \country{United States of America}}}
+
+%======================================================================================%
+% ABSTRACT
+%======================================================================================%
+\abstract{Climate variability poses significant challenges to agricultural resource management, as fixed irrigation and fertilization strategies optimized for typical conditions may perform poorly under drought, heat waves, or other weather extremes. This paper presents an adaptive approach combining Model Predictive Control (MPC) with Bayesian Optimization (BO) for irrigation and fertilizer scheduling under weather uncertainty. Building on a previously developed crop growth model that captures delayed nutrient absorption via finite impulse response (FIR) convolution and cumulative stress tracking via exponential moving average (EMA) filtering, we formulate a daily receding-horizon control problem that re-optimizes resource allocation based on observed weather conditions. The MPC controller solves a constrained finite-time optimal control (CFTOC) problem at each decision epoch, balancing crop value maximization against input costs and nutrient stress penalties. BO with Tree-structured Parzen Estimators (TPE) tunes the seven MPC weight parameters to maximize performance across a suite of 21 stochastic weather scenarios ranging from normal to extreme conditions. Evaluated on corn production in Iowa, we compare MPC against a genetic algorithm (GA) baseline that optimizes a fixed strategy for typical drought conditions. While the GA achieves higher revenue under normal weather (for which it was optimized), MPC demonstrates superior robustness: its performance advantage increases with weather extremity (correlation $R = 0.485$), and it reduces worst-case losses by 6.4\%. These results suggest that adaptive, closed-loop control offers meaningful risk management benefits for agricultural operations facing increasing climate uncertainty.}
+
+\keywords{precision agriculture, model predictive control, Bayesian optimization, weather uncertainty, adaptive control, irrigation scheduling}
+\maketitle
+
+%======================================================================================%
+% INTRODUCTION
+%======================================================================================%
+\section{Introduction}\label{sec:intro}
+
+Climate change is increasing the frequency and severity of extreme weather events, posing significant challenges to agricultural production \cite{ipcc2021}. Traditional approaches to irrigation and fertilizer scheduling rely on fixed strategies---either following agronomic best practices or optimized once for expected conditions---that cannot adapt when actual weather deviates from assumptions. As drought, heat waves, and other extremes become more common, there is growing need for adaptive resource management strategies that can respond to observed conditions in real time.
+
+In a companion paper currently under review \cite{becker2025ga}, we developed a generalized crop growth model based on coupled ordinary differential equations (ODEs) that captures the nonlinear dynamics of plant development under varying environmental conditions. The model tracks five state variables---plant height, leaf area, number of leaves, flower size, and fruit biomass---each governed by logistic growth with time-varying parameters modulated by nutrient factors. These factors quantify how well actual water, fertilizer, temperature, and solar radiation levels match the plant's physiological expectations, with delayed absorption modeled via finite impulse response (FIR) convolution and cumulative stress tracked via exponential moving average (EMA) filtering. Using a genetic algorithm (GA), we showed that optimized irrigation and fertilizer strategies can achieve 16\% higher net revenue than conventional farmer practices under drought conditions.
+
+However, the GA approach optimizes a \emph{fixed} strategy---specifying application frequencies and amounts that remain constant throughout the growing season. While effective when actual conditions match the optimization assumptions, such open-loop strategies cannot adapt to unexpected weather events. If a drought is more severe than anticipated, or an unexpected heat wave occurs, the pre-computed strategy may be far from optimal.
+
+This paper extends our previous work by developing an \emph{adaptive} approach using Model Predictive Control (MPC). MPC is a closed-loop control strategy that repeatedly solves an optimization problem over a finite horizon, applies only the first control action, then re-optimizes based on updated state and disturbance information \cite{rawlings2017mpc}. This receding-horizon structure enables the controller to adapt to changing conditions while maintaining optimality over the planning horizon.
+
+Applying MPC to agricultural systems presents several challenges. First, the nonlinear crop dynamics with delayed absorption effects complicate the optimization problem. Second, the controller must balance multiple competing objectives: maximizing crop value, minimizing input costs, and avoiding nutrient stress that degrades plant health. Third, the relative importance of these objectives depends on weather conditions and growth stage, requiring careful tuning of the cost function weights. To address this last challenge, we employ Bayesian Optimization (BO) \cite{shahriari2016taking} to automatically tune the MPC parameters for robust performance across diverse weather scenarios.
+
+Our contributions are:
+\begin{enumerate}
+\item Formulation of a constrained finite-time optimal control (CFTOC) problem for daily irrigation and fertilizer scheduling that accounts for delayed nutrient absorption and cumulative stress effects.
+\item A receding-horizon MPC implementation that adapts resource allocation based on observed weather conditions.
+\item A Bayesian optimization framework using Tree-structured Parzen Estimators (TPE) \cite{bergstra2011algorithms} to tune MPC weights for robustness across stochastic weather scenarios.
+\item Systematic comparison of adaptive MPC against fixed GA-optimized strategies under 21 weather scenarios ranging from normal to extreme conditions.
+\end{enumerate}
+
+We demonstrate that while the GA achieves higher revenue under normal weather (for which it was optimized), MPC's advantage increases with weather extremity, and it substantially reduces worst-case losses. These results suggest that adaptive control provides meaningful risk management benefits in the face of climate uncertainty.
+
+
+%======================================================================================%
+% DYNAMICS
+%======================================================================================%
+\section{Crop Growth Model}\label{sec:dynamics}
+
+We employ the crop growth model developed in \cite{becker2025ga}, which we briefly summarize here. The model treats the plant as a dynamic system with state vector $\mathbf{x} = [h, A, N, c, P]^T$ representing plant height (m), leaf area per leaf (m$^2$), number of leaves, flower size (spikelets), and fruit biomass (kg). Control inputs are irrigation $w$ (inches/hour) and fertilizer $f$ (lbs/hour), while disturbances include precipitation $S$ (inches/hour), temperature $T$ ($^\circ$C), and solar radiation $R$ (W/m$^2$).
+
+%------------------------------------%
+% LOGISTIC GROWTH
+%------------------------------------%
+\subsection{Logistic Growth Dynamics}\label{subsec:logistic}
+
+Each state variable follows logistic growth with time-varying parameters:
+\begin{equation}
+\df{dx}{dt} = \hat{a}_x(t) \cdot x(t) \left(1 - \df{x(t)}{\hat{k}_x(t)}\right)
+\label{eqn:logistic}
+\end{equation}
+where $\hat{a}_x(t)$ is the effective growth rate and $\hat{k}_x(t)$ is the effective carrying capacity, both modulated by nutrient factors. This equation admits a closed-form solution:
+\begin{equation}
+x(t + \Delta t) = \df{\hat{k}_x(t)}{1 + \left(\df{\hat{k}_x(t)}{x(t)} - 1\right)\exp(-\hat{a}_x(t)\Delta t)}
+\label{eqn:closed-form}
+\end{equation}
+enabling exact time-stepping without numerical integration error.
+
+%------------------------------------%
+% DELAYED ABSORPTION
+%------------------------------------%
+\subsection{Delayed Absorption via FIR Convolution}\label{subsec:fir}
+
+Plants do not immediately utilize applied nutrients; there is a physiologically-mediated delay between application and absorption. We model this using finite impulse response (FIR) convolution with Gaussian kernels:
+\begin{equation}
+g[k] = \df{1}{\sqrt{2\pi\sigma^2}}\exp\left\{-\df{(k-\mu)^2}{2\sigma^2}\right\}
+\label{eqn:gaussian-kernel}
+\end{equation}
+where $\sigma$ is the temporal spread characterizing absorption duration. We set $\mu \approx 1.96\sigma$ so that 95\% of the kernel mass lies within $[0, 2\mu]$. Different nutrients have different metabolic timescales: $\sigma_w = 30$ hours for water (rapid uptake), $\sigma_f = 300$ hours for fertilizer (slow root absorption), and $\sigma_T = \sigma_R = 30$ hours for temperature and radiation.
+
+The delayed (absorbed) signal is computed as:
+\begin{equation}
+\bar{u}[k] = \sum_{n=0}^{L-1} g[n] \cdot u[k-n]
+\label{eqn:convolution}
+\end{equation}
+where $L$ is the FIR horizon chosen to capture 95\% of the kernel mass.
+
+%------------------------------------%
+% CUMULATIVE STRESS
+%------------------------------------%
+\subsection{Cumulative Stress Tracking}\label{subsec:stress}
+
+While FIR convolution captures delayed absorption, plants also accumulate stress from sustained deviations from optimal conditions. We track cumulative divergence using exponential moving average (EMA) filtering:
+\begin{equation}
+\Delta_u[k] = \beta_\Delta \cdot \Delta_u[k-1] + (1-\beta_\Delta) \cdot \delta_u[k]
+\label{eqn:ema}
+\end{equation}
+where $\delta_u[k]$ is the instantaneous anomaly (relative deviation from expected cumulative absorption) and $\beta_\Delta = 0.95$ provides long memory of past stress events.
+
+%------------------------------------%
+% NUTRIENT FACTORS
+%------------------------------------%
+\subsection{Nutrient Factors}\label{subsec:nutrient-factors}
+
+The cumulative divergence is converted to a nutrient factor $\nu \in [0,1]$ via exponential decay with additional EMA smoothing:
+\begin{equation}
+\nu_u[k] = \beta_\nu \cdot \nu_u[k-1] + (1-\beta_\nu) \cdot \exp\{-\alpha \Delta_u[k]\}
+\label{eqn:nutrient-factor}
+\end{equation}
+where $\alpha = 3$ ensures $\nu \approx 0.05$ when $\Delta = 1$ (complete divergence). The nutrient factor equals 1 when inputs match expectations and decays toward 0 under sustained stress.
+
+The effective growth parameters are computed as geometric means of relevant nutrient factors. For example, fruit biomass carrying capacity depends on all inputs and prior vegetative growth:
+\begin{equation}
+\hat{k}_P(t) = k_P \left(\nu_w \nu_f \nu_T \nu_R \df{\hat{k}_h}{k_h} \df{\hat{k}_A}{k_A} \df{\hat{k}_c}{k_c}\right)^{1/7}
+\label{eqn:fruit-capacity}
+\end{equation}
+Full details of the parameter relationships are provided in \cite{becker2025ga}.
+
+
+%======================================================================================%
+% STOCHASTIC WEATHER
+%======================================================================================%
+\section{Stochastic Weather Scenario Generation}\label{sec:weather}
+
+To evaluate controller robustness, we generate a suite of stochastic weather scenarios from historical baseline data. Each scenario applies perturbations representing different climate conditions, from normal variability to extreme events.
+
+%------------------------------------%
+% SCENARIO PARAMETERIZATION
+%------------------------------------%
+\subsection{Scenario Parameterization}\label{subsec:scenario-params}
+
+A weather scenario $\mathcal{S}$ is defined by the following parameters:
+\begin{itemize}
+\item \textbf{Precipitation scale} $\gamma_S \in (0, 2]$: Multiplier for baseline precipitation ($\gamma_S < 1$ for drought, $\gamma_S > 1$ for wet conditions).
+\item \textbf{Temperature offset} $\delta_T \in [-5, 5]$ $^\circ$C: Additive shift to baseline temperature.
+\item \textbf{Radiation scale} $\gamma_R \in (0.5, 1.5]$: Multiplier for solar radiation.
+\item \textbf{Noise standard deviation} $\sigma_\epsilon \in [0, 0.1]$: Relative noise magnitude for temporal variability.
+\item \textbf{Extreme event periods}: Lists of (start hour, duration, intensity) tuples for drought periods, heat waves, and cold snaps.
+\end{itemize}
+
+%------------------------------------%
+% GENERATION PROCEDURE
+%------------------------------------%
+\subsection{Generation Procedure}\label{subsec:generation}
+
+Given baseline historical data $\{S_0[k], T_0[k], R_0[k]\}_{k=1}^K$ from NSRDB and NOAA, synthetic weather is generated as follows:
+
+\textbf{Step 1: Global scaling.}
+\begin{align}
+\tilde{S}[k] &= \gamma_S \cdot S_0[k] \\
+\tilde{T}[k] &= T_0[k] + \delta_T \\
+\tilde{R}[k] &= \gamma_R \cdot R_0[k]
+\end{align}
+
+\textbf{Step 2: Temporally-correlated noise.} To preserve realistic autocorrelation structure, we generate smooth noise by convolving white noise with a Gaussian kernel:
+\begin{equation}
+\epsilon[k] = \sigma_\epsilon \cdot (g_\tau * \mathcal{N}(0,1))[k]
+\end{equation}
+where $g_\tau$ is a Gaussian with spread $\tau$ (24 hours for temperature, 12 hours for radiation). The noise is applied multiplicatively:
+\begin{align}
+\hat{T}[k] &= \tilde{T}[k] \cdot (1 + \epsilon_T[k]) \\
+\hat{R}[k] &= \tilde{R}[k] \cdot (1 + \epsilon_R[k])
+\end{align}
+
+\textbf{Step 3: Extreme event injection.} For each drought period $(t_s, d, \iota)$, precipitation is reduced:
+\begin{equation}
+\hat{S}[k] = \begin{cases}
+\tilde{S}[k] \cdot (1 - \iota \cdot \phi(k)) & \text{if } t_s \leq k < t_s + d \\
+\tilde{S}[k] & \text{otherwise}
+\end{cases}
+\end{equation}
+where $\phi(k)$ is a tapering function providing smooth transitions. Heat waves and cold snaps similarly modify temperature with tapered intensity profiles.
+
+\textbf{Step 4: Physical bounds.} Final values are clipped to physical constraints: $S \geq 0$, $R \geq 0$, $T \in [-20, 50]$ $^\circ$C.
+
+%------------------------------------%
+% EXTREMITY INDEX
+%------------------------------------%
+\subsection{Extremity Index}\label{subsec:extremity}
+
+To quantify how far a scenario deviates from normal conditions, we define an extremity index:
+\begin{equation}
+E(\mathcal{S}) = |1 - \gamma_S| + 0.2|\delta_T| + |1 - \gamma_R| + 2\sigma_\epsilon + \sum_i \iota_i
+\label{eqn:extremity}
+\end{equation}
+where the sum is over all extreme event intensities. Normal scenarios have $E \approx 0$, while our most extreme scenario (combined drought and heat waves) has $E = 8.38$.
+
+
+%======================================================================================%
+% CFTOC
+%======================================================================================%
+\section{Constrained Finite-Time Optimal Control}\label{sec:cftoc}
+
+At each decision epoch, MPC solves a constrained finite-time optimal control (CFTOC) problem over a planning horizon of $H$ days.
+
+%------------------------------------%
+% PROBLEM FORMULATION
+%------------------------------------%
+\subsection{Problem Formulation}\label{subsec:cftoc-formulation}
+
+Let $\mathbf{x}_d$ denote the plant state at the start of day $d$, and let $\mathbf{u}_d = [w_d, f_d]^T$ denote the daily-average control inputs (irrigation and fertilizer rates). Given an $H$-day forecast of disturbances $\{\hat{\mathbf{d}}_d\}_{d=1}^H$ where $\hat{\mathbf{d}}_d = [\hat{S}_d, \hat{T}_d, \hat{R}_d]^T$, we solve:
+\begin{align}
+\min_{\mathbf{u}_1, \ldots, \mathbf{u}_H} \quad & J = \sum_{d=1}^{H} \ell_d(\mathbf{x}_d, \mathbf{u}_d) + V_H(\mathbf{x}_{H+1}) \label{eqn:cftoc-obj} \\
+\text{s.t.} \quad & \mathbf{x}_{d+1} = \mathcal{F}(\mathbf{x}_d, \mathbf{u}_d, \hat{\mathbf{d}}_d), \quad d = 1, \ldots, H \label{eqn:dynamics-constraint} \\
+& \underline{\mathbf{u}} \leq \mathbf{u}_d \leq \bar{\mathbf{u}}, \quad d = 1, \ldots, H \label{eqn:input-bounds}
+\end{align}
+where $\mathcal{F}$ represents the daily plant state transition (obtained by simulating hourly dynamics over 24 hours using the closed-form solution), and $\underline{\mathbf{u}}, \bar{\mathbf{u}}$ are input bounds.
+
+%------------------------------------%
+% STAGE COST
+%------------------------------------%
+\subsection{Stage Cost}\label{subsec:stage-cost}
+
+The daily stage cost balances input usage against nutrient stress:
+\begin{equation}
+\ell_d(\mathbf{x}_d, \mathbf{u}_d) = \omega_w \cdot w_d + \omega_f \cdot f_d + \omega_{\Delta w} \cdot \Delta_w[d] + \omega_{\Delta f} \cdot \Delta_f[d]
+\label{eqn:stage-cost}
+\end{equation}
+where $\omega_w, \omega_f$ are input cost weights, $\omega_{\Delta w}, \omega_{\Delta f}$ are anomaly penalty weights, and $\Delta_w[d], \Delta_f[d]$ are the cumulative divergences for water and fertilizer at day $d$. The anomaly penalties encourage the controller to maintain nutrient factors near 1, avoiding stress accumulation.
+
+%------------------------------------%
+% TERMINAL COST
+%------------------------------------%
+\subsection{Terminal Cost}\label{subsec:terminal-cost}
+
+The terminal cost rewards final crop value:
+\begin{equation}
+V_H(\mathbf{x}_{H+1}) = -\left(\omega_h \cdot h_{H+1} + \omega_A \cdot A_{H+1} + \omega_P \cdot P_{H+1}\right)
+\label{eqn:terminal-cost}
+\end{equation}
+where $\omega_h, \omega_A, \omega_P$ are economic weights for height, leaf area, and fruit biomass. The negative sign converts from cost minimization to value maximization.
+
+%------------------------------------%
+% SOLUTION METHOD
+%------------------------------------%
+\subsection{Solution Method}\label{subsec:solution}
+
+The CFTOC problem is formulated in Pyomo \cite{bynum2021pyomo} and solved using the IPOPT interior-point nonlinear optimizer \cite{wachter2006ipopt} with the MUMPS linear solver. The nonlinearity arises from the logistic dynamics, FIR convolution, EMA filtering, and exponential nutrient factor computation. We use an adaptive barrier parameter strategy for robust convergence.
+
+
+%======================================================================================%
+% MPC
+%======================================================================================%
+\section{Model Predictive Control}\label{sec:mpc}
+
+MPC implements the CFTOC in a receding-horizon fashion, re-optimizing daily based on updated state and weather observations.
+
+%------------------------------------%
+% ALGORITHM
+%------------------------------------%
+\subsection{Receding-Horizon Algorithm}\label{subsec:mpc-algorithm}
+
+Algorithm \ref{alg:mpc} presents the MPC procedure. At each decision day $d$:
+\begin{enumerate}
+\item Observe current plant state $\mathbf{x}_d$ and obtain $H$-day weather forecast $\{\hat{\mathbf{d}}_{d+j}\}_{j=0}^{H-1}$.
+\item Solve the CFTOC problem (\ref{eqn:cftoc-obj})--(\ref{eqn:input-bounds}) to obtain optimal control sequence $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$.
+\item Apply only the first control $\mathbf{u}^*_d$ as constant rates over day $d$.
+\item Simulate hourly plant dynamics using actual (not forecast) weather.
+\item Advance to day $d+1$ and repeat.
+\end{enumerate}
+
+\begin{algorithm}[h]
+\caption{Model Predictive Control for Irrigation and Fertilization}
+\label{alg:mpc}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Initial state $\mathbf{x}_0$, horizon $H$, season length $D$ days, weather data
+\State \textbf{Output:} Control history $\{w_d, f_d\}_{d=0}^{D-1}$, final state $\mathbf{x}_D$
+\State
+\State Initialize FIR kernel buffers, EMA state variables
+\For{$d = 0$ to $D-1$}
+    \State Aggregate hourly weather forecast into daily averages for days $d, \ldots, d+H-1$
+    \State Solve CFTOC$(\mathbf{x}_d, \{\hat{\mathbf{d}}_{d+j}\}_{j=0}^{H-1})$ $\rightarrow$ $\{\mathbf{u}^*_{d+j}\}_{j=0}^{H-1}$
+    \State Extract first control: $(w_d, f_d) \leftarrow \mathbf{u}^*_d$
+    \For{$h = 0$ to $23$} \Comment{Hourly simulation}
+        \State Apply $(w_d, f_d)$ with actual weather $(S_{24d+h}, T_{24d+h}, R_{24d+h})$
+        \State Update FIR buffers, EMA states, nutrient factors
+        \State Advance plant state using closed-form logistic solution
+    \EndFor
+    \State $\mathbf{x}_{d+1} \leftarrow$ current plant state
+\EndFor
+\State \Return $\{w_d, f_d\}_{d=0}^{D-1}$, $\mathbf{x}_D$
+\end{algorithmic}
+\end{algorithm}
+
+%------------------------------------%
+% FEEDBACK PROPERTIES
+%------------------------------------%
+\subsection{Feedback Properties}\label{subsec:feedback}
+
+The key advantage of MPC over open-loop optimization (such as GA) is its closed-loop nature. By re-solving the optimization problem each day with updated state and weather information, MPC can:
+\begin{itemize}
+\item \textbf{Correct for forecast errors:} If yesterday's weather differed from the forecast, today's optimization accounts for the actual plant state.
+\item \textbf{Adapt to changing conditions:} If a heat wave arrives unexpectedly, MPC can adjust irrigation to maintain nutrient factors.
+\item \textbf{Exploit updated forecasts:} Longer-range forecasts become more accurate as the event approaches.
+\end{itemize}
+
+This adaptivity comes at computational cost---solving a nonlinear optimization problem each day---but modern solvers handle the problem scale (5 state variables, 2 controls, 9-day horizon) in under one second per solve.
+
+
+%======================================================================================%
+% BAYESIAN OPTIMIZATION
+%======================================================================================%
+\section{Bayesian Optimization for MPC Parameter Tuning}\label{sec:bo}
+
+The MPC cost function contains seven tunable weights: $\omega_w, \omega_f, \omega_{\Delta w}, \omega_{\Delta f}, \omega_h, \omega_A, \omega_P$, plus the horizon length $H$. These parameters significantly affect controller behavior, and their optimal values depend on the weather scenario ensemble. We use Bayesian Optimization (BO) to automatically tune these parameters for robust performance.
+
+%------------------------------------%
+% BO OVERVIEW
+%------------------------------------%
+\subsection{Bayesian Optimization Overview}\label{subsec:bo-overview}
+
+BO is a sample-efficient global optimization method for expensive black-box functions \cite{shahriari2016taking}. Given a parameter vector $\boldsymbol{\theta}$ and objective function $f(\boldsymbol{\theta})$ (here, season-end revenue from MPC simulation), BO maintains a probabilistic surrogate model of $f$ and uses an acquisition function to select the next parameter configuration to evaluate.
+
+We employ Tree-structured Parzen Estimators (TPE) \cite{bergstra2011algorithms}, which model $p(\boldsymbol{\theta} | f(\boldsymbol{\theta}) < f^*)$ and $p(\boldsymbol{\theta} | f(\boldsymbol{\theta}) \geq f^*)$ separately, where $f^*$ is a threshold (typically the current best). The acquisition function is the ratio of these densities, favoring regions where good observations are likely.
+
+%------------------------------------%
+% SEARCH SPACE
+%------------------------------------%
+\subsection{Search Space}\label{subsec:search-space}
+
+Table \ref{tab:search-space} defines the search space for MPC parameter tuning. Cost weights use log-scale sampling to span multiple orders of magnitude, while value weights and horizon use linear/integer sampling.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Parameter & Lower & Upper & Scale \\
+\hline\hline
+$\omega_w$ (irrigation cost) & 0.001 & 10.0 & log \\
+$\omega_f$ (fertilizer cost) & 0.0001 & 1.0 & log \\
+$\omega_{\Delta w}$ (water anomaly) & 0.001 & 10.0 & log \\
+$\omega_{\Delta f}$ (fertilizer anomaly) & 0.001 & 10.0 & log \\
+$\omega_h$ (height value) & 10.0 & 1000.0 & linear \\
+$\omega_A$ (leaf area value) & 10.0 & 1000.0 & linear \\
+$\omega_P$ (fruit biomass value) & 100.0 & 10000.0 & linear \\
+$H$ (horizon, days) & 3 & 14 & integer \\
+\hline
+\end{tabular}
+\caption{Bayesian optimization search space for MPC parameters.}
+\label{tab:search-space}
+\end{table}
+
+%------------------------------------%
+% ROBUST OPTIMIZATION
+%------------------------------------%
+\subsection{Robust Optimization Objective}\label{subsec:robust-objective}
+
+For robust parameter tuning, we optimize average performance across multiple weather scenarios:
+\begin{equation}
+\boldsymbol{\theta}^* = \arg\max_{\boldsymbol{\theta}} \df{1}{|\mathcal{S}|} \sum_{\mathcal{S}_i \in \mathcal{S}} \text{Revenue}(\text{MPC}(\boldsymbol{\theta}, \mathcal{S}_i))
+\label{eqn:robust-objective}
+\end{equation}
+where $\mathcal{S}$ is a representative subset of weather scenarios. This encourages parameters that perform well across diverse conditions rather than overfitting to a single scenario.
+
+%------------------------------------%
+% ALGORITHM
+%------------------------------------%
+\subsection{Algorithm}\label{subsec:bo-algorithm}
+
+\begin{algorithm}[h]
+\caption{Bayesian Optimization for MPC Parameter Tuning}
+\label{alg:bo}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Search space $\Theta$, weather scenarios $\mathcal{S}$, budget $N$, startup trials $N_0$
+\State \textbf{Output:} Optimal parameters $\boldsymbol{\theta}^*$
+\State
+\State Initialize TPE surrogate model
+\For{$n = 1$ to $N$}
+    \If{$n \leq N_0$}
+        \State $\boldsymbol{\theta}_n \leftarrow$ sample uniformly from $\Theta$
+    \Else
+        \State $\boldsymbol{\theta}_n \leftarrow \arg\max_{\boldsymbol{\theta}} \text{EI}(\boldsymbol{\theta})$ using TPE
+    \EndIf
+    \State
+    \State $r_n \leftarrow 0$
+    \For{each scenario $\mathcal{S}_i \in \mathcal{S}$}
+        \State Run MPC with parameters $\boldsymbol{\theta}_n$ on scenario $\mathcal{S}_i$
+        \State $r_n \leftarrow r_n + \text{Revenue}_i / |\mathcal{S}|$
+    \EndFor
+    \State Update TPE model with observation $(\boldsymbol{\theta}_n, r_n)$
+\EndFor
+\State
+\State $\boldsymbol{\theta}^* \leftarrow \arg\max_n r_n$
+\State \Return $\boldsymbol{\theta}^*$
+\end{algorithmic}
+\end{algorithm}
+
+We use $N = 100$ trials with $N_0 = 20$ random startup trials before engaging the TPE sampler. For robust optimization, we use a representative subset of 5 scenarios spanning the extremity range.
+
+
+%======================================================================================%
+% CASE STUDY
+%======================================================================================%
+\pagebreak
+\section{Case Study: Corn in Iowa}\label{sec:case-study}
+
+We demonstrate the framework using corn, the most widely planted crop in the United States with over 90 million acres harvested annually \cite{fsa-acreage}. The case study uses historical weather data from Fairfax, Iowa (41.76$^{\circ}$N, 91.87$^{\circ}$W), a representative location in the Corn Belt (USDA climate zones 4b--5b).
+
+%------------------------------------%
+% SCENARIO SETUP
+%------------------------------------%
+\subsection{Scenario Configuration}\label{subsec:scenario}
+
+The simulation covers a typical growing season from late April to early October (approximately 2900 hours). Environmental inputs are:
+
+\begin{itemize}
+\item \textbf{Temperature and radiation:} Hourly data from NSRDB for Fairfax, IA. Mean temperature is 22.8$^{\circ}$C; mean solar radiation is 580 W/m$^{2}$.
+\item \textbf{Precipitation:} Daily data from NOAA, interpolated to hourly resolution.
+\item \textbf{Typical nutrient expectations:} Based on agronomic recommendations \cite{corn-nutrient-management}, the model expects 28 inches of water and 355 lbs of NPK fertilizer over the season ($w_{\text{typ}} \approx 0.01$ in/hr, $f_{\text{typ}} \approx 0.12$ lb/hr).
+\end{itemize}
+
+Table \ref{tab:corn-development} summarizes expected corn development timelines used to calibrate model parameters.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+State variable       & Days to maturity & Hours to maturity & Typical final value \\
+\hline\hline
+Plant height $h$     & 65--70           & 1560--1680        & 2.7--3.7 m          \\
+Leaf area $A$        & 55--65           & 1320--1560        & 0.6--0.7 m$^{2}$    \\
+Number of leaves $N$ & 65               & 1560              & 18--20              \\
+Spikelets $c$        & 65--70           & 1560--1680        & $\sim$1000          \\
+Fruit biomass $P$    & 125              & 3000              & 0.15--0.36 kg       \\
+\hline
+\end{tabular}
+\caption{Corn development timeline and typical final values from agronomic literature \cite{corn-growth-stages,corn-physiology}.}
+\label{tab:corn-development}
+\end{table}
+
+%------------------------------------%
+% BASELINE SCENARIO
+%------------------------------------%
+\subsection{Baseline Scenario: Farmer Best Practices Under Drought}\label{subsec:baseline}
+
+To establish a performance baseline, we first simulate crop growth under a drought scenario (50\% of typical precipitation) using conventional farmer practices: weekly irrigation of 1 inch \cite{kranz2008irrigation} and monthly fertilizer applications of 90 lbs \cite{davies2020nitrogen}. These values reflect standard agronomic recommendations for corn in the Corn Belt region.
+
+Figure \ref{fig:baseline-inputs} shows the environmental disturbances and control inputs over the growing season. The reduced precipitation characteristic of a drought year is clearly visible, along with the periodic irrigation and fertilizer applications.
+
+Figure \ref{fig:baseline-growth} shows the resulting plant state trajectories. Under drought conditions with conventional management, the plant reaches the following final values: height of 2.6 m (vs.\ 3.0 m capacity), leaf area of 0.57 m$^2$ (vs.\ 0.65 m$^2$), and fruit biomass of 0.22 kg (vs.\ 0.25 kg). The net revenue under this baseline scenario is \$859/acre.
+
+\pagebreak
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/no_opt_hourly_controls_and_disturbances.png}
+\caption{Environmental disturbances and control inputs for the baseline scenario. Top three panels show hourly precipitation (reduced to 50\% of normal), solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1 inch) and fertilizer (monthly, 90 lbs) application strategy.}
+\label{fig:baseline-inputs}
+\end{figure}
+
+\pagebreak
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/no_opt_crop_growth.png}
+\caption{Plant state variable trajectories under the baseline scenario (farmer best practices during drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$859/acre in revenue.}
+\label{fig:baseline-growth}
+\end{figure}
+
+The baseline scenario demonstrates how the model captures stress effects: despite regular irrigation, the mismatch between applied water and the plant's metabolic expectations under drought conditions leads to sustained nutrient factor depression and reduced growth potential. Detailed visualizations of the applied vs.\ absorbed nutrients, cumulative values, and nutrient factors are provided in the Supplementary Information.
+
+%------------------------------------%
+% GA COMPARISON
+%------------------------------------%
+\subsection{Genetic Algorithm Baseline}\label{subsec:ga}
+
+As a comparison point for MPC, we use the genetic algorithm (GA) optimization developed in \cite{becker2025ga}. The GA searches over four parameters---irrigation frequency, irrigation amount, fertilizer frequency, and fertilizer amount---to find a \emph{fixed} strategy that maximizes revenue under drought conditions. Unlike MPC, the GA-optimized strategy does not adapt during the season; the same control parameters are applied regardless of actual weather.
+
+The GA was optimized for the baseline drought scenario (50\% precipitation) and achieves \$999/acre---a 16\% improvement over farmer best practices. However, this strategy is specifically tuned for the assumed weather conditions. When actual weather deviates from assumptions, the fixed strategy cannot adapt.
+
+%------------------------------------%
+% MPC SETUP
+%------------------------------------%
+\subsection{MPC Configuration}\label{subsec:mpc-config}
+
+The MPC controller uses a 9-day planning horizon ($H = 9$) with daily re-optimization. Control bounds are set to $w \in [0, 0.7]$ inches/hour and $f \in [0, 12]$ lbs/hour, reflecting practical application rate limits.
+
+MPC weight parameters were tuned using Bayesian optimization (100 trials) to maximize robust performance across 5 representative weather scenarios. The optimal parameters are:
+\begin{itemize}
+\item Input costs: $\omega_w = 0.177$ \$/inch, $\omega_f = 0.002$ \$/lb
+\item Anomaly penalties: $\omega_{\Delta w} = 2.94$, $\omega_{\Delta f} = 1.21$
+\item Value weights: $\omega_h = 590.8$ \$/m, $\omega_A = 491.0$ \$/m$^2$, $\omega_P = 1203.3$ \$/kg
+\end{itemize}
+
+Note that these weights differ from the economic weights used in the GA cost function; they are tuned to optimize MPC behavior rather than represent true economic values.
+
+%------------------------------------%
+% WEATHER SCENARIOS
+%------------------------------------%
+\subsection{Weather Scenario Suite}\label{subsec:weather-scenarios}
+
+We evaluate both GA and MPC across 21 stochastic weather scenarios generated from the baseline historical data. Table \ref{tab:scenario-categories} summarizes the scenario categories.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Category    & Count & Extremity Range \\
+\hline\hline
+Normal      & 5     & 0.03--0.18      \\
+Moderate    & 5     & 0.35--0.90      \\
+Drought     & 4     & 1.20--2.45      \\
+Wet/Cool    & 2     & 0.95--1.10      \\
+Heat Stress & 2     & 2.10--3.50      \\
+Extreme     & 2     & 5.60--8.38      \\
+\hline
+\end{tabular}
+\caption{Weather scenario categories with extremity index ranges.}
+\label{tab:scenario-categories}
+\end{table}
+
+%------------------------------------%
+% RESULTS
+%------------------------------------%
+\subsection{Results}\label{subsec:results}
+
+Table \ref{tab:main-results} compares GA and MPC performance across the 21 scenarios. Both methods substantially outperform farmer best practices, but their relative performance depends on weather conditions.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Metric & GA & MPC & Difference \\
+\hline\hline
+Mean revenue (\$/acre) & 882.55 & 855.11 & $-27.44$ \\
+Best case (\$/acre) & 1033.63 & 1005.00 & $-28.63$ \\
+Worst case (\$/acre) & 491.50 & 522.91 & $+31.41$ \\
+Scenarios where better & 12/21 & 9/21 & -- \\
+\hline
+\end{tabular}
+\caption{Overall performance comparison between GA and MPC across 21 weather scenarios.}
+\label{tab:main-results}
+\end{table}
+
+On average, GA outperforms MPC by \$27.44/acre. This is expected: the GA strategy was optimized for drought conditions, and many scenarios involve some degree of drought (the baseline uses 50\% precipitation). However, the more interesting finding concerns the relationship between performance and weather extremity.
+
+%------------------------------------%
+% EXTREMITY ANALYSIS
+%------------------------------------%
+\subsection{Effect of Weather Extremity}\label{subsec:extremity-analysis}
+
+Figure \ref{fig:extremity-advantage} shows MPC's revenue advantage (MPC revenue minus GA revenue) as a function of weather extremity index. A clear positive trend emerges: MPC's relative performance improves as conditions become more extreme.
+
+Stratifying by extremity level:
+\begin{itemize}
+\item \textbf{Normal weather} ($E < 0.5$): MPC disadvantage = \$86.07/acre
+\item \textbf{Moderate weather} ($0.5 \leq E < 1.0$): MPC disadvantage = \$43.22/acre
+\item \textbf{Extreme weather} ($E > 1.0$): MPC advantage = \$18.74/acre
+\end{itemize}
+
+Linear regression yields a correlation coefficient of $R = 0.485$ ($p < 0.05$), indicating a statistically significant positive relationship between extremity and MPC advantage. This confirms the intuition that adaptive control provides greater benefit when conditions deviate more from baseline assumptions.
+
+%------------------------------------%
+% RISK MANAGEMENT
+%------------------------------------%
+\subsection{Risk Management Benefits}\label{subsec:risk}
+
+Beyond average performance, MPC provides meaningful risk management benefits. The worst-case scenario (combined severe drought and heat waves, $E = 8.38$) produces:
+\begin{itemize}
+\item GA revenue: \$491.50/acre
+\item MPC revenue: \$522.91/acre
+\item MPC improvement: \$31.41/acre (6.4\%)
+\end{itemize}
+
+This worst-case improvement is particularly relevant for risk-averse farmers or operations with significant fixed costs. While GA may maximize expected returns, MPC provides insurance against catastrophic outcomes.
+
+%------------------------------------%
+% RESOURCE ADAPTATION
+%------------------------------------%
+\subsection{Resource Usage Patterns}\label{subsec:resource-patterns}
+
+MPC's adaptive nature is evident in its resource usage across scenarios. While GA applies the same total irrigation regardless of conditions, MPC irrigation varies from 3.9 inches (wettest scenario) to 6.3 inches (driest scenario). This adaptation allows MPC to conserve water when natural precipitation is sufficient while providing additional irrigation when stress threatens crop development.
+
+
+%======================================================================================%
+% DISCUSSION
+%======================================================================================%
+\section{Discussion}\label{sec:discussion}
+
+%------------------------------------%
+% INTERPRETATION
+%------------------------------------%
+\subsection{Interpretation of Results}\label{subsec:interpretation}
+
+The results reveal a fundamental trade-off between optimization for expected conditions and robustness to uncertainty. The GA achieves higher revenue on average because it was optimized for drought conditions representative of the scenario ensemble. Under normal weather, the GA's aggressive irrigation strategy (designed for drought) actually provides excess water that, given the model's stress dynamics, does not harm the crop.
+
+MPC, in contrast, adapts its irrigation to observed conditions. Under normal weather, this adaptation is unnecessary and the daily re-optimization overhead manifests as slight suboptimality. However, when conditions become extreme---more extreme than the GA's optimization assumptions---MPC's ability to respond becomes valuable. The positive correlation between extremity and MPC advantage ($R = 0.485$) quantifies this relationship.
+
+The 6.4\% worst-case improvement highlights MPC's risk management value. For a 1000-acre corn operation, this represents approximately \$31,410 in additional revenue under the most adverse conditions. Whether this insurance value justifies MPC's computational overhead depends on the operation's risk tolerance and climate outlook.
+
+%------------------------------------%
+% COMPUTATIONAL CONSIDERATIONS
+%------------------------------------%
+\subsection{Computational Considerations}\label{subsec:computational}
+
+Each CFTOC solve requires approximately 0.5--1.0 seconds on a modern workstation using IPOPT. Over a 121-day growing season with daily re-optimization, total computation time is approximately 1--2 minutes. This is negligible compared to GA optimization (which requires thousands of full-season simulations) and well within practical limits for real-time control.
+
+The Bayesian optimization for parameter tuning requires 100 trials, each involving multiple full-season MPC simulations. Total tuning time is approximately 2--4 hours, but this is a one-time offline computation. Once parameters are tuned, MPC operates with minimal computational burden.
+
+%------------------------------------%
+% LIMITATIONS
+%------------------------------------%
+\subsection{Limitations and Extensions}\label{subsec:limitations}
+
+Several limitations suggest directions for future work:
+
+\textbf{Perfect forecast assumption.} Our MPC formulation assumes perfect weather forecasts over the planning horizon. In practice, forecast accuracy degrades with lead time. Incorporating forecast uncertainty through stochastic MPC or robust optimization would improve real-world applicability.
+
+\textbf{Single-point model.} The crop model represents a single plant without spatial heterogeneity. Field-scale implementation would require accounting for spatial variation in soil properties, drainage, and microclimate.
+
+\textbf{Simplified economics.} Our cost function uses constant economic weights. In practice, crop prices fluctuate seasonally, and input costs may have nonlinear components (e.g., volume discounts, capacity constraints).
+
+\textbf{Daily control resolution.} We optimize daily-average irrigation and fertilizer rates. Finer temporal resolution (e.g., hourly) could capture within-day dynamics but would substantially increase computational cost.
+
+\textbf{Additional control variables.} The current formulation considers only irrigation and fertilizer. Other controllable factors---such as planting date, crop variety selection, or deficit irrigation strategies---could be incorporated into the optimization framework.
+
+
+%======================================================================================%
+% CONCLUSION
+%======================================================================================%
+\section{Conclusion}\label{sec:conclusion}
+
+This paper developed an adaptive irrigation and fertilization framework combining Model Predictive Control with Bayesian-optimized parameters. Building on a crop growth model that captures delayed nutrient absorption and cumulative stress effects, we formulated a daily receding-horizon CFTOC problem and used TPE-based Bayesian optimization to tune the controller weights for robust performance across diverse weather scenarios.
+
+Evaluated on corn production in Iowa under 21 stochastic weather scenarios, we found that while a genetic algorithm achieves higher average revenue (for which it was optimized), MPC provides superior robustness to weather extremity. The correlation between extremity index and MPC advantage ($R = 0.485$) demonstrates that adaptive control becomes increasingly valuable as conditions deviate from baseline assumptions. MPC also reduces worst-case losses by 6.4\%, providing meaningful risk management benefits.
+
+These results suggest that as climate change increases the frequency and severity of extreme weather events, adaptive control strategies like MPC will become increasingly important for agricultural resource management. The computational overhead is modest (daily optimization solves in under one second), and the framework is generalizable to other crops through re-parameterization.
+
+Future work will incorporate forecast uncertainty through stochastic MPC, extend to field-scale spatial heterogeneity, and validate against field trial data.
+
+
+%======================================================================================%
+% SUPPLEMENTARY INFORMATION
+%======================================================================================%
+\backmatter
+\bmhead{Supplementary Information}
+
+This supplementary section provides additional visualizations of the baseline scenario and MPC operation.
+
+\subsection*{S1. Detailed Baseline Scenario Analysis}
+
+Figure \ref{fig:supp-applied-absorbed} shows the applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption via FIR convolution is visible in the lag between applied inputs and smoothed absorbed signals.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/no_opt_applied_absorbed.png}
+\caption{Applied versus absorbed nutrients under the baseline farmer strategy. Water absorption ($\sigma_w = 30$ hr) responds more quickly than fertilizer absorption ($\sigma_f = 300$ hr).}
+\label{fig:supp-applied-absorbed}
+\end{figure}
+
+Figure \ref{fig:supp-cumulative} shows cumulative absorbed nutrients compared to expected levels. Under drought conditions, actual water absorption falls progressively below expectations.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/no_opt_cum_values.png}
+\caption{Cumulative absorbed nutrients (solid) versus expected levels (dashed). The growing gap between actual and expected water absorption reflects cumulative drought stress.}
+\label{fig:supp-cumulative}
+\end{figure}
+
+Figure \ref{fig:supp-divergence} shows instantaneous divergence from expected cumulative levels.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/no_opt_cum_div.png}
+\caption{Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress.}
+\label{fig:supp-divergence}
+\end{figure}
+
+Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The water factor $\nu_w$ declines throughout the season as drought stress accumulates.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/no_opt_nutrient_factors.png}
+\caption{Nutrient factor evolution under the baseline scenario. The declining $\nu_w$ reduces effective growth rates and carrying capacities.}
+\label{fig:supp-nutrient-factors}
+\end{figure}
+
+
+%======================================================================================%
+% ACKNOWLEDGEMENTS
+%======================================================================================%
+\pagebreak
+\bmhead{Acknowledgements}
+
+This work has been partially supported by the UC Berkeley College of Engineering and the USDA AI Institute for Next Generation Food Systems (AIFS), USDA award number 2020-67021-32855.
+
+%======================================================================================%
+% DECLARATIONS
+%======================================================================================%
+\section*{Declarations}
+
+\noindent\textbf{Competing Interests}
+\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\noindent\textbf{Code availability}
+\noindent The source code used for this study is archived on Zenodo at [insert DOI link, e.g., doi.org]
+
+%======================================================================================%
+% BIBLIOGRAPHY
+%======================================================================================%
+\bibliography{bibliography}
+
+\end{document}

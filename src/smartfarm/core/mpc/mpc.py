@@ -730,7 +730,7 @@ class MPC:
 
             terminal_reward = -self.mpc_params.weight_fruit_biomass * model.P[horizon] / kP
             terminal_reward -= self.mpc_params.weight_height * model.h[horizon] / kh
-            terminal_reward -= self.mpc_params.weight_leaf_area * model.A[horizon] / k
+            terminal_reward -= self.mpc_params.weight_leaf_area * model.A[horizon] / kA
 
             return stage_cost + terminal_reward
 
