@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{25}
+\begin{thebibliography}{29}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -55,6 +55,82 @@ US Department of Agriculture
 \endbibitem
 
 %%% 2
+\bibitem[\protect\citeauthoryear{Zohdi}{2024}]{zohdi2024digitaltwin}
+\begin{barticle}
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A machine-learning enabled digital-twin framework for next generation
+  precision agriculture and forestry}.
+\bjtitle{Computer Methods in Applied Mechanics and Engineering}
+\bvolume{428},
+\bfpage{117250}
+(\byear{2024})
+\doiurl{10.1016/j.cma.2024.117250}
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Mengi et~al.}{2023}]{mengi2023indoorfarming}
+\begin{barticle}
+\bauthor{\bsnm{Mengi}, \binits{E.}},
+\bauthor{\bsnm{Becker}, \binits{C.J.}},
+\bauthor{\bsnm{Sedky}, \binits{M.}},
+\bauthor{\bsnm{Yu}, \binits{S.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A digital-twin and rapid optimization framework for optical design of
+  indoor farming systems}.
+\bjtitle{Computational Mechanics}
+\bvolume{72},
+\bfpage{953}--\blpage{970}
+(\byear{2023})
+\doiurl{10.1007/s00466-023-02421-9}
+\end{barticle}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Goodrich et~al.}{2022}]{goodrich2022sensors}
+\begin{barticle}
+\bauthor{\bsnm{Goodrich}, \binits{P.}},
+\bauthor{\bsnm{Betancourt}, \binits{O.}},
+\bauthor{\bsnm{Arias}, \binits{A.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{Placement and drone flight path mapping of agricultural soil sensors
+  using machine learning}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{198},
+\bfpage{107591}
+(\byear{2022})
+\doiurl{10.1016/j.compag.2022.107591}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Tagkopoulos
+  et~al.}{2022}]{tagkopoulos2024aifs}
+\begin{barticle}
+\bauthor{\bsnm{Tagkopoulos}, \binits{I.}},
+\bauthor{\bsnm{Brown}, \binits{S.F.}},
+\bauthor{\bsnm{Liu}, \binits{X.}},
+\bauthor{\bsnm{Zhao}, \binits{Q.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}},
+\bauthor{\bsnm{Earles}, \binits{J.M.}},
+\bauthor{\bsnm{Nitin}, \binits{N.}},
+\bauthor{\bsnm{Runcie}, \binits{D.E.}},
+\bauthor{\bsnm{Lemay}, \binits{D.G.}},
+\bauthor{\bsnm{Smith}, \binits{A.D.}},
+\bauthor{\bsnm{Ronald}, \binits{P.C.}},
+\bauthor{\bsnm{Feng}, \binits{H.}},
+\bauthor{\bsnm{Youtsey}, \binits{G.D.}}:
+\batitle{Special report: {AI} institute for next generation food systems
+  ({AIFS})}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{196},
+\bfpage{106819}
+(\byear{2022})
+\doiurl{10.1016/j.compag.2022.106819}
+\end{barticle}
+\endbibitem
+
+%%% 6
 \bibitem[\protect\citeauthoryear{Verhulst}{1838}]{verhulst1838}
 \begin{barticle}
 \bauthor{\bsnm{Verhulst}, \binits{P.-F.}}:
@@ -63,10 +139,11 @@ US Department of Agriculture
 \bvolume{10},
 \bfpage{113}--\blpage{126}
 (\byear{1838})
+\doiurl{10.1007/BF02309004}
 \end{barticle}
 \endbibitem
 
-%%% 3
+%%% 7
 \bibitem[\protect\citeauthoryear{Jones et~al.}{2003}]{jones2003dssat}
 \begin{barticle}
 \bauthor{\bsnm{Jones}, \binits{J.W.}},
@@ -84,10 +161,11 @@ US Department of Agriculture
 \bvolume{18}(\bissue{3-4}),
 \bfpage{235}--\blpage{265}
 (\byear{2003})
+\doiurl{10.1016/S1161-0301(02)00107-7}
 \end{barticle}
 \endbibitem
 
-%%% 4
+%%% 8
 \bibitem[\protect\citeauthoryear{Holzworth et~al.}{2014}]{holzworth2014apsim}
 \begin{barticle}
 \bauthor{\bsnm{Holzworth}, \binits{D.P.}},
@@ -106,10 +184,11 @@ US Department of Agriculture
 \bvolume{62},
 \bfpage{327}--\blpage{350}
 (\byear{2014})
+\doiurl{10.1016/j.envsoft.2014.07.009}
 \end{barticle}
 \endbibitem
 
-%%% 5
+%%% 9
 \bibitem[\protect\citeauthoryear{Van~Diepen et~al.}{1989}]{wofost}
 \begin{barticle}
 \bauthor{\bsnm{Van~Diepen}, \binits{C.}},
@@ -121,36 +200,39 @@ US Department of Agriculture
 \bvolume{5}(\bissue{1}),
 \bfpage{16}--\blpage{24}
 (\byear{1989})
+\doiurl{10.1111/j.1475-2743.1989.tb00755.x}
 \end{barticle}
 \endbibitem
 
-%%% 6
+%%% 10
 \bibitem[\protect\citeauthoryear{Gebbers and
-  Adamchuk}{2012}]{precision-ag-review}
+  Adamchuk}{2010}]{precision-ag-review}
 \begin{barticle}
 \bauthor{\bsnm{Gebbers}, \binits{R.}},
 \bauthor{\bsnm{Adamchuk}, \binits{V.I.}}:
-\batitle{Precision agriculture: A review}.
-\bjtitle{Computers and Electronics in Agriculture}
-\bvolume{81},
-\bfpage{60}--\blpage{75}
-(\byear{2012})
+\batitle{Precision agriculture and food security}.
+\bjtitle{Science}
+\bvolume{327}(\bissue{5967}),
+\bfpage{828}--\blpage{831}
+(\byear{2010})
+\doiurl{10.1126/science.1183899}
 \end{barticle}
 \endbibitem
 
-%%% 7
+%%% 11
 \bibitem[\protect\citeauthoryear{Singh}{2012}]{irrigation-optimization}
 \begin{barticle}
 \bauthor{\bsnm{Singh}, \binits{A.}}:
-\batitle{A review of irrigation optimization using mathematical programming}.
-\bjtitle{Water Resources Management}
-\bvolume{26}(\bissue{15}),
-\bfpage{4527}--\blpage{4549}
+\batitle{An overview of the optimization modelling applications}.
+\bjtitle{Journal of Hydrology}
+\bvolume{466--467},
+\bfpage{167}--\blpage{182}
 (\byear{2012})
+\doiurl{10.1016/j.jhydrol.2012.08.004}
 \end{barticle}
 \endbibitem
 
-%%% 8
+%%% 12
 \bibitem[\protect\citeauthoryear{Raman et~al.}{1992}]{dp-irrigation}
 \begin{barticle}
 \bauthor{\bsnm{Raman}, \binits{H.}},
@@ -161,10 +243,11 @@ US Department of Agriculture
 \bvolume{118}(\bissue{5}),
 \bfpage{688}--\blpage{702}
 (\byear{1992})
+\doiurl{10.1061/(ASCE)0733-9437(1992)118:5(688)}
 \end{barticle}
 \endbibitem
 
-%%% 9
+%%% 13
 \bibitem[\protect\citeauthoryear{Ding and Lin}{2020}]{ga-agriculture}
 \begin{barticle}
 \bauthor{\bsnm{Ding}, \binits{W.}},
@@ -174,10 +257,11 @@ US Department of Agriculture
 \bvolume{175},
 \bfpage{105524}
 (\byear{2020})
+\doiurl{10.1016/j.compag.2020.105524}
 \end{barticle}
 \endbibitem
 
-%%% 10
+%%% 14
 \bibitem[\protect\citeauthoryear{Goldberg}{1989}]{goldberg1989ga}
 \begin{bbook}
 \bauthor{\bsnm{Goldberg}, \binits{D.E.}}:
@@ -188,21 +272,22 @@ US Department of Agriculture
 \end{bbook}
 \endbibitem
 
-%%% 11
+%%% 15
 \bibitem[\protect\citeauthoryear{Wardlaw and
   Bhaktikul}{2004}]{ga-irrigation-scheduling}
 \begin{barticle}
 \bauthor{\bsnm{Wardlaw}, \binits{R.}},
 \bauthor{\bsnm{Bhaktikul}, \binits{K.}}:
-\batitle{Optimal irrigation scheduling using genetic algorithms}.
-\bjtitle{Journal of Hydroinformatics}
-\bvolume{6}(\bissue{1}),
-\bfpage{11}--\blpage{22}
+\batitle{Application of genetic algorithms for irrigation water scheduling}.
+\bjtitle{Irrigation and Drainage}
+\bvolume{53}(\bissue{4}),
+\bfpage{397}--\blpage{414}
 (\byear{2004})
+\doiurl{10.1002/ird.121}
 \end{barticle}
 \endbibitem
 
-%%% 12
+%%% 16
 \bibitem[\protect\citeauthoryear{Miao et~al.}{2006}]{ga-fertilizer}
 \begin{barticle}
 \bauthor{\bsnm{Miao}, \binits{Y.}},
@@ -217,7 +302,7 @@ US Department of Agriculture
 \end{barticle}
 \endbibitem
 
-%%% 13
+%%% 17
 \bibitem[\protect\citeauthoryear{Sengupta et~al.}{2018}]{nsrdb}
 \begin{barticle}
 \bauthor{\bsnm{Sengupta}, \binits{M.}},
@@ -227,14 +312,15 @@ US Department of Agriculture
 \bauthor{\bsnm{Maclaurin}, \binits{G.}},
 \bauthor{\bsnm{Shelby}, \binits{J.}}:
 \batitle{The national solar radiation data base (nsrdb)}.
-\bjtitle{Renewable and sustainable energy reviews}
+\bjtitle{Renewable and Sustainable Energy Reviews}
 \bvolume{89},
 \bfpage{51}--\blpage{60}
 (\byear{2018})
+\doiurl{10.1016/j.rser.2018.03.003}
 \end{barticle}
 \endbibitem
 
-%%% 14
+%%% 18
 \bibitem[\protect\citeauthoryear{{National Oceanic and Atmospheric
   Administration}}{2024}]{noaa-precip}
 \begin{botherref}
@@ -245,7 +331,7 @@ Climate Data Online
 \end{botherref}
 \endbibitem
 
-%%% 15
+%%% 19
 \bibitem[\protect\citeauthoryear{Sawyer et~al.}{2006}]{corn-nitrogen}
 \begin{botherref}
 \oauthor{\bsnm{Sawyer}, \binits{J.E.}},
@@ -261,7 +347,7 @@ Iowa State University Extension Publication PM
 \end{botherref}
 \endbibitem
 
-%%% 16
+%%% 20
 \bibitem[\protect\citeauthoryear{Payero et~al.}{2008}]{corn-irrigation}
 \begin{barticle}
 \bauthor{\bsnm{Payero}, \binits{J.O.}},
@@ -269,44 +355,49 @@ Iowa State University Extension Publication PM
 \bauthor{\bsnm{Irmak}, \binits{S.}},
 \bauthor{\bsnm{Davison}, \binits{D.R.}},
 \bauthor{\bsnm{Petersen}, \binits{J.L.}}:
-\batitle{Irrigation management strategies for corn}.
-\bjtitle{Crop Science}
-\bvolume{48}(\bissue{3}),
-\bfpage{1185}--\blpage{1196}
+\batitle{Effect of irrigation amounts applied with subsurface drip irrigation
+  on corn evapotranspiration, yield, water use efficiency, and dry matter
+  production in a semiarid climate}.
+\bjtitle{Agricultural Water Management}
+\bvolume{95}(\bissue{8}),
+\bfpage{895}--\blpage{908}
 (\byear{2008})
+\doiurl{10.1016/j.agwat.2008.02.015}
 \end{barticle}
 \endbibitem
 
-%%% 17
-\bibitem[\protect\citeauthoryear{Sanchez et~al.}{2014}]{corn-temperature}
+%%% 21
+\bibitem[\protect\citeauthoryear{S{\'a}nchez et~al.}{2014}]{corn-temperature}
 \begin{barticle}
-\bauthor{\bsnm{Sanchez}, \binits{B.}},
+\bauthor{\bsnm{S{\'a}nchez}, \binits{B.}},
 \bauthor{\bsnm{Rasmussen}, \binits{A.}},
 \bauthor{\bsnm{Porter}, \binits{J.R.}}:
-\batitle{Temperature effects on corn growth and development}.
-\bjtitle{Field Crops Research}
-\bvolume{166},
-\bfpage{110}--\blpage{118}
+\batitle{Temperatures and the growth and development of maize and rice: a
+  review}.
+\bjtitle{Global Change Biology}
+\bvolume{20}(\bissue{2}),
+\bfpage{408}--\blpage{417}
 (\byear{2014})
+\doiurl{10.1111/gcb.12389}
 \end{barticle}
 \endbibitem
 
-%%% 18
+%%% 22
 \bibitem[\protect\citeauthoryear{Lewontin and
   Cohen}{1969}]{geometric-mean-growth}
 \begin{barticle}
 \bauthor{\bsnm{Lewontin}, \binits{R.C.}},
 \bauthor{\bsnm{Cohen}, \binits{D.}}:
-\batitle{The geometric mean as a summary of growth rates in life history
-  studies}.
-\bjtitle{American Naturalist}
-\bvolume{103}(\bissue{932}),
-\bfpage{287}--\blpage{293}
+\batitle{On population growth in a randomly varying environment}.
+\bjtitle{Proceedings of the National Academy of Sciences}
+\bvolume{62}(\bissue{4}),
+\bfpage{1056}--\blpage{1060}
 (\byear{1969})
+\doiurl{10.1073/pnas.62.4.1056}
 \end{barticle}
 \endbibitem
 
-%%% 19
+%%% 23
 \bibitem[\protect\citeauthoryear{Abendroth et~al.}{2011}]{corn-growth-stages}
 \begin{botherref}
 \oauthor{\bsnm{Abendroth}, \binits{L.J.}},
@@ -320,7 +411,7 @@ Iowa State University Extension Publication PMR
 \end{botherref}
 \endbibitem
 
-%%% 20
+%%% 24
 \bibitem[\protect\citeauthoryear{{US Department of
   Agriculture}}{2023}]{fsa-acreage}
 \begin{botherref}
@@ -329,7 +420,7 @@ Iowa State University Extension Publication PMR
 \end{botherref}
 \endbibitem
 
-%%% 21
+%%% 25
 \bibitem[\protect\citeauthoryear{Sawyer
   et~al.}{2006}]{corn-nutrient-management}
 \begin{botherref}
@@ -345,7 +436,7 @@ University Extension Iowa State University Ames
 \end{botherref}
 \endbibitem
 
-%%% 22
+%%% 26
 \bibitem[\protect\citeauthoryear{White and Johnson}{2003}]{corn-physiology}
 \begin{bbook}
 \bauthor{\bsnm{White}, \binits{P.J.}},
@@ -358,7 +449,7 @@ University Extension Iowa State University Ames
 \end{bbook}
 \endbibitem
 
-%%% 23
+%%% 27
 \bibitem[\protect\citeauthoryear{Kranz et~al.}{2008}]{kranz2008irrigation}
 \begin{botherref}
 \oauthor{\bsnm{Kranz}, \binits{W.L.}},
@@ -374,7 +465,7 @@ University of Nebraska--Lincoln Extension
 \end{botherref}
 \endbibitem
 
-%%% 24
+%%% 28
 \bibitem[\protect\citeauthoryear{Davies et~al.}{2020}]{davies2020nitrogen}
 \begin{barticle}
 \bauthor{\bsnm{Davies}, \binits{B.}},
@@ -390,7 +481,7 @@ University of Nebraska--Lincoln Extension
 \end{barticle}
 \endbibitem
 
-%%% 25
+%%% 29
 \bibitem[\protect\citeauthoryear{Richards}{1959}]{richards1959}
 \begin{barticle}
 \bauthor{\bsnm{Richards}, \binits{F.J.}}:
@@ -399,6 +490,7 @@ University of Nebraska--Lincoln Extension
 \bvolume{10}(\bissue{2}),
 \bfpage{290}--\blpage{301}
 (\byear{1959})
+\doiurl{10.1093/jxb/10.2.290}
 \end{barticle}
 \endbibitem
 

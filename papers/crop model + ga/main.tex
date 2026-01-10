@@ -69,7 +69,7 @@
 %======================================================================================%
 \section{Introduction}\label{sec:intro}
 
-The agriculture sector in the United States faces significant challenges as the number of farms declines and the cost of farming continues to rise \cite{usda-farm-income}. Rising production expenses for equipment, seeds, and labor, coupled with elevated interest rates and declining commodity prices, have made farming increasingly expensive. To navigate this challenging landscape, farmers are employing strategies such as cost management and operational optimization. One promising approach is to use modeling and simulation to optimize farm operations without substantial capital investment.
+The agriculture sector in the United States faces significant challenges as the number of farms declines and the cost of farming continues to rise \cite{usda-farm-income}. Rising production expenses for equipment, seeds, and labor, coupled with elevated interest rates and declining commodity prices, have made farming increasingly expensive. To navigate this challenging landscape, farmers are employing strategies such as cost management and operational optimization. One promising approach is to use modeling and simulation to optimize farm operations without substantial capital investment. Recent advances in computational methods have enabled sophisticated digital-twin frameworks for precision agriculture \cite{zohdi2024digitaltwin,mengi2023indoorfarming}, and machine learning techniques have been applied to optimize sensor placement and resource delivery in agricultural systems \cite{goodrich2022sensors,tagkopoulos2024aifs}.
 
 Mathematical modeling of crop growth has a rich history, with models ranging from simple empirical relationships to complex mechanistic simulations. Logistic growth models, first proposed by Verhulst in 1838, remain widely used due to their interpretability and ability to capture resource-limited growth dynamics \cite{verhulst1838}. More sophisticated crop models such as DSSAT \cite{jones2003dssat}, APSIM \cite{holzworth2014apsim}, and WOFOST \cite{wofost} simulate detailed physiological processes but require extensive parameterization and may be computationally expensive for optimization applications. In contrast, reduced-order models that capture essential dynamics while remaining tractable for optimization have gained attention in precision agriculture \cite{precision-ag-review}.
 
@@ -83,7 +83,7 @@ We demonstrate the framework by optimizing irrigation and fertilizer strategies 
 %======================================================================================%
 % MODELING
 %======================================================================================%
-\section{Generalized, Coupled-ODE Crop Model}\label{sec:modeling}
+\section{Generalized, coupled-ODE crop model}\label{sec:modeling}
 
 The proposed model tracks five state variables representing key aspects of plant development: plant height $h$ (m), leaf area per leaf $A$ (m$^{2}$), number of leaves $N$, flower size $c$ (number of spikelets), and fruit biomass $P$ (kg). Each state variable follows logistic growth dynamics with time-varying growth rates and carrying capacities that depend on environmental conditions and resource availability.
 
@@ -92,7 +92,7 @@ The model receives four input signals: water from irrigation $w$ (inches), ferti
 %------------------------------------%
 % DELAYED ABSORPTION
 %------------------------------------%
-\subsection{Delayed Absorption via FIR Convolution}\label{subsec:fir-conv}
+\subsection{Delayed absorption via FIR convolution}\label{subsec:fir-conv}
 
 Plants do not immediately process applied nutrients; instead, there is a physiologically-mediated delay between application and utilization. We model this delayed absorption using finite impulse response (FIR) convolution with Gaussian kernels.
 
@@ -121,7 +121,7 @@ Different nutrients have different metabolic timescales. We use $\sigma_{w} = 30
 %------------------------------------%
 % CUMULATIVE STRESS TRACKING
 %------------------------------------%
-\subsection{Cumulative Stress Tracking via EMA Filtering}\label{subsec:ema-smooth}
+\subsection{Cumulative stress tracking via EMA filtering}\label{subsec:ema-smooth}
 
 While FIR convolution captures delayed absorption, plants also accumulate stress from sustained deviations from optimal conditions. We model this cumulative effect using exponential moving average (EMA) filters, which are equivalent to first-order infinite impulse response (IIR) systems.
 
@@ -135,7 +135,7 @@ where larger $\beta$ values correspond to longer memory (slower response to chan
 %------------------------------------%
 % NUTRIENT FACTORS
 %------------------------------------%
-\subsection{Nutrient Factor Calculation}\label{subsec:nutrient-factors}
+\subsection{Nutrient factor calculation}\label{subsec:nutrient-factors}
 
 We now describe the complete transformation pipeline that converts raw input signals into nutrient factors $\nu \in [0,1]$ that modulate plant growth. Using fertilizer as an example (the same process applies to water, temperature, and radiation):
 
@@ -187,7 +187,7 @@ Figure \ref{fig:metabolism-transformations} illustrates the FIR convolution and 
 %------------------------------------%
 % INPUT EFFECTS
 %------------------------------------%
-\subsection{Effects of Inputs on Plant Growth}\label{subsec:input-effects}
+\subsection{Effects of inputs on plant growth}\label{subsec:input-effects}
 
 Different inputs affect different aspects of plant growth. Tables \ref{tab:fert-irr-effects} and \ref{tab:temp-rad-effects} summarize these relationships based on agronomic literature \cite{corn-nitrogen,corn-irrigation,corn-temperature}.
 
@@ -236,7 +236,7 @@ Fruit biomass $P$    & +      & +  & +      & +  \\
 %------------------------------------%
 % DYNAMICS
 %------------------------------------%
-\subsection{Growth Dynamics}\label{subsec:dynamics}
+\subsection{Growth dynamics}\label{subsec:dynamics}
 
 Each state variable follows logistic growth with time-varying parameters modulated by nutrient factors. The general form is:
 \begin{equation}
@@ -282,7 +282,7 @@ The coupling terms $\hat{k}_{h}/k_{h}$, $\hat{k}_{A}/k_{A}$, and $\hat{k}_{c}/k_
 %------------------------------------%
 % PARAMETERS
 %------------------------------------%
-\subsection{Model Parameters}\label{subsec:parameters}
+\subsection{Model parameters}\label{subsec:parameters}
 
 The baseline growth rates and carrying capacities are crop-specific parameters that can be estimated from field data or literature values. For corn, we use the values in Table \ref{tab:model-params}, calibrated to match typical development timelines where plants reach full vegetative size around 65--70 days after sowing and grain fill completes around 125 days \cite{corn-growth-stages}.
 
@@ -321,14 +321,14 @@ We simulate the growing season at hourly resolution ($\Delta t = 1$ hour), yield
 %======================================================================================%
 % GENETIC ALGORITHM
 %======================================================================================%
-\section{Optimization via Genetic Algorithm}\label{sec:ga}
+\section{Optimization via genetic algorithm}\label{sec:ga}
 
 Given the nonlinear, delay-affected dynamics of the crop model, gradient-based optimization is challenging. The delayed effects of inputs create a non-convex landscape with potentially many local optima. We therefore employ a genetic algorithm (GA), a population-based metaheuristic inspired by natural selection that can effectively explore complex search spaces \cite{goldberg1989ga}.
 
 %------------------------------------%
 % DESIGN VARIABLES
 %------------------------------------%
-\subsection{Decision Variables}\label{subsec:design-vars}
+\subsection{Decision variables}\label{subsec:design-vars}
 
 Each candidate solution encodes a complete irrigation and fertilization strategy as a four-dimensional vector:
 \begin{equation}
@@ -341,7 +341,7 @@ The frequencies specify application intervals: $u_{1} = 168$ means irrigate ever
 %------------------------------------%
 % OBJECTIVE FUNCTION
 %------------------------------------%
-\subsection{Objective Function}\label{subsec:objective}
+\subsection{Objective function}\label{subsec:objective}
 
 The objective is to maximize net revenue, defined as crop value minus input costs.
 
@@ -386,7 +386,7 @@ $\omega_{P}$ & \$4,450/kg    & \$4/bushel $\times$ plant density \\
 %------------------------------------%
 % GA ALGORITHM
 %------------------------------------%
-\subsection{Algorithm Description}\label{subsec:ga-algorithm}
+\subsection{Algorithm description}\label{subsec:ga-algorithm}
 
 The GA maintains a population of $M$ candidate solutions and iteratively improves them through selection, crossover, and mutation over $G$ generations. Algorithm \ref{alg:ga} presents the complete procedure.
 
@@ -451,14 +451,14 @@ where $\phi \sim \text{Uniform}(0, 1)$ under normal operation. This crossover ca
 % CASE STUDY
 %======================================================================================%
 \pagebreak
-\section{Case Study: Corn in Iowa}\label{sec:case-study}
+\section{Case study: corn in iowa}\label{sec:case-study}
 
 We demonstrate the framework using corn, the most widely planted crop in the United States with over 90 million acres harvested annually \cite{fsa-acreage}. The case study uses historical weather data from Fairfax, Iowa (41.76$^{\circ}$N, 91.87$^{\circ}$W), a representative location in the Corn Belt (USDA climate zones 4b--5b).
 
 %------------------------------------%
 % SCENARIO SETUP
 %------------------------------------%
-\subsection{Scenario Configuration}\label{subsec:scenario}
+\subsection{Scenario configuration}\label{subsec:scenario}
 
 The simulation covers a typical growing season from late April to early October (approximately 2900 hours). Environmental inputs are:
 
@@ -490,7 +490,7 @@ Fruit biomass $P$    & 125              & 3000              & 0.15--0.36 kg     
 %------------------------------------%
 % BASELINE SCENARIO
 %------------------------------------%
-\subsection{Baseline Scenario: Farmer Best Practices Under Drought}\label{subsec:baseline}
+\subsection{Baseline scenario: farmer best practices under drought}\label{subsec:baseline}
 
 To establish a performance baseline, we first simulate crop growth under a drought scenario (50\% of typical precipitation) using conventional farmer practices: weekly irrigation of 1 inch \cite{kranz2008irrigation} and monthly fertilizer applications of 90 lbs \cite{davies2020nitrogen}. These values reflect standard agronomic recommendations for corn in the Corn Belt region.
 
@@ -520,7 +520,7 @@ The baseline scenario demonstrates how the model captures stress effects: despit
 % OPTIMIZATION SETUP
 %------------------------------------%
 \pagebreak
-\subsection{Optimization Configuration}\label{subsec:opt-config}
+\subsection{Optimization configuration}\label{subsec:opt-config}
 
 The GA searches over the following bounds:
 \begin{itemize}
@@ -535,7 +535,7 @@ These bounds reflect practical constraints: irrigation systems have minimum appl
 %------------------------------------%
 % RESULTS
 %------------------------------------%
-\subsection{Optimization Results}\label{subsec:results}
+\subsection{Optimization results}\label{subsec:results}
 
 To assess robustness of the optimization, we executed 10 independent GA runs with different random seeds. Figure \ref{fig:ga-convergence} shows the convergence of all 10 runs, with each curve representing the best revenue achieved at each generation. All runs converge to similar final values (within 3\% of each other), demonstrating that the GA reliably finds near-optimal solutions despite the stochastic nature of the search.
 
@@ -605,7 +605,7 @@ Input costs         & \$219          & \$312          \\
 %------------------------------------%
 % INTERPRETATION
 %------------------------------------%
-\subsection{Interpretation of Results}\label{subsec:interpretation}
+\subsection{Interpretation of results}\label{subsec:interpretation}
 
 The GA-optimized strategy differs from conventional wisdom in several notable ways. The algorithm discovers that less frequent but larger irrigation events, combined with reduced total fertilizer input, can outperform conventional uniform application schedules. This counterintuitive result emerges from the model's delayed absorption dynamics: under drought conditions, the plant's metabolic expectations are calibrated to typical water availability. The GA discovers that strategically-timed resource inputs better maintain alignment with metabolic expectations than aggressive compensation for drought through frequent, uniform applications.
 
@@ -616,7 +616,7 @@ The 16\% revenue improvement (\$999 vs.\ \$859 per acre) demonstrates substantia
 %------------------------------------%
 % PARAMETER ESTIMATION
 %------------------------------------%
-\subsection{Parameter Estimation in Practice}\label{subsec:parameter-estimation}
+\subsection{Parameter estimation in practice}\label{subsec:parameter-estimation}
 
 The framework requires crop-specific parameters: growth rates, carrying capacities, metabolic timescales, and typical nutrient expectations. Several approaches could estimate these from data:
 
@@ -631,7 +631,7 @@ Physics-informed neural networks (PINNs) could jointly fit model parameters and 
 %------------------------------------%
 % LIMITATIONS
 %------------------------------------%
-\subsection{Limitations and Extensions}\label{subsec:limitations}
+\subsection{Limitations and extensions}\label{subsec:limitations}
 
 Several model limitations suggest directions for future work:
 
@@ -665,7 +665,7 @@ The framework is generalizable to other crops through re-parameterization and of
 % SUPPLEMENTARY INFORMATION
 %======================================================================================%
 \backmatter
-\bmhead{Supplementary Information}
+\bmhead{Supplementary information}
 
 This supplementary section provides additional visualizations of the baseline scenario (farmer best practices under drought) and the GA optimization results.
 
@@ -673,7 +673,7 @@ This supplementary section provides additional visualizations of the baseline sc
 % SI 1
 %------------------------------------%
 \pagebreak
-\subsection*{S1. Detailed Baseline Scenario Analysis}
+\subsection*{S1. Detailed baseline scenario analysis}
 
 Figure \ref{fig:supp-applied-absorbed} shows the applied versus absorbed nutrients under the baseline scenario. The delayed absorption via FIR convolution is clearly visible: the absorbed signals (smoothed curves) lag behind the applied inputs and exhibit the characteristic spreading effect of the Gaussian kernels.
 
@@ -718,7 +718,7 @@ Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The
 % SI 1
 %------------------------------------%
 \pagebreak
-\subsection*{S2. GA Optimization: Worst-Case Analysis}
+\subsection*{S2. GA optimization: worst-case analysis}
 
 As a sanity check, Figure \ref{fig:supp-worst} shows the plant state trajectories for the \emph{worst} member in each GA run's final population. Even these suboptimal strategies---the least fit survivors after 100 generations of evolution---outperform the baseline farmer practices. This confirms that: (1) the GA successfully eliminates poor strategies, and (2) random or arbitrary irrigation/fertilization schedules cannot match even the worst optimized approaches.
 

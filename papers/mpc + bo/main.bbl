@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{13}
+\begin{thebibliography}{15}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -58,6 +58,79 @@ Cambridge University Press
 \endbibitem
 
 %%% 2
+\bibitem[\protect\citeauthoryear{Zohdi}{2024}]{zohdi2024digitaltwin}
+\begin{barticle}
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A machine-learning enabled digital-twin framework for next generation
+  precision agriculture and forestry}.
+\bjtitle{Computer Methods in Applied Mechanics and Engineering}
+\bvolume{428},
+\bfpage{117250}
+(\byear{2024})
+\doiurl{10.1016/j.cma.2024.117250}
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Mengi et~al.}{2023}]{mengi2023agrivoltaics}
+\begin{barticle}
+\bauthor{\bsnm{Mengi}, \binits{E.}},
+\bauthor{\bsnm{Samara}, \binits{O.A.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{Crop-driven optimization of agrivoltaics using a digital-replica
+  framework}.
+\bjtitle{Smart Agricultural Technology}
+\bvolume{4},
+\bfpage{100150}
+(\byear{2023})
+\doiurl{10.1016/j.atech.2022.100150}
+\end{barticle}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Betancourt et~al.}{2024}]{betancourt2024spray}
+\begin{barticle}
+\bauthor{\bsnm{Betancourt}, \binits{J.O.}},
+\bauthor{\bsnm{Li}, \binits{I.}},
+\bauthor{\bsnm{Mengi}, \binits{E.}},
+\bauthor{\bsnm{Corrales}, \binits{L.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A computational framework for precise aerial agricultural spray
+  delivery processes}.
+\bjtitle{Archives of Computational Methods in Engineering}
+(\byear{2024})
+\doiurl{10.1007/s11831-024-10106-6}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Tagkopoulos
+  et~al.}{2022}]{tagkopoulos2024aifs}
+\begin{barticle}
+\bauthor{\bsnm{Tagkopoulos}, \binits{I.}},
+\bauthor{\bsnm{Brown}, \binits{S.F.}},
+\bauthor{\bsnm{Liu}, \binits{X.}},
+\bauthor{\bsnm{Zhao}, \binits{Q.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}},
+\bauthor{\bsnm{Earles}, \binits{J.M.}},
+\bauthor{\bsnm{Nitin}, \binits{N.}},
+\bauthor{\bsnm{Runcie}, \binits{D.E.}},
+\bauthor{\bsnm{Lemay}, \binits{D.G.}},
+\bauthor{\bsnm{Smith}, \binits{A.D.}},
+\bauthor{\bsnm{Ronald}, \binits{P.C.}},
+\bauthor{\bsnm{Feng}, \binits{H.}},
+\bauthor{\bsnm{Youtsey}, \binits{G.D.}}:
+\batitle{Special report: {AI} institute for next generation food systems
+  ({AIFS})}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{196},
+\bfpage{106819}
+(\byear{2022})
+\doiurl{10.1016/j.compag.2022.106819}
+\end{barticle}
+\endbibitem
+
+%%% 6
 \bibitem[\protect\citeauthoryear{Becker and Zohdi}{2025}]{becker2025ga}
 \begin{botherref}
 \oauthor{\bsnm{Becker}, \binits{C.J.}},
@@ -70,7 +143,7 @@ Under review
 \end{botherref}
 \endbibitem
 
-%%% 3
+%%% 7
 \bibitem[\protect\citeauthoryear{Rawlings et~al.}{2017}]{rawlings2017mpc}
 \begin{bbook}
 \bauthor{\bsnm{Rawlings}, \binits{J.B.}},
@@ -83,7 +156,7 @@ Under review
 \end{bbook}
 \endbibitem
 
-%%% 4
+%%% 8
 \bibitem[\protect\citeauthoryear{Shahriari et~al.}{2016}]{shahriari2016taking}
 \begin{barticle}
 \bauthor{\bsnm{Shahriari}, \binits{B.}},
@@ -101,7 +174,7 @@ Under review
 \end{barticle}
 \endbibitem
 
-%%% 5
+%%% 9
 \bibitem[\protect\citeauthoryear{Bergstra
   et~al.}{2011}]{bergstra2011algorithms}
 \begin{bchapter}
@@ -113,11 +186,12 @@ Under review
 In: \bbtitle{Advances in Neural Information Processing Systems},
 vol. \bseriesno{24},
 pp. \bfpage{2546}--\blpage{2554}
-(\byear{2011})
+(\byear{2011}).
+\doiurl{10.5555/2986459.2986743}
 \end{bchapter}
 \endbibitem
 
-%%% 6
+%%% 10
 \bibitem[\protect\citeauthoryear{Bynum et~al.}{2021}]{bynum2021pyomo}
 \begin{bbook}
 \bauthor{\bsnm{Bynum}, \binits{M.L.}},
@@ -136,7 +210,7 @@ pp. \bfpage{2546}--\blpage{2554}
 \end{bbook}
 \endbibitem
 
-%%% 7
+%%% 11
 \bibitem[\protect\citeauthoryear{W{\"a}chter and
   Biegler}{2006}]{wachter2006ipopt}
 \begin{barticle}
@@ -152,7 +226,7 @@ pp. \bfpage{2546}--\blpage{2554}
 \end{barticle}
 \endbibitem
 
-%%% 8
+%%% 12
 \bibitem[\protect\citeauthoryear{{USDA Farm Service
   Agency}}{2024}]{fsa-acreage}
 \begin{botherref}
@@ -164,7 +238,7 @@ Accessed: 2024
 \end{botherref}
 \endbibitem
 
-%%% 9
+%%% 13
 \bibitem[\protect\citeauthoryear{Sawyer and
   Mallarino}{2017}]{corn-nutrient-management}
 \begin{botherref}
@@ -177,35 +251,7 @@ Iowa State University Extension
 \end{botherref}
 \endbibitem
 
-%%% 10
-\bibitem[\protect\citeauthoryear{Abendroth et~al.}{2011}]{corn-growth-stages}
-\begin{botherref}
-\oauthor{\bsnm{Abendroth}, \binits{L.J.}},
-\oauthor{\bsnm{Elmore}, \binits{R.W.}},
-\oauthor{\bsnm{Boyer}, \binits{M.J.}},
-\oauthor{\bsnm{Marlay}, \binits{S.K.}}:
-Corn growth and development.
-Iowa State University Extension
-(PMR 1009)
-(2011)
-\end{botherref}
-\endbibitem
-
-%%% 11
-\bibitem[\protect\citeauthoryear{Ritchie et~al.}{1993}]{corn-physiology}
-\begin{bbook}
-\bauthor{\bsnm{Ritchie}, \binits{S.W.}},
-\bauthor{\bsnm{Hanway}, \binits{J.J.}},
-\bauthor{\bsnm{Benson}, \binits{G.O.}}:
-\bbtitle{How a Corn Plant Develops}
-vol. \bseriesno{Special Report No. 48}.
-\bpublisher{Iowa State University Cooperative Extension Service},
-  \blocation{???}
-(\byear{1993})
-\end{bbook}
-\endbibitem
-
-%%% 12
+%%% 14
 \bibitem[\protect\citeauthoryear{Kranz et~al.}{2008}]{kranz2008irrigation}
 \begin{botherref}
 \oauthor{\bsnm{Kranz}, \binits{W.L.}},
@@ -220,7 +266,7 @@ NebGuide
 \end{botherref}
 \endbibitem
 
-%%% 13
+%%% 15
 \bibitem[\protect\citeauthoryear{Davies et~al.}{2020}]{davies2020nitrogen}
 \begin{barticle}
 \bauthor{\bsnm{Davies}, \binits{B.}},

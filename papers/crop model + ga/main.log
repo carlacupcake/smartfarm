@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  7 JAN 2026 23:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  9 JAN 2026 19:29
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -685,16 +685,16 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [2]
-<figures/metabolism_transformations.png, id=158, 644.6484pt x 1065.9825pt>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3]
+<figures/metabolism_transformations.png, id=180, 644.6484pt x 1065.9825pt>
 File: figures/metabolism_transformations.png Graphic file (type png)
 <use figures/metabolism_transformations.png>
 Package pdftex.def Info: figures/metabolism_transformations.png  used on input 
 line 181.
 (pdftex.def)             Requested size: 317.07614pt x 524.3204pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [3]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [4pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
@@ -757,7 +757,7 @@ has been already used, duplicate ignored
                                                   
 l.502 \begin
             {figure}[h]]
-<figures/no_opt_hourly_controls_and_disturbances.png, id=258, 638.8668pt x 979.
+<figures/no_opt_hourly_controls_and_disturbances.png, id=266, 638.8668pt x 979.
 2585pt>
 File: figures/no_opt_hourly_controls_and_disturbances.png Graphic file (type pn
 g)
@@ -775,7 +775,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 l.510 \begin
             {figure}[h] <./figures/no_opt_hourly_controls_and_disturbances.png>
 ]
-<figures/no_opt_crop_growth.png, id=264, 641.7576pt x 979.2585pt>
+<figures/no_opt_crop_growth.png, id=272, 641.7576pt x 979.2585pt>
 File: figures/no_opt_crop_growth.png Graphic file (type png)
 <use figures/no_opt_crop_growth.png>
 Package pdftex.def Info: figures/no_opt_crop_growth.png  used on input line 512
@@ -789,9 +789,9 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
 l.523 \subsection
-                 {Optimization Configuration}\label{subsec:opt-config} <./figur
+                 {Optimization configuration}\label{subsec:opt-config} <./figur
 es/no_opt_crop_growth.png>]
-<figures/ga_convg_10_runs.png, id=271, 642.4803pt x 208.8603pt>
+<figures/ga_convg_10_runs.png, id=279, 642.4803pt x 208.8603pt>
 File: figures/ga_convg_10_runs.png Graphic file (type png)
 <use figures/ga_convg_10_runs.png>
 Package pdftex.def Info: figures/ga_convg_10_runs.png  used on input line 544.
@@ -810,7 +810,7 @@ ier (name{table.6}) has been already used, duplicate ignored
                                                   
 l.570 \begin
             {figure}[h] <./figures/ga_convg_10_runs.png>]
-<figures/crop_growth_results_best.png, id=282, 641.7576pt x 979.2585pt>
+<figures/crop_growth_results_best.png, id=290, 641.7576pt x 979.2585pt>
 File: figures/crop_growth_results_best.png Graphic file (type png)
 <use figures/crop_growth_results_best.png>
 Package pdftex.def Info: figures/crop_growth_results_best.png  used on input li
@@ -843,7 +843,7 @@ Package hyperref Warning: Difference (4) between bookmark levels is greater
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [15]
-<figures/no_opt_applied_absorbed.png, id=306, 648.9846pt x 784.1295pt>
+<figures/no_opt_applied_absorbed.png, id=315, 648.9846pt x 784.1295pt>
 File: figures/no_opt_applied_absorbed.png Graphic file (type png)
 <use figures/no_opt_applied_absorbed.png>
 Package pdftex.def Info: figures/no_opt_applied_absorbed.png  used on input lin
@@ -858,7 +858,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
                                                   
 l.694 \begin
             {figure}[h] <./figures/no_opt_applied_absorbed.png>]
-<figures/no_opt_cum_values.png, id=321, 641.7576pt x 784.1295pt>
+<figures/no_opt_cum_values.png, id=329, 641.7576pt x 784.1295pt>
 File: figures/no_opt_cum_values.png Graphic file (type png)
 <use figures/no_opt_cum_values.png>
 Package pdftex.def Info: figures/no_opt_cum_values.png  used on input line 696.
@@ -873,7 +873,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
                                                   
 l.702 \begin
             {figure}[h] <./figures/no_opt_cum_values.png>]
-<figures/no_opt_cum_div.png, id=327, 647.5392pt x 784.1295pt>
+<figures/no_opt_cum_div.png, id=335, 647.5392pt x 784.1295pt>
 File: figures/no_opt_cum_div.png Graphic file (type png)
 <use figures/no_opt_cum_div.png>
 Package pdftex.def Info: figures/no_opt_cum_div.png  used on input line 704.
@@ -887,7 +887,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
                                                   
 l.710 \begin
             {figure}[h] <./figures/no_opt_cum_div.png>]
-<figures/no_opt_nutrient_factors.png, id=333, 647.5392pt x 784.1295pt>
+<figures/no_opt_nutrient_factors.png, id=341, 647.5392pt x 784.1295pt>
 File: figures/no_opt_nutrient_factors.png Graphic file (type png)
 <use figures/no_opt_nutrient_factors.png>
 Package pdftex.def Info: figures/no_opt_nutrient_factors.png  used on input lin
@@ -901,9 +901,9 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
 l.721 \subsection
-                 *{S2. GA Optimization: Worst-Case Analysis} <./figures/no_opt_
+                 *{S2. GA optimization: worst-case analysis} <./figures/no_opt_
 nutrient_factors.png>]
-<figures/crop_growth_results_worst.png, id=341, 641.7576pt x 979.2585pt>
+<figures/crop_growth_results_worst.png, id=349, 641.7576pt x 979.2585pt>
 File: figures/crop_growth_results_worst.png Graphic file (type png)
 <use figures/crop_growth_results_worst.png>
 Package pdftex.def Info: figures/crop_growth_results_worst.png  used on input l
@@ -935,16 +935,16 @@ LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.985pt have occurred.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 8785B9898D46AA2BA5456B2379B5EE74;4510.
+(rerunfilecheck)             Checksum: 47483BB9673859DBEE3AADDB823B1714;4510.
  ) 
 Here is how much of TeX's memory you used:
- 13753 strings out of 478994
- 200888 string characters out of 5858184
- 526371 words of memory out of 5000000
- 30864 multiletter control sequences out of 15000+600000
+ 13770 strings out of 478994
+ 201332 string characters out of 5858184
+ 526998 words of memory out of 5000000
+ 30877 multiletter control sequences out of 15000+600000
  433524 words of font info for 142 fonts, out of 8000000 for 9000
  1151 hyphenation exceptions out of 8191
- 98i,12n,102p,2042b,532s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 98i,12n,102p,2042b,526s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 }</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
 </usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
@@ -971,10 +971,10 @@ s/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2021/texmf-dist/fonts
 /type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2021/texmf-dist/fonts/t
 ype1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2021/texmf-dist/fonts/typ
 e1/public/cm-super/sfrm1000.pfb>
-Output written on main.pdf (22 pages, 1503137 bytes).
+Output written on main.pdf (22 pages, 1505051 bytes).
 PDF statistics:
- 476 PDF objects out of 1000 (max. 8388607)
- 402 compressed objects within 5 object streams
- 118 named destinations out of 1000 (max. 500000)
+ 508 PDF objects out of 1000 (max. 8388607)
+ 434 compressed objects within 5 object streams
+ 122 named destinations out of 1000 (max. 500000)
  251 words of extra memory for PDF output out of 10000 (max. 10000000)
 

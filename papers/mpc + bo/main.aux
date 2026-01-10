@@ -18,193 +18,197 @@
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \citation{ipcc2021}
-\citation{becker2025ga}
+\citation{zohdi2024digitaltwin,mengi2023agrivoltaics}
+\citation{betancourt2024spray,tagkopoulos2024aifs}
 \Newlabel{1}{1}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\citation{becker2025ga}
 \citation{rawlings2017mpc}
 \citation{shahriari2016taking}
 \citation{bergstra2011algorithms}
 \citation{becker2025ga}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Crop Growth Model}{2}{section.2}\protected@file@percent }
-\newlabel{sec:dynamics}{{2}{2}{Crop Growth Model}{section.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Logistic Growth Dynamics}{2}{subsection.2.1}\protected@file@percent }
-\newlabel{subsec:logistic}{{2.1}{2}{Logistic Growth Dynamics}{subsection.2.1}{}}
-\newlabel{eqn:logistic}{{1}{2}{Logistic Growth Dynamics}{equation.2.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Crop growth model}{2}{section.2}\protected@file@percent }
+\newlabel{sec:dynamics}{{2}{2}{Crop growth model}{section.2}{}}
 \citation{becker2025ga}
-\newlabel{eqn:closed-form}{{2}{3}{Logistic Growth Dynamics}{equation.2.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Delayed Absorption via FIR Convolution}{3}{subsection.2.2}\protected@file@percent }
-\newlabel{subsec:fir}{{2.2}{3}{Delayed Absorption via FIR Convolution}{subsection.2.2}{}}
-\newlabel{eqn:gaussian-kernel}{{3}{3}{Delayed Absorption via FIR Convolution}{equation.2.3}{}}
-\newlabel{eqn:convolution}{{4}{3}{Delayed Absorption via FIR Convolution}{equation.2.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Cumulative Stress Tracking}{3}{subsection.2.3}\protected@file@percent }
-\newlabel{subsec:stress}{{2.3}{3}{Cumulative Stress Tracking}{subsection.2.3}{}}
-\newlabel{eqn:ema}{{5}{3}{Cumulative Stress Tracking}{equation.2.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Nutrient Factors}{3}{subsection.2.4}\protected@file@percent }
-\newlabel{subsec:nutrient-factors}{{2.4}{3}{Nutrient Factors}{subsection.2.4}{}}
-\newlabel{eqn:nutrient-factor}{{6}{3}{Nutrient Factors}{equation.2.6}{}}
-\newlabel{eqn:fruit-capacity}{{7}{3}{Nutrient Factors}{equation.2.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Stochastic Weather Scenario Generation}{3}{section.3}\protected@file@percent }
-\newlabel{sec:weather}{{3}{3}{Stochastic Weather Scenario Generation}{section.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Generation Process}{4}{subsection.3.1}\protected@file@percent }
-\newlabel{subsec:weather-generation}{{3.1}{4}{Generation Process}{subsection.3.1}{}}
-\newlabel{eqn:history}{{10}{4}{Generation Process}{equation.3.10}{}}
-\newlabel{eqn:weather-scenario}{{11}{4}{Generation Process}{equation.3.11}{}}
-\newlabel{eqn:event}{{12}{4}{Generation Process}{equation.3.12}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Global Scaling and Offset}{4}{subsubsection.3.1.1}\protected@file@percent }
-\newlabel{subsubsec:weather-step-1}{{3.1.1}{4}{Global Scaling and Offset}{subsubsection.3.1.1}{}}
-\newlabel{eqn:global-scaling}{{13}{4}{Global Scaling and Offset}{equation.3.13}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Add White Noise}{4}{subsubsection.3.1.2}\protected@file@percent }
-\newlabel{subsubsec:weather-step-2}{{3.1.2}{4}{Add White Noise}{subsubsection.3.1.2}{}}
-\newlabel{eqn:varepsilon}{{15}{4}{Add White Noise}{equation.3.15}{}}
-\newlabel{eqn:smooth-noise}{{17}{5}{Add White Noise}{equation.3.17}{}}
-\newlabel{eqn:add-noise}{{19}{5}{Add White Noise}{equation.3.19}{}}
-\newlabel{eqn:daymask}{{20}{5}{Add White Noise}{equation.3.20}{}}
-\newlabel{eqn:P2-P1}{{21}{5}{Add White Noise}{equation.3.21}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Drought Injection}{5}{subsubsection.3.1.3}\protected@file@percent }
-\newlabel{subsubsec:drought-injection}{{3.1.3}{5}{Drought Injection}{subsubsection.3.1.3}{}}
-\newlabel{eqn:drought-event}{{22}{5}{Drought Injection}{equation.3.22}{}}
-\newlabel{eqn:affected-indices}{{23}{5}{Drought Injection}{equation.3.23}{}}
-\newlabel{eqn:P3}{{24}{5}{Drought Injection}{equation.3.24}{}}
-\newlabel{eqn:T3R3-T2R2}{{25}{5}{Drought Injection}{equation.3.25}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Heat Wave Injection}{5}{subsubsection.3.1.4}\protected@file@percent }
-\newlabel{subsubsec:heat-wave-injection}{{3.1.4}{5}{Heat Wave Injection}{subsubsection.3.1.4}{}}
-\newlabel{eqn:heatwave-event}{{26}{5}{Heat Wave Injection}{equation.3.26}{}}
-\newlabel{eqn:kappa-ramp}{{27}{5}{Heat Wave Injection}{equation.3.27}{}}
-\newlabel{eqn:kappa-hold}{{28}{5}{Heat Wave Injection}{equation.3.28}{}}
-\newlabel{eqn:w-heat}{{29}{5}{Heat Wave Injection}{equation.3.29}{}}
-\newlabel{eqn:T4a}{{30}{6}{Heat Wave Injection}{equation.3.30}{}}
-\newlabel{eqn:P4P3-R4R3}{{31}{6}{Heat Wave Injection}{equation.3.31}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Cold Snap Injection}{6}{subsubsection.3.1.5}\protected@file@percent }
-\newlabel{subsubsec:cold-snap-injection}{{3.1.5}{6}{Cold Snap Injection}{subsubsection.3.1.5}{}}
-\newlabel{eqn:coldsnap-event}{{32}{6}{Cold Snap Injection}{equation.3.32}{}}
-\newlabel{eqn:T4b}{{33}{6}{Cold Snap Injection}{equation.3.33}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.6}Clipping to Physical Bounds}{6}{subsubsection.3.1.6}\protected@file@percent }
-\newlabel{subsubsec:clipping}{{3.1.6}{6}{Clipping to Physical Bounds}{subsubsection.3.1.6}{}}
-\newlabel{eqn:PTR-syn}{{36}{6}{Clipping to Physical Bounds}{equation.3.36}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Extremity Index}{6}{subsection.3.2}\protected@file@percent }
-\newlabel{subsec:extremity}{{3.2}{6}{Extremity Index}{subsection.3.2}{}}
-\newlabel{eqn:extreme-precip}{{37}{6}{Extremity Index}{equation.3.37}{}}
-\newlabel{eqn:extreme-temp}{{38}{6}{Extremity Index}{equation.3.38}{}}
-\newlabel{eqn:extreme-drought}{{39}{6}{Extremity Index}{equation.3.39}{}}
-\newlabel{eqn:extreme-heatwave}{{41}{6}{Extremity Index}{equation.3.41}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Logistic growth dynamics}{3}{subsection.2.1}\protected@file@percent }
+\newlabel{subsec:logistic}{{2.1}{3}{Logistic growth dynamics}{subsection.2.1}{}}
+\newlabel{eqn:logistic}{{1}{3}{Logistic growth dynamics}{equation.2.1}{}}
+\newlabel{eqn:closed-form}{{2}{3}{Logistic growth dynamics}{equation.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Delayed absorption via FIR convolution}{3}{subsection.2.2}\protected@file@percent }
+\newlabel{subsec:fir}{{2.2}{3}{Delayed absorption via FIR convolution}{subsection.2.2}{}}
+\newlabel{eqn:gaussian-kernel}{{3}{3}{Delayed absorption via FIR convolution}{equation.2.3}{}}
+\newlabel{eqn:convolution}{{4}{3}{Delayed absorption via FIR convolution}{equation.2.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Cumulative stress tracking}{3}{subsection.2.3}\protected@file@percent }
+\newlabel{subsec:stress}{{2.3}{3}{Cumulative stress tracking}{subsection.2.3}{}}
+\newlabel{eqn:ema}{{5}{3}{Cumulative stress tracking}{equation.2.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Nutrient factors}{3}{subsection.2.4}\protected@file@percent }
+\newlabel{subsec:nutrient-factors}{{2.4}{3}{Nutrient factors}{subsection.2.4}{}}
+\newlabel{eqn:nutrient-factor}{{6}{3}{Nutrient factors}{equation.2.6}{}}
+\newlabel{eqn:fruit-capacity}{{7}{3}{Nutrient factors}{equation.2.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Stochastic weather scenario generation}{4}{section.3}\protected@file@percent }
+\newlabel{sec:weather}{{3}{4}{Stochastic weather scenario generation}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Generation process}{4}{subsection.3.1}\protected@file@percent }
+\newlabel{subsec:weather-generation}{{3.1}{4}{Generation process}{subsection.3.1}{}}
+\newlabel{eqn:history}{{10}{4}{Generation process}{equation.3.10}{}}
+\newlabel{eqn:weather-scenario}{{11}{4}{Generation process}{equation.3.11}{}}
+\newlabel{eqn:event}{{12}{4}{Generation process}{equation.3.12}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Global scaling and offset}{4}{subsubsection.3.1.1}\protected@file@percent }
+\newlabel{subsubsec:weather-step-1}{{3.1.1}{4}{Global scaling and offset}{subsubsection.3.1.1}{}}
+\newlabel{eqn:global-scaling}{{13}{4}{Global scaling and offset}{equation.3.13}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Add white noise}{4}{subsubsection.3.1.2}\protected@file@percent }
+\newlabel{subsubsec:weather-step-2}{{3.1.2}{4}{Add white noise}{subsubsection.3.1.2}{}}
+\newlabel{eqn:varepsilon}{{15}{4}{Add white noise}{equation.3.15}{}}
+\newlabel{eqn:smooth-noise}{{17}{5}{Add white noise}{equation.3.17}{}}
+\newlabel{eqn:add-noise}{{19}{5}{Add white noise}{equation.3.19}{}}
+\newlabel{eqn:daymask}{{20}{5}{Add white noise}{equation.3.20}{}}
+\newlabel{eqn:P2-P1}{{21}{5}{Add white noise}{equation.3.21}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Drought injection}{5}{subsubsection.3.1.3}\protected@file@percent }
+\newlabel{subsubsec:drought-injection}{{3.1.3}{5}{Drought injection}{subsubsection.3.1.3}{}}
+\newlabel{eqn:drought-event}{{22}{5}{Drought injection}{equation.3.22}{}}
+\newlabel{eqn:affected-indices}{{23}{5}{Drought injection}{equation.3.23}{}}
+\newlabel{eqn:P3}{{24}{5}{Drought injection}{equation.3.24}{}}
+\newlabel{eqn:T3R3-T2R2}{{25}{5}{Drought injection}{equation.3.25}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Heat wave injection}{5}{subsubsection.3.1.4}\protected@file@percent }
+\newlabel{subsubsec:heat-wave-injection}{{3.1.4}{5}{Heat wave injection}{subsubsection.3.1.4}{}}
+\newlabel{eqn:heatwave-event}{{26}{5}{Heat wave injection}{equation.3.26}{}}
+\newlabel{eqn:kappa-ramp}{{27}{5}{Heat wave injection}{equation.3.27}{}}
+\newlabel{eqn:kappa-hold}{{28}{5}{Heat wave injection}{equation.3.28}{}}
+\newlabel{eqn:w-heat}{{29}{6}{Heat wave injection}{equation.3.29}{}}
+\newlabel{eqn:T4a}{{30}{6}{Heat wave injection}{equation.3.30}{}}
+\newlabel{eqn:P4P3-R4R3}{{31}{6}{Heat wave injection}{equation.3.31}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Cold snap injection}{6}{subsubsection.3.1.5}\protected@file@percent }
+\newlabel{subsubsec:cold-snap-injection}{{3.1.5}{6}{Cold snap injection}{subsubsection.3.1.5}{}}
+\newlabel{eqn:coldsnap-event}{{32}{6}{Cold snap injection}{equation.3.32}{}}
+\newlabel{eqn:T4b}{{33}{6}{Cold snap injection}{equation.3.33}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.6}Clipping to physical bounds}{6}{subsubsection.3.1.6}\protected@file@percent }
+\newlabel{subsubsec:clipping}{{3.1.6}{6}{Clipping to physical bounds}{subsubsection.3.1.6}{}}
+\newlabel{eqn:PTR-syn}{{36}{6}{Clipping to physical bounds}{equation.3.36}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Extremity index}{6}{subsection.3.2}\protected@file@percent }
+\newlabel{subsec:extremity}{{3.2}{6}{Extremity index}{subsection.3.2}{}}
+\newlabel{eqn:extreme-precip}{{37}{6}{Extremity index}{equation.3.37}{}}
+\newlabel{eqn:extreme-temp}{{38}{6}{Extremity index}{equation.3.38}{}}
+\newlabel{eqn:extreme-drought}{{39}{6}{Extremity index}{equation.3.39}{}}
+\newlabel{eqn:extreme-heatwave}{{41}{7}{Extremity index}{equation.3.41}{}}
+\newlabel{eqn:extremity}{{42}{7}{Extremity index}{equation.3.42}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Model predictive control}{7}{section.4}\protected@file@percent }
+\newlabel{sec:mpc}{{4}{7}{Model predictive control}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Constrained finite-time optimal control}{7}{subsection.4.1}\protected@file@percent }
+\newlabel{subsec:cftoc}{{4.1}{7}{Constrained finite-time optimal control}{subsection.4.1}{}}
+\newlabel{eqn:U0K}{{43}{7}{Constrained finite-time optimal control}{equation.4.43}{}}
+\newlabel{eqn:gen-opt-ctrl-cost}{{44}{7}{Constrained finite-time optimal control}{equation.4.44}{}}
+\newlabel{eqn:dyn-constraint}{{45}{7}{Constrained finite-time optimal control}{equation.4.45}{}}
+\newlabel{eqn:ineq-constraints}{{46}{7}{Constrained finite-time optimal control}{equation.4.46}{}}
+\newlabel{eqn:minimization-cftoc}{{47}{7}{Constrained finite-time optimal control}{equation.4.47}{}}
+\newlabel{eqn:stage-cost}{{48}{7}{Constrained finite-time optimal control}{equation.4.48}{}}
 \citation{bynum2021pyomo}
 \citation{wachter2006ipopt}
-\newlabel{eqn:extremity}{{42}{7}{Extremity Index}{equation.3.42}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Model Predictive Control}{7}{section.4}\protected@file@percent }
-\newlabel{sec:mpc}{{4}{7}{Model Predictive Control}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Constrained Finite-Time Optimal Control}{7}{subsection.4.1}\protected@file@percent }
-\newlabel{subsec:cftoc}{{4.1}{7}{Constrained Finite-Time Optimal Control}{subsection.4.1}{}}
-\newlabel{eqn:U0K}{{43}{7}{Constrained Finite-Time Optimal Control}{equation.4.43}{}}
-\newlabel{eqn:gen-opt-ctrl-cost}{{44}{7}{Constrained Finite-Time Optimal Control}{equation.4.44}{}}
-\newlabel{eqn:dyn-constraint}{{45}{7}{Constrained Finite-Time Optimal Control}{equation.4.45}{}}
-\newlabel{eqn:ineq-constraints}{{46}{7}{Constrained Finite-Time Optimal Control}{equation.4.46}{}}
-\newlabel{eqn:minimization-cftoc}{{47}{7}{Constrained Finite-Time Optimal Control}{equation.4.47}{}}
-\newlabel{eqn:stage-cost}{{48}{7}{Constrained Finite-Time Optimal Control}{equation.4.48}{}}
-\newlabel{eqn:terminal-cost}{{49}{7}{Constrained Finite-Time Optimal Control}{equation.4.49}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Solution Method}{8}{subsection.4.2}\protected@file@percent }
-\newlabel{subsec:solution}{{4.2}{8}{Solution Method}{subsection.4.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Receding-Horizon Algorithm}{8}{subsection.4.3}\protected@file@percent }
-\newlabel{subsec:mpc-algorithm}{{4.3}{8}{Receding-Horizon Algorithm}{subsection.4.3}{}}
+\newlabel{eqn:terminal-cost}{{49}{8}{Constrained finite-time optimal control}{equation.4.49}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Solution method}{8}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:solution}{{4.2}{8}{Solution method}{subsection.4.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Receding-horizon algorithm}{8}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:mpc-algorithm}{{4.3}{8}{Receding-horizon algorithm}{subsection.4.3}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Model Predictive Control for Irrigation and Fertilization}}{8}{algorithm.1}\protected@file@percent }
-\newlabel{alg:mpc}{{1}{8}{Receding-Horizon Algorithm}{algorithm.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Feedback Properties}{8}{subsection.4.4}\protected@file@percent }
-\newlabel{subsec:feedback}{{4.4}{8}{Feedback Properties}{subsection.4.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Bayesian Optimization for MPC Parameter Tuning}{8}{section.5}\protected@file@percent }
-\newlabel{sec:bo}{{5}{8}{Bayesian Optimization for MPC Parameter Tuning}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Bayesian Optimization Overview}{9}{subsection.5.1}\protected@file@percent }
-\newlabel{subsec:bo-overview}{{5.1}{9}{Bayesian Optimization Overview}{subsection.5.1}{}}
-\newlabel{eqn:another-gp}{{50}{9}{Bayesian Optimization Overview}{equation.5.50}{}}
-\newlabel{eqn:another-posterior}{{51}{9}{Bayesian Optimization Overview}{equation.5.51}{}}
-\newlabel{eqn:next-x}{{52}{9}{Bayesian Optimization Overview}{equation.5.52}{}}
-\newlabel{eqn:y-plus}{{53}{9}{Bayesian Optimization Overview}{equation.5.53}{}}
-\newlabel{eqn:EI-TPE}{{54}{9}{Bayesian Optimization Overview}{equation.5.54}{}}
-\newlabel{eqn:EI-TPE-bayes}{{55}{9}{Bayesian Optimization Overview}{equation.5.55}{}}
-\newlabel{eqn:EI-factor-out-x}{{56}{9}{Bayesian Optimization Overview}{equation.5.56}{}}
-\newlabel{eqn:EI-propto}{{57}{9}{Bayesian Optimization Overview}{equation.5.57}{}}
-\newlabel{eqn:total-prob}{{58}{9}{Bayesian Optimization Overview}{equation.5.58}{}}
-\newlabel{eqn:EI-propto-total-prob}{{59}{9}{Bayesian Optimization Overview}{equation.5.59}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Kernel Density Estimation}{10}{subsection.5.2}\protected@file@percent }
-\newlabel{sec:kde}{{5.2}{10}{Kernel Density Estimation}{subsection.5.2}{}}
-\newlabel{eqn:p-hat}{{60}{10}{Kernel Density Estimation}{equation.5.60}{}}
-\newlabel{eqn:1-dim-p-hat}{{61}{10}{Kernel Density Estimation}{equation.5.61}{}}
-\newlabel{eqn:lg-kde}{{62}{10}{Kernel Density Estimation}{equation.5.62}{}}
-\newlabel{eqn:tree-structure}{{63}{10}{Kernel Density Estimation}{equation.5.63}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Search Space}{10}{subsection.5.3}\protected@file@percent }
-\newlabel{subsec:search-space}{{5.3}{10}{Search Space}{subsection.5.3}{}}
+\newlabel{alg:mpc}{{1}{8}{Receding-horizon algorithm}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Feedback properties}{8}{subsection.4.4}\protected@file@percent }
+\newlabel{subsec:feedback}{{4.4}{8}{Feedback properties}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Bayesian optimization for MPC parameter tuning}{9}{section.5}\protected@file@percent }
+\newlabel{sec:bo}{{5}{9}{Bayesian optimization for MPC parameter tuning}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Bayesian optimization overview}{9}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:bo-overview}{{5.1}{9}{Bayesian optimization overview}{subsection.5.1}{}}
+\newlabel{eqn:another-gp}{{50}{9}{Bayesian optimization overview}{equation.5.50}{}}
+\newlabel{eqn:another-posterior}{{51}{9}{Bayesian optimization overview}{equation.5.51}{}}
+\newlabel{eqn:next-x}{{52}{9}{Bayesian optimization overview}{equation.5.52}{}}
+\newlabel{eqn:y-plus}{{53}{9}{Bayesian optimization overview}{equation.5.53}{}}
+\newlabel{eqn:EI-TPE}{{54}{9}{Bayesian optimization overview}{equation.5.54}{}}
+\newlabel{eqn:EI-TPE-bayes}{{55}{9}{Bayesian optimization overview}{equation.5.55}{}}
+\newlabel{eqn:EI-factor-out-x}{{56}{9}{Bayesian optimization overview}{equation.5.56}{}}
+\newlabel{eqn:EI-propto}{{57}{9}{Bayesian optimization overview}{equation.5.57}{}}
+\newlabel{eqn:total-prob}{{58}{10}{Bayesian optimization overview}{equation.5.58}{}}
+\newlabel{eqn:EI-propto-total-prob}{{59}{10}{Bayesian optimization overview}{equation.5.59}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Kernel density estimation}{10}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:kde}{{5.2}{10}{Kernel density estimation}{subsection.5.2}{}}
+\newlabel{eqn:p-hat}{{60}{10}{Kernel density estimation}{equation.5.60}{}}
+\newlabel{eqn:1-dim-p-hat}{{61}{10}{Kernel density estimation}{equation.5.61}{}}
+\newlabel{eqn:lg-kde}{{62}{10}{Kernel density estimation}{equation.5.62}{}}
+\newlabel{eqn:tree-structure}{{63}{10}{Kernel density estimation}{equation.5.63}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Search space}{10}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:search-space}{{5.3}{10}{Search space}{subsection.5.3}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Bayesian optimization search space for MPC parameters.}}{10}{table.1}\protected@file@percent }
 \newlabel{tab:search-space}{{1}{10}{Bayesian optimization search space for MPC parameters}{table.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Robust Optimization Objective}{10}{subsection.5.4}\protected@file@percent }
-\newlabel{subsec:robust-objective}{{5.4}{10}{Robust Optimization Objective}{subsection.5.4}{}}
-\newlabel{eqn:robust-objective}{{64}{10}{Robust Optimization Objective}{equation.5.64}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Algorithm}{10}{subsection.5.5}\protected@file@percent }
-\newlabel{subsec:bo-algorithm}{{5.5}{10}{Algorithm}{subsection.5.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Robust optimization objective}{11}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:robust-objective}{{5.4}{11}{Robust optimization objective}{subsection.5.4}{}}
+\newlabel{eqn:robust-objective}{{64}{11}{Robust optimization objective}{equation.5.64}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}TPE algorithm}{11}{subsection.5.5}\protected@file@percent }
+\newlabel{subsec:bo-algorithm}{{5.5}{11}{TPE algorithm}{subsection.5.5}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Bayesian Optimization for MPC Parameter Tuning}}{11}{algorithm.2}\protected@file@percent }
+\newlabel{alg:bo}{{2}{11}{TPE algorithm}{algorithm.2}{}}
 \citation{fsa-acreage}
 \citation{corn-nutrient-management}
 \citation{kranz2008irrigation,davies2020nitrogen}
 \citation{becker2025ga}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Bayesian Optimization for MPC Parameter Tuning}}{11}{algorithm.2}\protected@file@percent }
-\newlabel{alg:bo}{{2}{11}{Algorithm}{algorithm.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Case Study: Corn in Iowa}{11}{section.6}\protected@file@percent }
-\newlabel{sec:case-study}{{6}{11}{Case Study: Corn in Iowa}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Scenario Configuration}{11}{subsection.6.1}\protected@file@percent }
-\newlabel{subsec:scenario}{{6.1}{11}{Scenario Configuration}{subsection.6.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Three Strategies for Comparison}{11}{subsection.6.2}\protected@file@percent }
-\newlabel{subsec:strategies}{{6.2}{11}{Three Strategies for Comparison}{subsection.6.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Case study: corn in iowa}{12}{section.6}\protected@file@percent }
+\newlabel{sec:case-study}{{6}{12}{Case study: corn in iowa}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Scenario configuration}{12}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:scenario}{{6.1}{12}{Scenario configuration}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Three strategies for comparison}{12}{subsection.6.2}\protected@file@percent }
+\newlabel{subsec:strategies}{{6.2}{12}{Three strategies for comparison}{subsection.6.2}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Control parameters for the three strategies compared in this study.}}{12}{table.2}\protected@file@percent }
 \newlabel{tab:strategy-params}{{2}{12}{Control parameters for the three strategies compared in this study}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}MPC Configuration}{12}{subsection.6.3}\protected@file@percent }
-\newlabel{subsec:mpc-config}{{6.3}{12}{MPC Configuration}{subsection.6.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Weather Scenario Suite}{12}{subsection.6.4}\protected@file@percent }
-\newlabel{subsec:weather-scenarios}{{6.4}{12}{Weather Scenario Suite}{subsection.6.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Weather scenario categories with extremity index ranges.}}{12}{table.3}\protected@file@percent }
-\newlabel{tab:scenario-categories}{{3}{12}{Weather scenario categories with extremity index ranges}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Results}{12}{subsection.6.5}\protected@file@percent }
-\newlabel{subsec:results}{{6.5}{12}{Results}{subsection.6.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Summary statistics for the three strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean).}}{12}{table.4}\protected@file@percent }
-\newlabel{tab:main-results}{{4}{12}{Summary statistics for the three strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean)}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}MPC configuration}{12}{subsection.6.3}\protected@file@percent }
+\newlabel{subsec:mpc-config}{{6.3}{12}{MPC configuration}{subsection.6.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Weather scenario suite}{12}{subsection.6.4}\protected@file@percent }
+\newlabel{subsec:weather-scenarios}{{6.4}{12}{Weather scenario suite}{subsection.6.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Weather scenario categories with extremity index ranges.}}{13}{table.3}\protected@file@percent }
+\newlabel{tab:scenario-categories}{{3}{13}{Weather scenario categories with extremity index ranges}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Results}{13}{subsection.6.5}\protected@file@percent }
+\newlabel{subsec:results}{{6.5}{13}{Results}{subsection.6.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Summary statistics for the three strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean).}}{13}{table.4}\protected@file@percent }
+\newlabel{tab:main-results}{{4}{13}{Summary statistics for the three strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean)}{table.4}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Revenue (\$/acre) for representative scenarios. MPC outperforms GA in normal/wet conditions; GA outperforms MPC in drought conditions.}}{13}{table.5}\protected@file@percent }
 \newlabel{tab:scenario-results}{{5}{13}{Revenue (\$/acre) for representative scenarios. MPC outperforms GA in normal/wet conditions; GA outperforms MPC in drought conditions}{table.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right).}}{13}{figure.1}\protected@file@percent }
-\newlabel{fig:revenue-comparison}{{1}{13}{Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right)}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Performance by Weather Type}{13}{subsection.6.6}\protected@file@percent }
-\newlabel{subsec:weather-type-analysis}{{6.6}{13}{Performance by Weather Type}{subsection.6.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Mean revenue (\$/acre) by weather category. MPC excels in normal and wet conditions; GA excels in drought conditions.}}{13}{table.6}\protected@file@percent }
-\newlabel{tab:category-results}{{6}{13}{Mean revenue (\$/acre) by weather category. MPC excels in normal and wet conditions; GA excels in drought conditions}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Performance by weather type}{13}{subsection.6.6}\protected@file@percent }
+\newlabel{subsec:weather-type-analysis}{{6.6}{13}{Performance by weather type}{subsection.6.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right).}}{14}{figure.1}\protected@file@percent }
+\newlabel{fig:revenue-comparison}{{1}{14}{Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right)}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Mean revenue (\$/acre) by weather category. MPC excels in normal and wet conditions; GA excels in drought conditions.}}{14}{table.6}\protected@file@percent }
+\newlabel{tab:category-results}{{6}{14}{Mean revenue (\$/acre) by weather category. MPC excels in normal and wet conditions; GA excels in drought conditions}{table.6}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Mean revenue by weather category. MPC (green) outperforms Fixed GA (orange) in normal and moderate conditions, while Fixed GA dominates in drought and extreme scenarios. Both optimization methods substantially outperform Farmer Baseline (blue) across all categories.}}{14}{figure.2}\protected@file@percent }
 \newlabel{fig:by-category}{{2}{14}{Mean revenue by weather category. MPC (green) outperforms Fixed GA (orange) in normal and moderate conditions, while Fixed GA dominates in drought and extreme scenarios. Both optimization methods substantially outperform Farmer Baseline (blue) across all categories}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Variance and Risk Analysis}{14}{subsection.6.7}\protected@file@percent }
-\newlabel{subsec:risk}{{6.7}{14}{Variance and Risk Analysis}{subsection.6.7}{}}
-\newlabel{eqn:cv}{{65}{14}{Variance and Risk Analysis}{equation.6.65}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance.}}{14}{figure.3}\protected@file@percent }
-\newlabel{fig:boxplot}{{3}{14}{Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%).}}{15}{figure.4}\protected@file@percent }
-\newlabel{fig:cv-comparison}{{4}{15}{Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%)}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.8}Resource Usage Patterns}{15}{subsection.6.8}\protected@file@percent }
-\newlabel{subsec:resource-patterns}{{6.8}{15}{Resource Usage Patterns}{subsection.6.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Variance and risk analysis}{14}{subsection.6.7}\protected@file@percent }
+\newlabel{subsec:risk}{{6.7}{14}{Variance and risk analysis}{subsection.6.7}{}}
+\newlabel{eqn:cv}{{65}{14}{Variance and risk analysis}{equation.6.65}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance.}}{15}{figure.3}\protected@file@percent }
+\newlabel{fig:boxplot}{{3}{15}{Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.8}Resource usage patterns}{15}{subsection.6.8}\protected@file@percent }
+\newlabel{subsec:resource-patterns}{{6.8}{15}{Resource usage patterns}{subsection.6.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{15}{section.7}\protected@file@percent }
 \newlabel{sec:discussion}{{7}{15}{Discussion}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Interpretation of Results}{15}{subsection.7.1}\protected@file@percent }
-\newlabel{subsec:interpretation}{{7.1}{15}{Interpretation of Results}{subsection.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Computational Considerations}{16}{subsection.7.2}\protected@file@percent }
-\newlabel{subsec:computational}{{7.2}{16}{Computational Considerations}{subsection.7.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Limitations and Extensions}{16}{subsection.7.3}\protected@file@percent }
-\newlabel{subsec:limitations}{{7.3}{16}{Limitations and Extensions}{subsection.7.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{16}{section.8}\protected@file@percent }
-\newlabel{sec:conclusion}{{8}{16}{Conclusion}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Interpretation of results}{15}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:interpretation}{{7.1}{15}{Interpretation of results}{subsection.7.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%).}}{16}{figure.4}\protected@file@percent }
+\newlabel{fig:cv-comparison}{{4}{16}{Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%)}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Computational considerations}{16}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:computational}{{7.2}{16}{Computational considerations}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Limitations and extensions}{16}{subsection.7.3}\protected@file@percent }
+\newlabel{subsec:limitations}{{7.3}{16}{Limitations and extensions}{subsection.7.3}{}}
 \bibdata{bibliography}
 \bibcite{ipcc2021}{{1}{2021}{{{IPCC}}}{{}}}
-\bibcite{becker2025ga}{{2}{2025}{{Becker and Zohdi}}{{}}}
-\bibcite{rawlings2017mpc}{{3}{2017}{{Rawlings et~al.}}{{}}}
-\bibcite{shahriari2016taking}{{4}{2016}{{Shahriari et~al.}}{{}}}
-\bibcite{bergstra2011algorithms}{{5}{2011}{{Bergstra et~al.}}{{}}}
-\bibcite{bynum2021pyomo}{{6}{2021}{{Bynum et~al.}}{{}}}
-\bibcite{wachter2006ipopt}{{7}{2006}{{W{\"a}chter and Biegler}}{{}}}
-\bibcite{fsa-acreage}{{8}{2024}{{{USDA Farm Service Agency}}}{{}}}
-\bibcite{corn-nutrient-management}{{9}{2017}{{Sawyer and Mallarino}}{{}}}
-\bibcite{corn-growth-stages}{{10}{2011}{{Abendroth et~al.}}{{}}}
-\bibcite{corn-physiology}{{11}{1993}{{Ritchie et~al.}}{{}}}
-\bibcite{kranz2008irrigation}{{12}{2008}{{Kranz et~al.}}{{}}}
-\bibcite{davies2020nitrogen}{{13}{2020}{{Davies et~al.}}{{}}}
+\bibcite{zohdi2024digitaltwin}{{2}{2024}{{Zohdi}}{{}}}
+\bibcite{mengi2023agrivoltaics}{{3}{2023}{{Mengi et~al.}}{{}}}
+\bibcite{betancourt2024spray}{{4}{2024}{{Betancourt et~al.}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{17}{section.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{17}{Conclusion}{section.8}{}}
 \@writefile{toc}{\contentsline {subparagraph}{Acknowledgements}{17}{section*.2}\protected@file@percent }
+\bibcite{tagkopoulos2024aifs}{{5}{2022}{{Tagkopoulos et~al.}}{{}}}
+\bibcite{becker2025ga}{{6}{2025}{{Becker and Zohdi}}{{}}}
+\bibcite{rawlings2017mpc}{{7}{2017}{{Rawlings et~al.}}{{}}}
+\bibcite{shahriari2016taking}{{8}{2016}{{Shahriari et~al.}}{{}}}
+\bibcite{bergstra2011algorithms}{{9}{2011}{{Bergstra et~al.}}{{}}}
+\bibcite{bynum2021pyomo}{{10}{2021}{{Bynum et~al.}}{{}}}
+\bibcite{wachter2006ipopt}{{11}{2006}{{W{\"a}chter and Biegler}}{{}}}
+\bibcite{fsa-acreage}{{12}{2024}{{{USDA Farm Service Agency}}}{{}}}
+\bibcite{corn-nutrient-management}{{13}{2017}{{Sawyer and Mallarino}}{{}}}
+\bibcite{kranz2008irrigation}{{14}{2008}{{Kranz et~al.}}{{}}}
+\bibcite{davies2020nitrogen}{{15}{2020}{{Davies et~al.}}{{}}}
 \gdef \@abspage@last{18}
