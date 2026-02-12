@@ -1,285 +1,101 @@
-%% BioMed_Central_Bib_Style_v1.01
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
 
-\begin{thebibliography}{15}
-% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
-\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
-\ifx \binits  \undefined \def \binits#1{#1}\fi
-\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
-\ifx \batitle  \undefined \def \batitle#1{#1}\fi
-\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
-\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
-\ifx \byear  \undefined \def \byear#1{#1}\fi
-\ifx \bissue  \undefined \def \bissue#1{#1}\fi
-\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
-\ifx \blpage  \undefined \def \blpage #1{#1}\fi
-\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
-\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
-\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
-\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
-\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
-\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
-\ifx \beditor  \undefined \def \beditor#1{#1}\fi
-\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
-\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
-\ifx \bedition  \undefined \def \bedition#1{#1}\fi
-\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
-\ifx \blocation  \undefined \def \blocation#1{#1}\fi
-\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
-\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
-\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
-\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
-\ifx \barticle \undefined \def \barticle#1{#1}\fi
-\bibcommenthead
-\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
-\ifx \botherref \undefined \def \botherref #1{#1}\fi
-\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
-\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
-\ifx \bbook \undefined \def \bbook#1{#1}\fi
-\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
-\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
-\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
-\ifx \endbibitem  \undefined \def \endbibitem {}\fi
-\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
-\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
-\csname PreBibitemsHook\endcsname
+\bibitem{ipcc2021}
+{IPCC}, Climate change 2021: The physical science basis. contribution of
+  working group i to the sixth assessment report of the intergovernmental panel
+  on climate change, Tech. rep., Cambridge University Press (2021).
+\newblock \href {https://doi.org/10.1017/9781009157896}
+  {\path{doi:10.1017/9781009157896}}.
 
-%%% 1
-\bibitem[\protect\citeauthoryear{{IPCC}}{2021}]{ipcc2021}
-\begin{botherref}
-\oauthor{\bsnm{{IPCC}}}:
-Climate change 2021: The physical science basis. contribution of working group
-  i to the sixth assessment report of the intergovernmental panel on climate
-  change.
-Technical report,
-Cambridge University Press
-(2021).
-\doiurl{10.1017/9781009157896}
-\end{botherref}
-\endbibitem
+\bibitem{zohdi2024digitaltwin}
+T.~I. Zohdi, A machine-learning enabled digital-twin framework for next
+  generation precision agriculture and forestry, Computer Methods in Applied
+  Mechanics and Engineering 428 (2024) 117250.
+\newblock \href {https://doi.org/10.1016/j.cma.2024.117250}
+  {\path{doi:10.1016/j.cma.2024.117250}}.
 
-%%% 2
-\bibitem[\protect\citeauthoryear{Zohdi}{2024}]{zohdi2024digitaltwin}
-\begin{barticle}
-\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
-\batitle{A machine-learning enabled digital-twin framework for next generation
-  precision agriculture and forestry}.
-\bjtitle{Computer Methods in Applied Mechanics and Engineering}
-\bvolume{428},
-\bfpage{117250}
-(\byear{2024})
-\doiurl{10.1016/j.cma.2024.117250}
-\end{barticle}
-\endbibitem
+\bibitem{mengi2023agrivoltaics}
+E.~Mengi, O.~A. Samara, T.~I. Zohdi, Crop-driven optimization of agrivoltaics
+  using a digital-replica framework, Smart Agricultural Technology 4 (2023)
+  100150.
+\newblock \href {https://doi.org/10.1016/j.atech.2022.100150}
+  {\path{doi:10.1016/j.atech.2022.100150}}.
 
-%%% 3
-\bibitem[\protect\citeauthoryear{Mengi et~al.}{2023}]{mengi2023agrivoltaics}
-\begin{barticle}
-\bauthor{\bsnm{Mengi}, \binits{E.}},
-\bauthor{\bsnm{Samara}, \binits{O.A.}},
-\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
-\batitle{Crop-driven optimization of agrivoltaics using a digital-replica
-  framework}.
-\bjtitle{Smart Agricultural Technology}
-\bvolume{4},
-\bfpage{100150}
-(\byear{2023})
-\doiurl{10.1016/j.atech.2022.100150}
-\end{barticle}
-\endbibitem
+\bibitem{betancourt2024spray}
+J.~O. Betancourt, I.~Li, E.~Mengi, L.~Corrales, T.~I. Zohdi, A computational
+  framework for precise aerial agricultural spray delivery processes, Archives
+  of Computational Methods in Engineering (2024).
+\newblock \href {https://doi.org/10.1007/s11831-024-10106-6}
+  {\path{doi:10.1007/s11831-024-10106-6}}.
 
-%%% 4
-\bibitem[\protect\citeauthoryear{Betancourt et~al.}{2024}]{betancourt2024spray}
-\begin{barticle}
-\bauthor{\bsnm{Betancourt}, \binits{J.O.}},
-\bauthor{\bsnm{Li}, \binits{I.}},
-\bauthor{\bsnm{Mengi}, \binits{E.}},
-\bauthor{\bsnm{Corrales}, \binits{L.}},
-\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
-\batitle{A computational framework for precise aerial agricultural spray
-  delivery processes}.
-\bjtitle{Archives of Computational Methods in Engineering}
-(\byear{2024})
-\doiurl{10.1007/s11831-024-10106-6}
-\end{barticle}
-\endbibitem
+\bibitem{tagkopoulos2024aifs}
+I.~Tagkopoulos, S.~F. Brown, X.~Liu, Q.~Zhao, T.~I. Zohdi, J.~M. Earles,
+  N.~Nitin, D.~E. Runcie, D.~G. Lemay, A.~D. Smith, P.~C. Ronald, H.~Feng,
+  G.~D. Youtsey, Special report: {AI} institute for next generation food
+  systems ({AIFS}), Computers and Electronics in Agriculture 196 (2022) 106819.
+\newblock \href {https://doi.org/10.1016/j.compag.2022.106819}
+  {\path{doi:10.1016/j.compag.2022.106819}}.
 
-%%% 5
-\bibitem[\protect\citeauthoryear{Tagkopoulos
-  et~al.}{2022}]{tagkopoulos2024aifs}
-\begin{barticle}
-\bauthor{\bsnm{Tagkopoulos}, \binits{I.}},
-\bauthor{\bsnm{Brown}, \binits{S.F.}},
-\bauthor{\bsnm{Liu}, \binits{X.}},
-\bauthor{\bsnm{Zhao}, \binits{Q.}},
-\bauthor{\bsnm{Zohdi}, \binits{T.I.}},
-\bauthor{\bsnm{Earles}, \binits{J.M.}},
-\bauthor{\bsnm{Nitin}, \binits{N.}},
-\bauthor{\bsnm{Runcie}, \binits{D.E.}},
-\bauthor{\bsnm{Lemay}, \binits{D.G.}},
-\bauthor{\bsnm{Smith}, \binits{A.D.}},
-\bauthor{\bsnm{Ronald}, \binits{P.C.}},
-\bauthor{\bsnm{Feng}, \binits{H.}},
-\bauthor{\bsnm{Youtsey}, \binits{G.D.}}:
-\batitle{Special report: {AI} institute for next generation food systems
-  ({AIFS})}.
-\bjtitle{Computers and Electronics in Agriculture}
-\bvolume{196},
-\bfpage{106819}
-(\byear{2022})
-\doiurl{10.1016/j.compag.2022.106819}
-\end{barticle}
-\endbibitem
+\bibitem{becker2025ga}
+C.~J. Becker, T.~I. Zohdi, Optimizing irrigation and fertilizer strategy using
+  a crop growth model with delayed nutrient absorption dynamics, Computers and
+  Electronics in AgricultureUnder review (2025).
 
-%%% 6
-\bibitem[\protect\citeauthoryear{Becker and Zohdi}{2025}]{becker2025ga}
-\begin{botherref}
-\oauthor{\bsnm{Becker}, \binits{C.J.}},
-\oauthor{\bsnm{Zohdi}, \binits{T.I.}}:
-Optimizing irrigation and fertilizer strategy using a crop growth model with
-  delayed nutrient absorption dynamics.
-Computers and Electronics in Agriculture
-(2025).
-Under review
-\end{botherref}
-\endbibitem
+\bibitem{rawlings2017mpc}
+J.~B. Rawlings, D.~Q. Mayne, M.~Diehl, Model Predictive Control: Theory,
+  Computation, and Design, 2nd Edition, Nob Hill Publishing, 2017.
 
-%%% 7
-\bibitem[\protect\citeauthoryear{Rawlings et~al.}{2017}]{rawlings2017mpc}
-\begin{bbook}
-\bauthor{\bsnm{Rawlings}, \binits{J.B.}},
-\bauthor{\bsnm{Mayne}, \binits{D.Q.}},
-\bauthor{\bsnm{Diehl}, \binits{M.}}:
-\bbtitle{Model Predictive Control: Theory, Computation, and Design},
-\bedition{2nd} edn.
-\bpublisher{Nob Hill Publishing}, \blocation{???}
-(\byear{2017})
-\end{bbook}
-\endbibitem
+\bibitem{shahriari2016taking}
+B.~Shahriari, K.~Swersky, Z.~Wang, R.~P. Adams, N.~de~Freitas, Taking the human
+  out of the loop: A review of {Bayesian} optimization, Proceedings of the IEEE
+  104~(1) (2016) 148--175.
+\newblock \href {https://doi.org/10.1109/JPROC.2015.2494218}
+  {\path{doi:10.1109/JPROC.2015.2494218}}.
 
-%%% 8
-\bibitem[\protect\citeauthoryear{Shahriari et~al.}{2016}]{shahriari2016taking}
-\begin{barticle}
-\bauthor{\bsnm{Shahriari}, \binits{B.}},
-\bauthor{\bsnm{Swersky}, \binits{K.}},
-\bauthor{\bsnm{Wang}, \binits{Z.}},
-\bauthor{\bsnm{Adams}, \binits{R.P.}},
-\bauthor{\bsnm{Freitas}, \binits{N.}}:
-\batitle{Taking the human out of the loop: A review of {Bayesian}
-  optimization}.
-\bjtitle{Proceedings of the IEEE}
-\bvolume{104}(\bissue{1}),
-\bfpage{148}--\blpage{175}
-(\byear{2016})
-\doiurl{10.1109/JPROC.2015.2494218}
-\end{barticle}
-\endbibitem
+\bibitem{bergstra2011algorithms}
+J.~Bergstra, R.~Bardenet, Y.~Bengio, B.~K{\'e}gl, Algorithms for
+  hyper-parameter optimization, in: Advances in Neural Information Processing
+  Systems, Vol.~24, 2011, pp. 2546--2554.
+\newblock \href {https://doi.org/10.5555/2986459.2986743}
+  {\path{doi:10.5555/2986459.2986743}}.
 
-%%% 9
-\bibitem[\protect\citeauthoryear{Bergstra
-  et~al.}{2011}]{bergstra2011algorithms}
-\begin{bchapter}
-\bauthor{\bsnm{Bergstra}, \binits{J.}},
-\bauthor{\bsnm{Bardenet}, \binits{R.}},
-\bauthor{\bsnm{Bengio}, \binits{Y.}},
-\bauthor{\bsnm{K{\'e}gl}, \binits{B.}}:
-\bctitle{Algorithms for hyper-parameter optimization}.
-In: \bbtitle{Advances in Neural Information Processing Systems},
-vol. \bseriesno{24},
-pp. \bfpage{2546}--\blpage{2554}
-(\byear{2011}).
-\doiurl{10.5555/2986459.2986743}
-\end{bchapter}
-\endbibitem
+\bibitem{bynum2021pyomo}
+M.~L. Bynum, G.~A. Hackebeil, W.~E. Hart, C.~D. Laird, B.~L. Nicholson, J.~D.
+  Siirola, J.-P. Watson, D.~L. Woodruff, Pyomo---Optimization Modeling in
+  {Python}, 3rd Edition, Springer, 2021.
+\newblock \href {https://doi.org/10.1007/978-3-030-68928-5}
+  {\path{doi:10.1007/978-3-030-68928-5}}.
 
-%%% 10
-\bibitem[\protect\citeauthoryear{Bynum et~al.}{2021}]{bynum2021pyomo}
-\begin{bbook}
-\bauthor{\bsnm{Bynum}, \binits{M.L.}},
-\bauthor{\bsnm{Hackebeil}, \binits{G.A.}},
-\bauthor{\bsnm{Hart}, \binits{W.E.}},
-\bauthor{\bsnm{Laird}, \binits{C.D.}},
-\bauthor{\bsnm{Nicholson}, \binits{B.L.}},
-\bauthor{\bsnm{Siirola}, \binits{J.D.}},
-\bauthor{\bsnm{Watson}, \binits{J.-P.}},
-\bauthor{\bsnm{Woodruff}, \binits{D.L.}}:
-\bbtitle{Pyomo---Optimization Modeling in {Python}},
-\bedition{3rd} edn.
-\bpublisher{Springer}, \blocation{???}
-(\byear{2021}).
-\doiurl{10.1007/978-3-030-68928-5}
-\end{bbook}
-\endbibitem
+\bibitem{wachter2006ipopt}
+A.~W{\"a}chter, L.~T. Biegler, On the implementation of an interior-point
+  filter line-search algorithm for large-scale nonlinear programming,
+  Mathematical Programming 106~(1) (2006) 25--57.
+\newblock \href {https://doi.org/10.1007/s10107-004-0559-y}
+  {\path{doi:10.1007/s10107-004-0559-y}}.
 
-%%% 11
-\bibitem[\protect\citeauthoryear{W{\"a}chter and
-  Biegler}{2006}]{wachter2006ipopt}
-\begin{barticle}
-\bauthor{\bsnm{W{\"a}chter}, \binits{A.}},
-\bauthor{\bsnm{Biegler}, \binits{L.T.}}:
-\batitle{On the implementation of an interior-point filter line-search
-  algorithm for large-scale nonlinear programming}.
-\bjtitle{Mathematical Programming}
-\bvolume{106}(\bissue{1}),
-\bfpage{25}--\blpage{57}
-(\byear{2006})
-\doiurl{10.1007/s10107-004-0559-y}
-\end{barticle}
-\endbibitem
+\bibitem{fsa-acreage}
+{USDA Farm Service Agency}, Acreage data,
+  \url{https://www.fsa.usda.gov/news-room/efoia/electronic-reading-room/frequently-requested-information/crop-acreage-data},
+  accessed: 2024 (2024).
 
-%%% 12
-\bibitem[\protect\citeauthoryear{{USDA Farm Service
-  Agency}}{2024}]{fsa-acreage}
-\begin{botherref}
-\oauthor{\bsnm{{USDA Farm Service Agency}}}:
-Acreage Data.
-\url{https://www.fsa.usda.gov/news-room/efoia/electronic-reading-room/frequently-requested-information/crop-acreage-data}.
-Accessed: 2024
-(2024)
-\end{botherref}
-\endbibitem
+\bibitem{corn-nutrient-management}
+J.~E. Sawyer, A.~P. Mallarino, Nutrient management for corn following corn,
+  Tech. Rep. PM 2088, Iowa State University Extension (2017).
 
-%%% 13
-\bibitem[\protect\citeauthoryear{Sawyer and
-  Mallarino}{2017}]{corn-nutrient-management}
-\begin{botherref}
-\oauthor{\bsnm{Sawyer}, \binits{J.E.}},
-\oauthor{\bsnm{Mallarino}, \binits{A.P.}}:
-Nutrient management for corn following corn.
-Technical Report PM 2088,
-Iowa State University Extension
-(2017)
-\end{botherref}
-\endbibitem
+\bibitem{kranz2008irrigation}
+W.~L. Kranz, S.~Irmak, S.~J. van Donk, C.~D. Yonts, D.~L. Martin, Irrigation
+  management for corn, NebGuide~(G1850) (2008).
 
-%%% 14
-\bibitem[\protect\citeauthoryear{Kranz et~al.}{2008}]{kranz2008irrigation}
-\begin{botherref}
-\oauthor{\bsnm{Kranz}, \binits{W.L.}},
-\oauthor{\bsnm{Irmak}, \binits{S.}},
-\oauthor{\bsnm{Donk}, \binits{S.J.}},
-\oauthor{\bsnm{Yonts}, \binits{C.D.}},
-\oauthor{\bsnm{Martin}, \binits{D.L.}}:
-Irrigation management for corn.
-NebGuide
-(G1850)
-(2008)
-\end{botherref}
-\endbibitem
-
-%%% 15
-\bibitem[\protect\citeauthoryear{Davies et~al.}{2020}]{davies2020nitrogen}
-\begin{barticle}
-\bauthor{\bsnm{Davies}, \binits{B.}},
-\bauthor{\bsnm{Coulter}, \binits{J.A.}},
-\bauthor{\bsnm{Pagliari}, \binits{P.H.}}:
-\batitle{Timing and rate of nitrogen fertilization influence maize yield and
-  nitrogen use efficiency}.
-\bjtitle{PLoS ONE}
-\bvolume{15}(\bissue{5}),
-\bfpage{0233674}
-(\byear{2020})
-\doiurl{10.1371/journal.pone.0233674}
-\end{barticle}
-\endbibitem
+\bibitem{davies2020nitrogen}
+B.~Davies, J.~A. Coulter, P.~H. Pagliari, Timing and rate of nitrogen
+  fertilization influence maize yield and nitrogen use efficiency, PLoS ONE
+  15~(5) (2020) e0233674.
+\newblock \href {https://doi.org/10.1371/journal.pone.0233674}
+  {\path{doi:10.1371/journal.pone.0233674}}.
 
 \end{thebibliography}

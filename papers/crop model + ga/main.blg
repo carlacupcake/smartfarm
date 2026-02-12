@@ -1,76 +1,53 @@
 This is BibTeX, Version 0.99d (TeX Live 2021)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
-The style file: sn-mathphys-num.bst
-Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
-Reallocated global_strs (elt_size=200001) to 20 items from 10.
-Reallocated glb_str_end (elt_size=4) to 20 items from 10.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
+The style file: elsarticle-num.bst
 Database file #1: bibliography.bib
-Repeated entry---line 279 of file bibliography.bib
+Repeated entry---line 281 of file bibliography.bib
  : @misc{nsrdb
  :            ,
 I'm skipping whatever remains of this entry
 Warning--entry type for "fsa-acreage" isn't style-file defined
---line 383 of file bibliography.bib
-sn-mathphys-num.bst [2024/07/19 v1.1  bibliography style]
-Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated singl_function (elt_size=4) to 100 items from 50.
+--line 385 of file bibliography.bib
 You've used 29 entries,
-            7485 wiz_defined-function locations,
-            1388 strings with 15918 characters,
-and the built_in function-call counts, 218893 in all, are:
-= -- 35436
-> -- 1044
-< -- 435
-+ -- 17493
-- -- 322
-* -- 8940
-:= -- 40081
-add.period$ -- 29
+            2952 wiz_defined-function locations,
+            883 strings with 11620 characters,
+and the built_in function-call counts, 9046 in all, are:
+= -- 877
+> -- 350
+< -- 1
++ -- 136
+- -- 107
+* -- 735
+:= -- 1303
+add.period$ -- 49
 call.type$ -- 29
-change.case$ -- 181
-chr.to.int$ -- 1166
+change.case$ -- 29
+chr.to.int$ -- 0
 cite$ -- 29
-duplicate$ -- 1389
-empty$ -- 7254
-format.name$ -- 803
-if$ -- 54066
-int.to.chr$ -- 1
-int.to.str$ -- 43
-missing$ -- 0
-newline$ -- 479
-num.names$ -- 145
-pop$ -- 680
+duplicate$ -- 231
+empty$ -- 949
+format.name$ -- 127
+if$ -- 2276
+int.to.chr$ -- 0
+int.to.str$ -- 29
+missing$ -- 27
+newline$ -- 119
+num.names$ -- 29
+pop$ -- 141
 preamble$ -- 1
-purify$ -- 129
+purify$ -- 0
 quote$ -- 0
-skip$ -- 20870
+skip$ -- 552
 stack$ -- 0
-substring$ -- 24016
-swap$ -- 760
-text.length$ -- 354
+substring$ -- 468
+swap$ -- 73
+text.length$ -- 1
 text.prefix$ -- 0
-top$ -- 1
-type$ -- 1173
+top$ -- 0
+type$ -- 0
 warning$ -- 0
-while$ -- 892
-width$ -- 0
-write$ -- 652
+while$ -- 63
+width$ -- 31
+write$ -- 284
 (There was 1 error message)

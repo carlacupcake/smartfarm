@@ -1,15 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                                                 %%
-%% Please do not use \input{...} to include other tex files.       %%
-%% Submit your LaTeX manuscript as one .tex document.              %%
-%%                                                                 %%
-%% All additional figures and files should be attached             %%
-%% separately and not embedded in the \TeX\ document itself.       %%
-%%                                                                 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Math and Physical Sciences Numbered Reference Style
-\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+% Author: Carla Becker, 2026
+\documentclass[preprint,12pt]{elsarticle}
 
 % Standard Packages
 \usepackage{algorithm}
@@ -20,6 +10,8 @@
 \usepackage{booktabs}
 \usepackage[title]{appendix}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{lineno}
 \usepackage{listings}
 \usepackage{manyfoot}
 \usepackage{mathrsfs}
@@ -28,41 +20,84 @@
 \usepackage{xcolor}
 
 % Other
-\geometry{margin=1in, bindingoffset=0in, asymmetric=false}
 \raggedbottom
 \newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
 
+\journal{Agricultural Systems}
+
+%======================================================================================%
+% BEGIN DOCUMENT
+%======================================================================================%
 \begin{document}
+\linenumbers
+\begin{frontmatter}
+\title{Optimizing irrigation and fertilizer strategy using a crop growth model with delayed nutrient absorption dynamics}
 
-\title[Article Title]{Optimizing irrigation and fertilizer strategy using a crop growth model with delayed nutrient absorption dynamics}
+% Author information
+\author{Carla J. Becker}
+\affiliation{
+	organization={Department of Mechanical Engineering, University of California, Berkeley}, % Department and Organization
+    addressline={6141 Etcheverry Hall}, 
+    city={Berkeley},
+    postcode={94720}, 
+    state={California},
+    country={United States of America}
+}
 
-%======================================================================================%
-%% TARGET JOURNAL: Computers and Electronics in Agriculture
-%% https://www.sciencedirect.com/journal/computers-and-electronics-in-agriculture/publish/guide-for-authors
-
-% Paper A (Model + GA):
-% Given a nonlinear, delay-affected plant growth system with resource penalties, can 
-% global optimization discover non-intuitive but high-performing control strategies?
-
-% Paper B (MPC):
-% Given that same system, can we close the loop and recover near-optimal performance
-% under uncertainty and disturbances?
-%======================================================================================%
-
-\author*[1]{\fnm{Carla J.} \sur{Becker}}\email{carlabecker@berkeley.edu, ORCID: 0009-0004-0646-6386}
-
-\author[1]{\fnm{Tarek I.} \sur{Zohdi}}\email{zohdi@berkeley.edu, ORCID: 0000-0002-0844-3573}
-%\equalcont{These authors contributed equally to this work.}
-
-\affil*[1]{\orgdiv{Department of Mechanical Engineering}, \orgname{University of California, Berkeley}, \orgaddress{\street{6141 Etcheverry Hall}, \city{Berkeley}, \postcode{94720}, \state{California}, \country{United States of America}}}
-
+\author{Tarek I. Zohdi}
+\affiliation{
+	organization={Department of Mechanical Engineering, University of California, Berkeley}, % Department and Organization
+    addressline={6141 Etcheverry Hall}, 
+    city={Berkeley},
+    postcode={94720}, 
+    state={California},
+    country={United States of America}
+}
+            	
 %======================================================================================%
 % ABSTRACT
 %======================================================================================%
-\abstract{Rising production costs and declining commodity prices have motivated farmers to seek computational tools for optimizing resource application. This paper presents a generalized, coupled ordinary differential equation (ODE) model for crop growth that captures the nonlinear dynamics of plant development under varying environmental conditions and fertilizer and irrigation strategy. The model tracks five state variables---plant height, leaf area, number of leaves, flower size, and fruit biomass---each governed by logistic growth with time-varying growth rates and carrying capacities. These parameters are modulated by nutrient factors that quantify how well actual water, fertilizer, temperature, and solar radiation levels match expected values. To capture the delayed physiological response of plants to resource inputs, we employ finite impulse response (FIR) convolution with Gaussian kernels, where different temporal spreads represent the distinct metabolic timescales for each input type. Cumulative divergence from expected nutrient levels is tracked using exponential moving average filters, providing the model with memory of past stress events. Given this nonlinear, delay-affected system, we employ a genetic algorithm (GA) to discover optimal irrigation and fertilizer strategies that maximize crop yield while minimizing input costs. The GA searches over application frequency and amount for both irrigation and fertilizer, evaluating candidate strategies through full-season simulations. We demonstrate the framework using corn grown in Fairfax, Iowa, with historical weather data. Results show the GA identifies non-intuitive strategies that outperform conventional uniform application schedules, achieving 16\% higher net revenue through strategic timing of resource inputs. The optimized strategies use dramatically less irrigation than farmer best practices while achieving higher crop yields, demonstrating that under delayed absorption dynamics, timing of inputs matters more than total quantity.}
+\begin{abstract}
+\noindent\textbf{Context}
+Rising production costs and declining commodity prices have motivated farmers to seek computational tools for optimizing resource application. While sophisticated crop models such as DSSAT and APSIM simulate detailed physiological processes, they require extensive parameterization and may be computationally expensive for optimization applications. Moreover, existing optimization approaches often use simplified plant response models that do not capture the delayed, cumulative effects of resource application.
 
-\keywords{precision agriculture, resource optimization, crop growth model, genetic algorithm, cumulative stress tracking}
-\maketitle
+\noindent\textbf{Objective}
+This study develops a reduced-order crop growth model that captures delayed nutrient absorption dynamics and couples it with a genetic algorithm to optimize irrigation and fertilizer strategies that maximize net revenue while minimizing input costs.
+
+\noindent\textbf{Methods}
+We present a generalized, coupled ordinary differential equation (ODE) model tracking five state variables---plant height, leaf area, number of leaves, flower size, and fruit biomass---each governed by logistic growth with time-varying growth rates and carrying capacities. These parameters are modulated by nutrient factors quantifying how well actual water, fertilizer, temperature, and solar radiation levels match expected values. Delayed physiological response is captured using finite impulse response (FIR) convolution with Gaussian kernels, where different temporal spreads represent distinct metabolic timescales for each input type. Cumulative stress from sustained deviations is tracked using exponential moving average (EMA) filters. A genetic algorithm searches over application frequency and amount for both irrigation and fertilizer, evaluating candidate strategies through full-season simulations. The framework is demonstrated using corn grown in Fairfax, Iowa, with historical weather data under a drought scenario (50\% of typical precipitation).
+
+\noindent\textbf{Results and Conclusions}
+The genetic algorithm identifies non-intuitive strategies that outperform conventional uniform application schedules, achieving 16\% higher net revenue (\$999 vs.\ \$859 per acre) through strategic timing of resource inputs. The optimized strategies use 17\% less irrigation (15 vs.\ 18 inches) and 32\% less fertilizer (307 vs.\ 450 lbs) than farmer best practices while achieving comparable or higher crop yields. Across 10 independent optimization runs, 9 outperformed the baseline, demonstrating algorithm robustness.
+
+\noindent\textbf{Significance}
+These results demonstrate that under delayed absorption dynamics, timing of inputs matters more than total quantity---a finding that challenges conventional drought response strategies of increased irrigation frequency. The framework offers a computationally tractable alternative to complex mechanistic models for precision agriculture optimization and is generalizable to other crops through re-parameterization.
+\end{abstract}
+
+%% Graphical abstract
+\begin{graphicalabstract}
+\includegraphics[width=\linewidth]{graphical_abstract.pdf}
+\end{graphicalabstract}
+
+%% Research highlights
+\begin{highlights}
+\item Reduced-order coupled ODE model; efficient alternative to DSSAT/APSIM
+\item FIR convolution formulation for delayed nutrient absorption dynamics
+\item EMA filtering for cumulative environmental stress tracking
+\item GA optimization of irrigation/fertilization schedules to maximize revenue
+\item Calibration and validation against Iowa corn agronomic data
+\end{highlights}
+
+%% Keywords
+\begin{keyword}
+precision agriculture \sep
+resource optimization \sep
+crop growth model \sep
+genetic algorithm \sep
+cumulative stress tracking
+\end{keyword}
+
+\end{frontmatter}
 
 %======================================================================================%
 % INTRODUCTION
@@ -178,7 +213,7 @@ Figure \ref{fig:metabolism-transformations} illustrates the FIR convolution and 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\textwidth]{figures/metabolism_transformations.png}
+\includegraphics[width=0.7\textwidth]{metabolism_transformations.png}
 \caption{Illustration of the metabolic transformation pipeline. Panel 1: Gaussian FIR kernels with different temporal spreads $\sigma$ demonstrate how water ($\sigma_w = 30$ hr) is absorbed more rapidly than fertilizer ($\sigma_f = 300$ hr). Panel 4: EMA filters with different memory parameters $\beta$ show how cumulative divergence tracking responds to sustained anomalies, with larger $\beta$ providing longer memory of past stress events.}
 \label{fig:metabolism-transformations}
 \end{figure}
@@ -191,7 +226,7 @@ Figure \ref{fig:metabolism-transformations} illustrates the FIR convolution and 
 
 Different inputs affect different aspects of plant growth. Tables \ref{tab:fert-irr-effects} and \ref{tab:temp-rad-effects} summarize these relationships based on agronomic literature \cite{corn-nitrogen,corn-irrigation,corn-temperature}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -212,7 +247,7 @@ Fruit biomass $P$    & $\sim$ & $\sim$ & +      & +      \\
 \label{tab:fert-irr-effects}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -286,7 +321,7 @@ The coupling terms $\hat{k}_{h}/k_{h}$, $\hat{k}_{A}/k_{A}$, and $\hat{k}_{c}/k_
 
 The baseline growth rates and carrying capacities are crop-specific parameters that can be estimated from field data or literature values. For corn, we use the values in Table \ref{tab:model-params}, calibrated to match typical development timelines where plants reach full vegetative size around 65--70 days after sowing and grain fill completes around 125 days \cite{corn-growth-stages}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -366,7 +401,7 @@ where $\omega_{w}$ and $\omega_{f}$ are costs per unit of irrigation and fertili
 
 For corn, the economic weights are derived from market prices and typical yields (Table \ref{tab:economic-weights}). The fruit biomass weight dominates, reflecting that grain yield is the primary economic output.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -470,7 +505,7 @@ The simulation covers a typical growing season from late April to early October 
 
 Table \ref{tab:corn-development} summarizes expected corn development timelines used to calibrate model parameters.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -501,7 +536,7 @@ Figure \ref{fig:baseline-growth} shows the resulting plant state trajectories. U
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_hourly_controls_and_disturbances.png}
+\includegraphics[width=0.75\textwidth]{no_opt_hourly_controls_and_disturbances.png}
 \caption{Environmental disturbances and control inputs for the baseline scenario. Top three panels show hourly precipitation (reduced to 50\% of normal), solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1 inch) and fertilizer (monthly, 90 lbs) application strategy.}
 \label{fig:baseline-inputs}
 \end{figure}
@@ -509,7 +544,7 @@ Figure \ref{fig:baseline-growth} shows the resulting plant state trajectories. U
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_crop_growth.png}
+\includegraphics[width=0.75\textwidth]{no_opt_crop_growth.png}
 \caption{Plant state variable trajectories under the baseline scenario (farmer best practices during drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$859/acre in revenue.}
 \label{fig:baseline-growth}
 \end{figure}
@@ -541,14 +576,14 @@ To assess robustness of the optimization, we executed 10 independent GA runs wit
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/ga_convg_10_runs.png}
+\includegraphics[width=0.85\textwidth]{ga_convg_10_runs.png}
 \caption{GA convergence across 10 independent runs. Each curve shows the best revenue at each generation. All runs exhibit rapid improvement in early generations followed by convergence to near-optimal solutions. The consistency across runs demonstrates algorithm robustness.}
 \label{fig:ga-convergence}
 \end{figure}
 
 The optimal strategy identified by the GA is summarized in Table \ref{tab:optimal-strategy}. Notably, the algorithm discovers a strategy with less frequent but larger irrigation events and infrequent fertilizer applications---a pattern that minimizes cumulative divergence from expected nutrient levels given the model's delayed absorption dynamics.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -569,7 +604,7 @@ Figure \ref{fig:state-trajectories} shows the plant state trajectories for the b
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/crop_growth_results_best.png}
+\includegraphics[width=0.75\textwidth]{crop_growth_results_best.png}
 \caption{Plant state variable trajectories for the best member from each of the 10 independent GA runs. All optimized strategies achieve similar, near-optimal growth trajectories, and  9 of 10 runs substantially outperform the baseline farmer practices (Figure \ref{fig:baseline-growth}). The tight clustering of trajectories demonstrates that different GA runs converge to similar optimal strategies.}
 \label{fig:state-trajectories}
 \end{figure}
@@ -577,7 +612,7 @@ Figure \ref{fig:state-trajectories} shows the plant state trajectories for the b
 \pagebreak
 Table \ref{tab:economic-comparison} provides an economic comparison between the baseline farmer practices and the GA-optimized strategies. The best GA strategy achieves \$999/acre net revenue compared to \$859/acre for the baseline---a 16\% improvement. Even the worst members in each GA run's final population outperform the baseline, providing a sanity check that random strategies are not viable (see Supplementary Information).
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -664,22 +699,20 @@ The framework is generalizable to other crops through re-parameterization and of
 %======================================================================================%
 % SUPPLEMENTARY INFORMATION
 %======================================================================================%
-\backmatter
-\bmhead{Supplementary information}
+\section{Supplementary information}
 
 This supplementary section provides additional visualizations of the baseline scenario (farmer best practices under drought) and the GA optimization results.
 
 %------------------------------------%
 % SI 1
 %------------------------------------%
-\pagebreak
 \subsection*{S1. Detailed baseline scenario analysis}
 
 Figure \ref{fig:supp-applied-absorbed} shows the applied versus absorbed nutrients under the baseline scenario. The delayed absorption via FIR convolution is clearly visible: the absorbed signals (smoothed curves) lag behind the applied inputs and exhibit the characteristic spreading effect of the Gaussian kernels.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_applied_absorbed.png}
+\includegraphics[width=0.75\textwidth]{no_opt_applied_absorbed.png}
 \caption{Applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption dynamics are evident in the lag between applied inputs and the smoothed absorbed signals. Water absorption ($\sigma_w = 30$ hr) responds more quickly than fertilizer absorption ($\sigma_f = 300$ hr).}
 \label{fig:supp-applied-absorbed}
 \end{figure}
@@ -693,7 +726,7 @@ Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_cum_values.png}
+\includegraphics[width=0.75\textwidth]{no_opt_cum_values.png}
 \caption{Cumulative absorbed nutrients (solid) versus expected levels (dashed red). The growing gap between actual and expected water absorption reflects the drought stress accumulating over the season. Fertilizer applications maintain closer alignment with expectations.}
 \label{fig:supp-cumulative}
 \end{figure}
@@ -701,7 +734,7 @@ Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_cum_div.png}
+\includegraphics[width=0.75\textwidth]{no_opt_cum_div.png}
 \caption{Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress. The water divergence grows throughout the season due to cumulative drought effects.}
 \label{fig:supp-divergence}
 \end{figure}
@@ -709,7 +742,7 @@ Figure \ref{fig:supp-nutrient-factors} shows the resulting nutrient factors. The
 \pagebreak
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/no_opt_nutrient_factors.png}
+\includegraphics[width=0.75\textwidth]{no_opt_nutrient_factors.png}
 \caption{Nutrient factor evolution under the baseline scenario. The water factor $\nu_w$ declines due to cumulative drought stress, while fertilizer, temperature, and radiation factors remain closer to 1.0 (no stress). The declining $\nu_w$ reduces effective growth rates and carrying capacities throughout the season.}
 \label{fig:supp-nutrient-factors}
 \end{figure}
@@ -724,7 +757,7 @@ As a sanity check, Figure \ref{fig:supp-worst} shows the plant state trajectorie
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/crop_growth_results_worst.png}
+\includegraphics[width=0.75\textwidth]{crop_growth_results_worst.png}
 \caption{Plant state variable trajectories for the worst member from each GA run's final population. Even these suboptimal strategies outperform baseline farmer practices (compare to Figure \ref{fig:baseline-growth}), demonstrating that the GA successfully identifies the high-performing region of the strategy space and that random strategies are not competitive.}
 \label{fig:supp-worst}
 \end{figure}
@@ -733,7 +766,7 @@ As a sanity check, Figure \ref{fig:supp-worst} shows the plant state trajectorie
 % ACKNOWLEDGEMENTS
 %======================================================================================%
 \pagebreak
-\bmhead{Acknowledgements}
+\section{Acknowledgements}
 
 This work has been partially supported by the UC Berkeley College of Engineering and the USDA AI Institute for Next Generation Food Systems (AIFS), USDA award number 2020-67021-32855.
 
@@ -743,10 +776,10 @@ This work has been partially supported by the UC Berkeley College of Engineering
 \section*{Declarations}
 
 \noindent\textbf{Competing Interests}
-\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. \\
 
 \noindent\textbf{Code availability}
-\noindent The source code used for this study is archived on Zenodo at \url{https://doi.org/10.5281/zenodo.18204023}.
+\noindent The source code used for this study is archived on Zenodo at \url{https://doi.org/10.5281/zenodo.18204023}. \\
 
 \noindent\textbf{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 \noindent During the preparation of this work the authors used ChatGPT and Claude Code in order to generate some portions of the code base, though no underlying theory, and refine the original drafts of the paper. After using this tool/service, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
@@ -754,6 +787,7 @@ This work has been partially supported by the UC Berkeley College of Engineering
 %======================================================================================%
 % BIBLIOGRAPHY
 %======================================================================================%
+\bibliographystyle{elsarticle-num} 
 \bibliography{bibliography}
 
 \end{document}

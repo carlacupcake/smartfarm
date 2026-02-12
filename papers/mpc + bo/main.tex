@@ -1,15 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                                                 %%
-%% Please do not use \input{...} to include other tex files.       %%
-%% Submit your LaTeX manuscript as one .tex document.              %%
-%%                                                                 %%
-%% All additional figures and files should be attached             %%
-%% separately and not embedded in the \TeX\ document itself.       %%
-%%                                                                 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Math and Physical Sciences Numbered Reference Style
-\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+% Author: Carla Becker, 2026
+\documentclass[preprint,12pt]{elsarticle}
 
 % Standard Packages
 \usepackage{algorithm}
@@ -20,6 +10,8 @@
 \usepackage{booktabs}
 \usepackage[title]{appendix}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{lineno}
 \usepackage{listings}
 \usepackage{manyfoot}
 \usepackage{mathrsfs}
@@ -28,33 +20,71 @@
 \usepackage{xcolor}
 
 % Other
-\geometry{margin=1in, bindingoffset=0in, asymmetric=false}
 \raggedbottom
 \newcommand{\df}[2]{\displaystyle\frac{#1}{#2}}
 
+\journal{Computers and Electronics in Agriculture}
+
+%======================================================================================%
+% BEGIN DOCUMENT
+%======================================================================================%
 \begin{document}
+\linenumbers
+\begin{frontmatter}
+\title{Fixed versus adaptive irrigation and fertilizer management under weather uncertainty: a comparative study using genetic algorithm optimization and model predictive control}
 
-\title[Article Title]{Fixed versus adaptive irrigation and fertilizer management under weather uncertainty: a comparative study using genetic algorithm optimization and model predictive control}
+% Author information
+\author{Carla J. Becker}
+\affiliation{
+	organization={Department of Mechanical Engineering, University of California, Berkeley}, % Department and Organization
+    addressline={6141 Etcheverry Hall}, 
+    city={Berkeley},
+    postcode={94720}, 
+    state={California},
+    country={United States of America}
+}
 
-%======================================================================================%
-%% TARGET JOURNAL: Computers and Electronics in Agriculture
-%% https://www.sciencedirect.com/journal/computers-and-electronics-in-agriculture/publish/guide-for-authors
-%======================================================================================%
-
-\author*[1]{\fnm{Carla J.} \sur{Becker}}\email{carlabecker@berkeley.edu, ORCID: 0009-0004-0646-6386}
-
-\author[1]{\fnm{Tarek I.} \sur{Zohdi}}\email{zohdi@berkeley.edu, ORCID: 0000-0002-0844-3573}
-%\equalcont{These authors contributed equally to this work.}
-
-\affil*[1]{\orgdiv{Department of Mechanical Engineering}, \orgname{University of California, Berkeley}, \orgaddress{\street{6141 Etcheverry Hall}, \city{Berkeley}, \postcode{94720}, \state{California}, \country{United States of America}}}
-
+\author{Tarek I. Zohdi}
+\affiliation{
+	organization={Department of Mechanical Engineering, University of California, Berkeley}, % Department and Organization
+    addressline={6141 Etcheverry Hall}, 
+    city={Berkeley},
+    postcode={94720}, 
+    state={California},
+    country={United States of America}
+}
+            	
 %======================================================================================%
 % ABSTRACT
 %======================================================================================%
-\abstract{Climate variability poses significant challenges to agricultural resource management, as fixed irrigation and fertilization strategies optimized for expected conditions may perform poorly when actual weather deviates from assumptions. This paper presents a comparative study of fixed versus adaptive resource management strategies under weather uncertainty. We develop an adaptive approach combining Model Predictive Control (MPC) with Bayesian Optimization (BO) for irrigation and fertilizer scheduling, building on a crop growth model that captures delayed nutrient absorption via finite impulse response (FIR) convolution and cumulative stress tracking via exponential moving average (EMA) filtering. The MPC controller solves a constrained finite-time optimal control (CFTOC) problem at each decision epoch, balancing crop value maximization against input costs and nutrient stress penalties, with BO using Tree-structured Parzen Estimators (TPE) to tune controller parameters for robust performance. Evaluated on corn production in Iowa across 21 stochastic weather scenarios ranging from normal to extreme conditions, we compare three strategies: farmer baseline practices, a genetic algorithm (GA) that optimizes a fixed strategy for drought conditions, and adaptive MPC that re-optimizes daily. Results reveal a fundamental tradeoff between mean revenue and consistency. The fixed GA achieves the highest mean revenue (\$796/acre) but with substantial variance, while MPC achieves lower mean revenue (\$750/acre) but with the lowest coefficient of variation (15.4\% vs 16.6\%). MPC outperforms GA in 12 of 21 scenarios---particularly in normal and wet conditions---while GA excels in the drought conditions for which it was optimized. These findings provide practical guidance: when weather patterns are predictable and match optimization assumptions, fixed strategies maximize returns; when weather is uncertain, adaptive MPC provides valuable risk reduction through consistent performance across diverse conditions.}
+\begin{abstract}
+Climate variability poses significant challenges to agricultural resource management, as fixed irrigation and fertilization strategies optimized for expected conditions may perform poorly when actual weather deviates from assumptions. This paper presents a comparative study of fixed versus adaptive resource management strategies under weather uncertainty. We develop an adaptive approach combining Model Predictive Control (MPC) with Bayesian Optimization (BO) for irrigation and fertilizer scheduling, building on a crop growth model that captures delayed nutrient absorption via finite impulse response (FIR) convolution and cumulative stress tracking via exponential moving average (EMA) filtering. The MPC controller solves a constrained finite-time optimal control (CFTOC) problem at each decision epoch, balancing crop value maximization against input costs and nutrient stress penalties, with BO using Tree-structured Parzen Estimators (TPE) to tune controller parameters for robust performance. Evaluated on corn production in Iowa across 21 stochastic weather scenarios ranging from normal to extreme conditions, we compare three strategies: farmer baseline practices, a genetic algorithm (GA) that optimizes a fixed strategy for drought conditions, and adaptive MPC that re-optimizes daily. Results reveal a fundamental tradeoff between mean revenue and consistency. The fixed GA achieves the highest mean revenue (\$796/acre) but with substantial variance, while MPC achieves lower mean revenue (\$750/acre) but with the lowest coefficient of variation (15.4\% vs 16.6\%). MPC outperforms GA in 12 of 21 scenarios---particularly in normal and wet conditions---while GA excels in the drought conditions for which it was optimized. These findings provide practical guidance: when weather patterns are predictable and match optimization assumptions, fixed strategies maximize returns; when weather is uncertain, adaptive MPC provides valuable risk reduction through consistent performance across diverse conditions.
+\end{abstract}
 
-\keywords{precision agriculture, model predictive control, Bayesian optimization, weather uncertainty, adaptive control}
-\maketitle
+%%Graphical abstract
+%\begin{graphicalabstract}
+%\includegraphics{grabs}
+%\end{graphicalabstract}
+
+%% Research highlights
+\begin{highlights}
+\item Comparative framework: fixed GA strategy vs. adaptive MPC approach
+\item Bayesian Optimization (TPE) for automated MPC weight tuning
+\item Risk-return tradeoff analysis via coefficient of variation
+\item Stochastic weather scenarios: drought, normal, wet conditions
+\item Decision guidance: MPC for risk-averse, GA for drought-prone regions
+\end{highlights}
+
+%% Keywords
+\begin{keyword}
+precision agriculture \sep
+model predictive control \sep
+Bayesian optimization \sep
+weather uncertainty \sep
+adaptive control \sep
+\end{keyword}
+
+\end{frontmatter}
 
 %======================================================================================%
 % INTRODUCTION
@@ -476,7 +506,7 @@ Algorithm \ref{alg:mpc} presents the MPC procedure. At each decision day $k$:
 \item Advance to day $k+1$ and repeat.
 \end{enumerate}
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Model Predictive Control for Irrigation and Fertilization}
 \label{alg:mpc}
 \begin{algorithmic}[1]
@@ -619,7 +649,7 @@ p(x) = p(x_{1})p(x_{2}|x_{2})p(x_{3}|x_{2})...
 
 Table \ref{tab:search-space} defines the search space for MPC parameter tuning. Cost weights use log-scale sampling to span multiple orders of magnitude, while value weights and horizon use linear/integer sampling.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -658,7 +688,7 @@ where $\mathcal{S}$ is a representative subset of weather scenarios. This encour
 
 Algorithm~\ref{alg:bo} presents the TPE-based parameter tuning procedure. The objective function averages MPC performance across multiple weather scenarios, encouraging parameters that perform well across diverse conditions rather than overfitting to a single scenario.
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{Bayesian Optimization for MPC Parameter Tuning}
 \label{alg:bo}
 \begin{algorithmic}[1]
@@ -725,7 +755,7 @@ We compare three irrigation and fertilization strategies representing different 
 
 Table~\ref{tab:strategy-params} summarizes the control parameters for each strategy.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|c|c|c|}
 \hline
@@ -763,7 +793,7 @@ Note that these weights differ from the economic weights used in the GA cost fun
 
 We evaluate both GA and MPC across 21 stochastic weather scenarios generated from the baseline historical data. Table \ref{tab:scenario-categories} summarizes the scenario categories.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -788,7 +818,7 @@ Extreme     & 2     & 5.60--8.38      \\
 
 Table~\ref{tab:main-results} presents summary statistics for all three strategies across the 21 weather scenarios. Both optimization-based methods substantially outperform farmer baseline practices, with the Fixed GA achieving the highest mean revenue and MPC achieving the lowest variance.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
@@ -807,7 +837,7 @@ Both the Fixed GA and MPC outperform farmer baseline in all scenarios, with mean
 
 Table~\ref{tab:scenario-results} presents results for representative scenarios spanning the extremity range. MPC outperforms GA in normal and wet conditions, where the GA's drought-optimized strategy applies more resources than necessary. Conversely, GA outperforms MPC in drought scenarios, where its optimization assumptions match actual conditions.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
@@ -830,9 +860,9 @@ worst\_case & 8.38 & 659 & 734 & 445 & $-$289 \\
 
 Figure~\ref{fig:revenue-comparison} visualizes revenue across all 21 scenarios, sorted by increasing extremity index. The divergence between strategies is evident: MPC (green) consistently outperforms in the left portion of the plot (normal conditions), while Fixed GA (orange) dominates in the right portion (drought and extreme conditions).
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figures/three_way_revenue_comparison.png}
+\includegraphics[width=\textwidth]{three_way_revenue_comparison.png}
 \caption{Revenue comparison across all 21 weather scenarios, sorted by extremity index. Farmer Baseline (blue), Fixed GA (orange), and Adaptive MPC (green). Both optimization-based methods outperform the baseline in all scenarios. MPC excels in normal/wet conditions (left), while Fixed GA excels in drought conditions (right).}
 \label{fig:revenue-comparison}
 \end{figure}
@@ -844,7 +874,7 @@ Figure~\ref{fig:revenue-comparison} visualizes revenue across all 21 scenarios, 
 
 To better understand when each strategy excels, we categorize scenarios by their dominant characteristic and compute mean revenue within each category (Table~\ref{tab:category-results}).
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|c|c|c|}
 \hline
@@ -863,9 +893,9 @@ Extreme Combined & 2 & 713 & 785 & 482 \\
 
 The pattern is clear: MPC outperforms the Fixed GA by \$65/acre on average in normal conditions and by \$91/acre in wet/cool conditions. However, the Fixed GA outperforms MPC by \$258/acre in drought scenarios and by \$303/acre in the most extreme combined scenarios. This divergence reflects the fundamental difference in approach: the GA was optimized for drought and performs best when those assumptions hold, while MPC adapts to observed conditions but cannot anticipate future drought stress as effectively. Figure~\ref{fig:by-category} illustrates this pattern visually.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figures/three_way_by_category.png}
+\includegraphics[width=\textwidth]{three_way_by_category.png}
 \caption{Mean revenue by weather category. MPC (green) outperforms Fixed GA (orange) in normal and moderate conditions, while Fixed GA dominates in drought and extreme scenarios. Both optimization methods substantially outperform Farmer Baseline (blue) across all categories.}
 \label{fig:by-category}
 \end{figure}
@@ -889,18 +919,18 @@ For risk-averse decision-makers, this tradeoff is significant. Consider a farmer
 
 Figure~\ref{fig:boxplot} shows the revenue distribution for each strategy as a box plot. The Fixed GA has the highest median and mean (red diamond), but also exhibits greater spread. MPC's distribution is more compact, reflecting its consistent performance across diverse conditions.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figures/three_way_revenue_boxplot.png}
+\includegraphics[width=\textwidth]{three_way_revenue_boxplot.png}
 \caption{Revenue distribution across 21 weather scenarios. Box plots show median (black line), interquartile range (box), and full range (whiskers). Red diamonds indicate means. MPC exhibits the most compact distribution despite a lower mean, indicating more consistent performance.}
 \label{fig:boxplot}
 \end{figure}
 
 Figure~\ref{fig:cv-comparison} directly compares the coefficient of variation for each strategy. MPC achieves a 7\% reduction in relative variability compared to the Fixed GA (15.4\% vs 16.6\%), and a 29\% reduction compared to Farmer Baseline (15.4\% vs 21.6\%). This consistency is a key advantage for operations that prioritize predictable outcomes over maximum expected returns.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
-\includegraphics[width=0.7\textwidth]{figures/three_way_cv_comparison.png}
+\includegraphics[width=0.7\textwidth]{three_way_cv_comparison.png}
 \caption{Coefficient of variation (CV) comparison. Lower CV indicates more consistent relative performance. MPC achieves the lowest CV (15.4\%), followed by Fixed GA (16.6\%) and Farmer Baseline (21.6\%).}
 \label{fig:cv-comparison}
 \end{figure}
@@ -985,19 +1015,10 @@ The computational overhead of MPC is modest---daily optimization solves complete
 
 Future work will incorporate forecast uncertainty through stochastic MPC, extend to field-scale spatial heterogeneity, and validate against field trial data. Additionally, exploring hybrid strategies that combine fixed optimization with adaptive adjustments may capture benefits of both approaches.
 
-
-%======================================================================================%
-% SUPPLEMENTARY INFORMATION
-%======================================================================================%
-\backmatter
-%\bmhead{Supplementary Information}
-
-
-
 %======================================================================================%
 % ACKNOWLEDGEMENTS
 %======================================================================================%
-\bmhead{Acknowledgements}
+\section*{Acknowledgements}
 
 This work has been partially supported by the UC Berkeley College of Engineering and the USDA AI Institute for Next Generation Food Systems (AIFS), USDA award number 2020-67021-32855.
 
@@ -1007,10 +1028,10 @@ This work has been partially supported by the UC Berkeley College of Engineering
 \section*{Declarations}
 
 \noindent\textbf{Competing Interests}
-\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+\noindent The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. \\
 
 \noindent\textbf{Code availability}
-\noindent The source code used for this study is archived on Zenodo at \url{https://doi.org/10.5281/zenodo.18204023}.
+\noindent The source code used for this study is archived on Zenodo at \url{https://doi.org/10.5281/zenodo.18204023}. \\
 
 \noindent\textbf{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 \noindent During the preparation of this work the authors used ChatGPT and Claude Code in order to generate some portions of the code base, though no underlying theory, and refine the original drafts of the paper. After using this tool/service, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
@@ -1018,6 +1039,7 @@ This work has been partially supported by the UC Berkeley College of Engineering
 %======================================================================================%
 % BIBLIOGRAPHY
 %======================================================================================%
+\bibliographystyle{elsarticle-num} 
 \bibliography{bibliography}
 
 \end{document}
