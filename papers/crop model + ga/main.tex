@@ -58,19 +58,19 @@
 % ABSTRACT
 %======================================================================================%
 \begin{abstract}
-\noindent\textbf{Context}
-Rising production costs and declining commodity prices have motivated farmers to seek computational tools for optimizing resource application. While sophisticated crop models such as DSSAT and APSIM simulate detailed physiological processes, they require extensive parameterization and may be computationally expensive for optimization applications. Moreover, existing optimization approaches often use simplified plant response models that do not capture the delayed, cumulative effects of resource application.
+\noindent\textbf{CONTEXT}
+Rising production costs and declining commodity prices have motivated farmers to seek computational tools for optimizing resource application. While sophisticated crop models such as DSSAT and APSIM simulate detailed physiological processes, they require extensive parameterization and may be computationally expensive for optimization applications. Moreover, existing optimization approaches often use simplified plant response models that do not capture the delayed, cumulative effects of resource application. \\
 
-\noindent\textbf{Objective}
-This study develops a reduced-order crop growth model that captures delayed nutrient absorption dynamics and couples it with a genetic algorithm to optimize irrigation and fertilizer strategies that maximize net revenue while minimizing input costs.
+\noindent\textbf{OBJECTIVE}
+This study develops a reduced-order crop growth model that captures delayed nutrient absorption dynamics and couples it with a genetic algorithm to optimize irrigation and fertilizer strategies that maximize net revenue while minimizing input costs. \\
 
-\noindent\textbf{Methods}
-We present a generalized, coupled ordinary differential equation (ODE) model tracking five state variables---plant height, leaf area, number of leaves, flower size, and fruit biomass---each governed by logistic growth with time-varying growth rates and carrying capacities. These parameters are modulated by nutrient factors quantifying how well actual water, fertilizer, temperature, and solar radiation levels match expected values. Delayed physiological response is captured using finite impulse response (FIR) convolution with Gaussian kernels, where different temporal spreads represent distinct metabolic timescales for each input type. Cumulative stress from sustained deviations is tracked using exponential moving average (EMA) filters. A genetic algorithm searches over application frequency and amount for both irrigation and fertilizer, evaluating candidate strategies through full-season simulations. The framework is demonstrated using corn grown in Fairfax, Iowa, with historical weather data under a drought scenario (50\% of typical precipitation).
+\noindent\textbf{METHODS}
+We present a generalized, coupled ordinary differential equation (ODE) model tracking five state variables---plant height, leaf area, number of leaves, flower size, and fruit biomass---each governed by logistic growth with time-varying growth rates and carrying capacities. These parameters are modulated by nutrient factors quantifying how well actual water, fertilizer, temperature, and solar radiation levels match expected values. Delayed physiological response is captured using finite impulse response (FIR) convolution with Gaussian kernels, where different temporal spreads represent distinct metabolic timescales for each input type. Cumulative stress from sustained deviations is tracked using exponential moving average (EMA) filters. A genetic algorithm searches over application frequency and amount for both irrigation and fertilizer, evaluating candidate strategies through full-season simulations. The framework is demonstrated using corn grown in Fairfax, Iowa, with historical weather data under a drought scenario (50\% of typical precipitation). \\
 
-\noindent\textbf{Results and Conclusions}
-The genetic algorithm identifies non-intuitive strategies that outperform conventional uniform application schedules, achieving 16\% higher net revenue (\$999 vs.\ \$859 per acre) through strategic timing of resource inputs. The optimized strategies use 17\% less irrigation (15 vs.\ 18 inches) and 32\% less fertilizer (307 vs.\ 450 lbs) than farmer best practices while achieving comparable or higher crop yields. Across 10 independent optimization runs, 9 outperformed the baseline, demonstrating algorithm robustness.
+\noindent\textbf{RESULTS AND CONCLUSIONS}
+The genetic algorithm identifies non-intuitive strategies that outperform conventional uniform application schedules, achieving 16\% higher net revenue (\$999 vs.\ \$859 per acre) through strategic timing of resource inputs. The optimized strategies use 17\% less irrigation (15 vs.\ 18 inches) and 32\% less fertilizer (307 vs.\ 450 lbs) than farmer best practices while achieving comparable or higher crop yields. Across 10 independent optimization runs, 9 outperformed the baseline, demonstrating algorithm robustness. \\
 
-\noindent\textbf{Significance}
+\noindent\textbf{SIGNIFICANCE}
 These results demonstrate that under delayed absorption dynamics, timing of inputs matters more than total quantity---a finding that challenges conventional drought response strategies of increased irrigation frequency. The framework offers a computationally tractable alternative to complex mechanistic models for precision agriculture optimization and is generalizable to other crops through re-parameterization.
 \end{abstract}
 
