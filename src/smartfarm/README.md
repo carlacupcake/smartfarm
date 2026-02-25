@@ -6,7 +6,6 @@ A Python framework for simulating crop growth under varying environmental condit
 
 Rising production costs and declining commodity prices have made farming increasingly expensive. This framework provides computational tools for optimizing resource application without requiring costly field trials. The core idea is that plants have "memory"—they don't respond instantly to water, fertilizer, temperature, and solar radiation, but absorb nutrients over time with characteristic delays. By modeling these delayed, cumulative dynamics, we can search for irrigation and fertilizer strategies that outperform conventional scheduling approaches.
 
-The framework implements:
 - A **coupled ODE crop growth model** with five state variables (height, leaf area, leaf count, flower size, fruit biomass)
 - **Delayed absorption** via FIR (Finite Impulse Response) convolution with Gaussian kernels
 - **Cumulative stress tracking** via EMA (Exponential Moving Average) filtering

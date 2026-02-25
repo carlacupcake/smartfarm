@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  12 FEB 2026 11:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  24 FEB 2026 11:00
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -793,9 +793,6 @@ nvg_10_runs.png>] [31 <./crop_growth_results_best.png>] [32 <./no_opt_applied_a
 bsorbed.png>] [33 <./no_opt_cum_values.png>] [34 <./no_opt_cum_div.png>]
 [35 <./no_opt_nutrient_factors.png>] [36 <./crop_growth_results_worst.png>]
 (./main.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D755261796B20CC46108FB7243CADCC6;4514.
  ) 
