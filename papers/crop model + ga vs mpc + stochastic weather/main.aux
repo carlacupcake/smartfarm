@@ -1,0 +1,392 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{usda-farm-income}
+\citation{zohdi2024digitaltwin,mengi2023indoorfarming}
+\citation{goodrich2022sensors,tagkopoulos2024aifs}
+\citation{verhulst1838}
+\citation{jones2003dssat}
+\citation{holzworth2014apsim}
+\citation{wofost}
+\citation{precision-ag-review}
+\citation{irrigation-optimization}
+\citation{dp-irrigation}
+\citation{ga-agriculture}
+\citation{goldberg1989ga}
+\citation{ga-irrigation-scheduling}
+\citation{ga-fertilizer}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{2}{Introduction}{section.1}{}}
+\citation{ipcc2021}
+\citation{rawlings2017mpc}
+\citation{corn-nitrogen,corn-irrigation,corn-temperature}
+\citation{azi2025sweetcorn_bion_fertilizer}
+\citation{lum2024azolla_sweetcorn_growth}
+\citation{liu2024irrigation_fertilizer_silage_corn}
+\citation{khan2014pistia_phytochemistry}
+\citation{azi2025sweetcorn_bion_fertilizer}
+\citation{lum2024azolla_sweetcorn_growth}
+\citation{liu2024irrigation_fertilizer_silage_corn}
+\citation{khan2014pistia_phytochemistry}
+\citation{groundnut}
+\citation{groundnut}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Generalized, coupled-ODE crop model}{4}{section.2}\protected@file@percent }
+\newlabel{sec:modeling}{{2}{4}{Generalized, coupled-ODE crop model}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Effects of inputs on plant growth}{4}{subsection.2.1}\protected@file@percent }
+\newlabel{subsec:input-effects}{{2.1}{4}{Effects of inputs on plant growth}{subsection.2.1}{}}
+\citation{geometric-mean-growth}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces This paper treats a crop as a control system with its own internal state variables and dynamics, affected by input controls, input disturbances, and feedback. Output is a function of the state variables.}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:plant-as-control-sys}{{1}{5}{This paper treats a crop as a control system with its own internal state variables and dynamics, affected by input controls, input disturbances, and feedback. Output is a function of the state variables}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Growth dynamics}{5}{subsection.2.2}\protected@file@percent }
+\newlabel{subsec:dynamics}{{2.2}{5}{Growth dynamics}{subsection.2.2}{}}
+\newlabel{eqn:logistic-general}{{1}{5}{Growth dynamics}{equation.2.1}{}}
+\newlabel{eqn:hats-for-h}{{2}{5}{Growth dynamics}{equation.2.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Effects of irrigation and fertilizer on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect. \cite  {azi2025sweetcorn_bion_fertilizer}, \cite  {lum2024azolla_sweetcorn_growth}, \cite  {liu2024irrigation_fertilizer_silage_corn}, \cite  {khan2014pistia_phytochemistry}.}}{6}{table.1}\protected@file@percent }
+\newlabel{tab:fert-irr-effects}{{1}{6}{Effects of irrigation and fertilizer on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect. \cite {azi2025sweetcorn_bion_fertilizer}, \cite {lum2024azolla_sweetcorn_growth}, \cite {liu2024irrigation_fertilizer_silage_corn}, \cite {khan2014pistia_phytochemistry}}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Effects of temperature and solar radiation on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect, ``--'' indicates a negative effect. For flower size, excess heat and radiation reduce flower development, hence negative effects. \cite  {groundnut}}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:temp-rad-effects}{{2}{6}{Effects of temperature and solar radiation on growth dynamics. ``+'' indicates positive effect, ``$\sim $'' indicates a negligible effect, ``--'' indicates a negative effect. For flower size, excess heat and radiation reduce flower development, hence negative effects. \cite {groundnut}}{table.2}{}}
+\newlabel{eqn:hats-for-A}{{3}{6}{Growth dynamics}{equation.2.3}{}}
+\citation{ren2022agronomic_traits_climate_maize_yield}
+\citation{stubbs2023plant_height_maize_lodging}
+\citation{wang2022maize_tassel_anther_pollen_genetics}
+\citation{silveira2024adaptability_maize_tassel_yield}
+\newlabel{eqn:hats-for-N}{{4}{7}{Growth dynamics}{equation.2.4}{}}
+\newlabel{eqn:hats-for-c}{{5}{7}{Growth dynamics}{equation.2.5}{}}
+\newlabel{eqn:hats-for-P}{{6}{7}{Growth dynamics}{equation.2.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Delayed absorption via FIR convolution}{7}{subsection.2.3}\protected@file@percent }
+\newlabel{subsec:fir-conv}{{2.3}{7}{Delayed absorption via FIR convolution}{subsection.2.3}{}}
+\newlabel{eqn:erf}{{7}{8}{Delayed absorption via FIR convolution}{equation.2.7}{}}
+\newlabel{eqn:gaussian-kernel}{{8}{8}{Delayed absorption via FIR convolution}{equation.2.8}{}}
+\newlabel{eqn:L-star}{{9}{8}{Delayed absorption via FIR convolution}{equation.2.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Cumulative stress tracking via EMA filtering}{8}{subsection.2.4}\protected@file@percent }
+\newlabel{subsec:ema-smooth}{{2.4}{8}{Cumulative stress tracking via EMA filtering}{subsection.2.4}{}}
+\newlabel{eqn:iir-filter}{{10}{9}{Cumulative stress tracking via EMA filtering}{equation.2.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Nutrient factor calculation}{9}{subsection.2.5}\protected@file@percent }
+\newlabel{subsec:nutrient-factors}{{2.5}{9}{Nutrient factor calculation}{subsection.2.5}{}}
+\newlabel{eqn:delayed-trans}{{11}{9}{Nutrient factor calculation}{equation.2.11}{}}
+\newlabel{eqn:cum-trans}{{12}{9}{Nutrient factor calculation}{equation.2.12}{}}
+\newlabel{eqn:anomaly-trans}{{13}{9}{Nutrient factor calculation}{equation.2.13}{}}
+\newlabel{eqn:cum-div-trans}{{14}{9}{Nutrient factor calculation}{equation.2.14}{}}
+\newlabel{eqn:nut-fac-trans}{{15}{10}{Nutrient factor calculation}{equation.2.15}{}}
+\citation{fsa-acreage}
+\citation{NSRDB}
+\citation{noaa-precip}
+\citation{corn-nutrient-management}
+\citation{corn-growth-stages,corn-physiology}
+\citation{bayer2018height_difference_corn}
+\citation{kellersfarmstand2018sweetcorn_fieldcorn_height}
+\citation{nanda2017corn_leaf_number_maturity}
+\citation{nielsen2025tassel_emergence_pollen_shed}
+\citation{ufseeds2024pencil_cob_corn_seed}
+\citation{bayer2020corn_growth_stages_gdu}
+\citation{ucdavis2024corn_crop_development}
+\citation{sisson2020corn_growth_stages}
+\citation{westco_corn_growth}
+\citation{cornstates2018corn_growth_stages_gdu}
+\citation{corn-growth-stages,corn-physiology}
+\citation{bayer2018height_difference_corn}
+\citation{kellersfarmstand2018sweetcorn_fieldcorn_height}
+\citation{nanda2017corn_leaf_number_maturity}
+\citation{nielsen2025tassel_emergence_pollen_shed}
+\citation{ufseeds2024pencil_cob_corn_seed}
+\citation{bayer2020corn_growth_stages_gdu}
+\citation{ucdavis2024corn_crop_development}
+\citation{sisson2020corn_growth_stages}
+\citation{westco_corn_growth}
+\citation{cornstates2018corn_growth_stages_gdu}
+\citation{eisenthal2025fertilizer_prices}
+\citation{ncga2025corn_production_costs}
+\citation{swanson2025high_production_costs_part3}
+\citation{farmonaut2025corn_land_costs}
+\citation{newman2023irrigating_us_crops}
+\citation{RATHORE2024101373}
+\citation{berger2020estimating_bushels_corn_ground}
+\citation{groenke2018estimating_corn_yield_potential}
+\citation{bayer2023estimating_corn_yield}
+\citation{licht2020corn_yield_estimates}
+\citation{usda2026iowa_cash_grain_bids}
+\citation{sucu2020plant_density_corn_silage}
+\citation{dhaliwal2021sweetcorn_density_tolerance}
+\citation{hanna2024corn_weight}
+\citation{hommood2020physical_mechanical_sweetcorn}
+\citation{eisenthal2025fertilizer_prices}
+\citation{ncga2025corn_production_costs}
+\citation{swanson2025high_production_costs_part3}
+\citation{farmonaut2025corn_land_costs}
+\citation{newman2023irrigating_us_crops}
+\citation{RATHORE2024101373}
+\citation{berger2020estimating_bushels_corn_ground}
+\citation{groenke2018estimating_corn_yield_potential}
+\citation{bayer2023estimating_corn_yield}
+\citation{licht2020corn_yield_estimates}
+\citation{usda2026iowa_cash_grain_bids}
+\citation{sucu2020plant_density_corn_silage}
+\citation{dhaliwal2021sweetcorn_density_tolerance}
+\citation{hanna2024corn_weight}
+\citation{hommood2020physical_mechanical_sweetcorn}
+\citation{corn-growth-stages}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Simulation}{11}{subsection.2.6}\protected@file@percent }
+\newlabel{subsec:simulation}{{2.6}{11}{Simulation}{subsection.2.6}{}}
+\newlabel{eqn:closed-form-logistic}{{16}{11}{Simulation}{equation.2.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7}Case study: corn in Iowa}{11}{subsection.2.7}\protected@file@percent }
+\newlabel{subsec:case-study}{{2.7}{11}{Case study: corn in Iowa}{subsection.2.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Illustration of the metabolic transformation pipeline using fertilizer as an example. Applied fertilizer is treated as a finite impulse, while absorbed fertilizer is modeled by convolving the applied signal with a Gaussian FIR kernel. Panel 1 shows how larger temporal spreads, which define the kernel, result in slower absorption. Panel 2 shows the cumulative fertilizer absorbed over time. Panel 3 shows the fertilizer anomaly, which compares the actual cumulative fertilizer absorbed to the expected level. Panel 4 shows how EMA filtering smooths the effects of cumulative anomalies. Panel 5 shows the nutrient factors that result from the preceding transformations.}}{12}{figure.2}\protected@file@percent }
+\newlabel{fig:metabolism-transformations}{{2}{12}{Illustration of the metabolic transformation pipeline using fertilizer as an example. Applied fertilizer is treated as a finite impulse, while absorbed fertilizer is modeled by convolving the applied signal with a Gaussian FIR kernel. Panel 1 shows how larger temporal spreads, which define the kernel, result in slower absorption. Panel 2 shows the cumulative fertilizer absorbed over time. Panel 3 shows the fertilizer anomaly, which compares the actual cumulative fertilizer absorbed to the expected level. Panel 4 shows how EMA filtering smooths the effects of cumulative anomalies. Panel 5 shows the nutrient factors that result from the preceding transformations}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Corn development timeline and typical final values from agronomic literature. \cite  {corn-growth-stages,corn-physiology}, \cite  {bayer2018height_difference_corn}, \cite  {kellersfarmstand2018sweetcorn_fieldcorn_height}, \cite  {nanda2017corn_leaf_number_maturity}, \cite  {nielsen2025tassel_emergence_pollen_shed}, \cite  {ufseeds2024pencil_cob_corn_seed}, \cite  {bayer2020corn_growth_stages_gdu}, \cite  {ucdavis2024corn_crop_development}, \cite  {sisson2020corn_growth_stages}, \cite  {westco_corn_growth}, \cite  {cornstates2018corn_growth_stages_gdu}.}}{13}{table.3}\protected@file@percent }
+\newlabel{tab:corn-development}{{3}{13}{Corn development timeline and typical final values from agronomic literature. \cite {corn-growth-stages,corn-physiology}, \cite {bayer2018height_difference_corn}, \cite {kellersfarmstand2018sweetcorn_fieldcorn_height}, \cite {nanda2017corn_leaf_number_maturity}, \cite {nielsen2025tassel_emergence_pollen_shed}, \cite {ufseeds2024pencil_cob_corn_seed}, \cite {bayer2020corn_growth_stages_gdu}, \cite {ucdavis2024corn_crop_development}, \cite {sisson2020corn_growth_stages}, \cite {westco_corn_growth}, \cite {cornstates2018corn_growth_stages_gdu}}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Model parameters derived from values in Table \ref  {tab:corn-development}. Initial conditions are set to $k_{x}/K$ where $K \approx 2900$ is the season length in hours (about 120 days).}}{13}{table.4}\protected@file@percent }
+\newlabel{tab:model-params}{{4}{13}{Model parameters derived from values in Table \ref {tab:corn-development}. Initial conditions are set to $k_{x}/K$ where $K \approx 2900$ is the season length in hours (about 120 days)}{table.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Stochastic weather scenario generation}{13}{section.3}\protected@file@percent }
+\newlabel{sec:weather}{{3}{13}{Stochastic weather scenario generation}{section.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Economic weights for the corn objective function. The fruit biomass weight accounts for approximately 28,350 plants per acre at \$0.157/kg. \cite  {eisenthal2025fertilizer_prices}, \cite  {ncga2025corn_production_costs}, \cite  {swanson2025high_production_costs_part3}, \cite  {farmonaut2025corn_land_costs}, \cite  {newman2023irrigating_us_crops}, \cite  {RATHORE2024101373}, \cite  {berger2020estimating_bushels_corn_ground}, \cite  {groenke2018estimating_corn_yield_potential}, \cite  {bayer2023estimating_corn_yield}, \cite  {licht2020corn_yield_estimates}, \cite  {usda2026iowa_cash_grain_bids}, \cite  {sucu2020plant_density_corn_silage}, \cite  {dhaliwal2021sweetcorn_density_tolerance}, \cite  {hanna2024corn_weight}, \cite  {hommood2020physical_mechanical_sweetcorn}.}}{14}{table.5}\protected@file@percent }
+\newlabel{tab:economic-weights}{{5}{14}{Economic weights for the corn objective function. The fruit biomass weight accounts for approximately 28,350 plants per acre at \$0.157/kg. \cite {eisenthal2025fertilizer_prices}, \cite {ncga2025corn_production_costs}, \cite {swanson2025high_production_costs_part3}, \cite {farmonaut2025corn_land_costs}, \cite {newman2023irrigating_us_crops}, \cite {RATHORE2024101373}, \cite {berger2020estimating_bushels_corn_ground}, \cite {groenke2018estimating_corn_yield_potential}, \cite {bayer2023estimating_corn_yield}, \cite {licht2020corn_yield_estimates}, \cite {usda2026iowa_cash_grain_bids}, \cite {sucu2020plant_density_corn_silage}, \cite {dhaliwal2021sweetcorn_density_tolerance}, \cite {hanna2024corn_weight}, \cite {hommood2020physical_mechanical_sweetcorn}}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Defining a stochastic weather scenario}{14}{subsection.3.1}\protected@file@percent }
+\newlabel{subsec:weather-generation}{{3.1}{14}{Defining a stochastic weather scenario}{subsection.3.1}{}}
+\newlabel{eqn:history}{{19}{14}{Defining a stochastic weather scenario}{equation.3.19}{}}
+\newlabel{eqn:weather-scenario}{{20}{14}{Defining a stochastic weather scenario}{equation.3.20}{}}
+\newlabel{eqn:event}{{21}{15}{Defining a stochastic weather scenario}{equation.3.21}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Global scaling and offset}{15}{subsubsection.3.1.1}\protected@file@percent }
+\newlabel{subsubsec:weather-step-1}{{3.1.1}{15}{Global scaling and offset}{subsubsection.3.1.1}{}}
+\newlabel{eqn:global-scaling}{{22}{15}{Global scaling and offset}{equation.3.22}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Add white noise}{15}{subsubsection.3.1.2}\protected@file@percent }
+\newlabel{subsubsec:weather-step-2}{{3.1.2}{15}{Add white noise}{subsubsection.3.1.2}{}}
+\newlabel{eqn:varepsilon}{{24}{15}{Add white noise}{equation.3.24}{}}
+\newlabel{eqn:smooth-noise}{{26}{15}{Add white noise}{equation.3.26}{}}
+\newlabel{eqn:add-noise}{{28}{16}{Add white noise}{equation.3.28}{}}
+\newlabel{eqn:daymask}{{29}{16}{Add white noise}{equation.3.29}{}}
+\newlabel{eqn:P2-P1}{{30}{16}{Add white noise}{equation.3.30}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Drought/downpour injection}{16}{subsubsection.3.1.3}\protected@file@percent }
+\newlabel{subsubsec:drought-injection}{{3.1.3}{16}{Drought/downpour injection}{subsubsection.3.1.3}{}}
+\newlabel{eqn:drought-event}{{31}{16}{Drought/downpour injection}{equation.3.31}{}}
+\newlabel{eqn:affected-indices}{{32}{16}{Drought/downpour injection}{equation.3.32}{}}
+\newlabel{eqn:P3}{{33}{16}{Drought/downpour injection}{equation.3.33}{}}
+\newlabel{eqn:T3R3-T2R2}{{34}{16}{Drought/downpour injection}{equation.3.34}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Heat wave/cold snap injection}{16}{subsubsection.3.1.4}\protected@file@percent }
+\newlabel{subsubsec:heat-wave-injection}{{3.1.4}{16}{Heat wave/cold snap injection}{subsubsection.3.1.4}{}}
+\newlabel{eqn:heatwave-event}{{35}{16}{Heat wave/cold snap injection}{equation.3.35}{}}
+\newlabel{eqn:kappa-ramp}{{36}{17}{Heat wave/cold snap injection}{equation.3.36}{}}
+\newlabel{eqn:kappa-hold}{{37}{17}{Heat wave/cold snap injection}{equation.3.37}{}}
+\newlabel{eqn:w-heat}{{38}{17}{Heat wave/cold snap injection}{equation.3.38}{}}
+\newlabel{eqn:T4a}{{39}{17}{Heat wave/cold snap injection}{equation.3.39}{}}
+\newlabel{eqn:P4P3-R4R3}{{40}{17}{Heat wave/cold snap injection}{equation.3.40}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Clipping to physical bounds}{17}{subsubsection.3.1.5}\protected@file@percent }
+\newlabel{subsubsec:clipping}{{3.1.5}{17}{Clipping to physical bounds}{subsubsection.3.1.5}{}}
+\newlabel{eqn:PTR-syn}{{43}{17}{Clipping to physical bounds}{equation.3.43}{}}
+\citation{kranz2008irrigation}
+\citation{hatfield2015temperature}
+\citation{kranz2008irrigation}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Extremity index}{18}{subsection.3.2}\protected@file@percent }
+\newlabel{subsec:extremity}{{3.2}{18}{Extremity index}{subsection.3.2}{}}
+\newlabel{eqn:extreme-precip}{{44}{18}{Extremity index}{equation.3.44}{}}
+\newlabel{eqn:extreme-temp}{{45}{18}{Extremity index}{equation.3.45}{}}
+\newlabel{eqn:extreme-drought}{{46}{18}{Extremity index}{equation.3.46}{}}
+\citation{hatfield2015temperature}
+\citation{goldberg1989ga}
+\newlabel{eqn:extreme-heatwave}{{47}{19}{Extremity index}{equation.3.47}{}}
+\newlabel{eqn:extremity}{{48}{19}{Extremity index}{equation.3.48}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Weather scenario suite}{19}{subsection.3.3}\protected@file@percent }
+\newlabel{subsec:weather-scenarios}{{3.3}{19}{Weather scenario suite}{subsection.3.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Weather scenario categories with extremity index ranges.}}{19}{table.6}\protected@file@percent }
+\newlabel{tab:scenario-categories}{{6}{19}{Weather scenario categories with extremity index ranges}{table.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Genetic algorithm optimization}{20}{section.4}\protected@file@percent }
+\newlabel{sec:ga}{{4}{20}{Genetic algorithm optimization}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Algorithm description}{20}{subsection.4.1}\protected@file@percent }
+\newlabel{subsec:ga-alg}{{4.1}{20}{Algorithm description}{subsection.4.1}{}}
+\newlabel{eqn:crossover}{{49}{20}{Algorithm description}{equation.4.49}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Genetic algorithm visualized. Initialization, followed by evaluation, ranking, mating, and selection, repeated for 100 generations with an added check for stagnation every 10 generations.}}{21}{figure.3}\protected@file@percent }
+\newlabel{fig:ga-alg}{{3}{21}{Genetic algorithm visualized. Initialization, followed by evaluation, ranking, mating, and selection, repeated for 100 generations with an added check for stagnation every 10 generations}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Decision variables and search space: GA}{21}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:design-vars-ga}{{4.2}{21}{Decision variables and search space: GA}{subsection.4.2}{}}
+\newlabel{eqn:design-vars}{{50}{21}{Decision variables and search space: GA}{equation.4.50}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Genetic algorithm objective function}{22}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:objective}{{4.3}{22}{Genetic algorithm objective function}{subsection.4.3}{}}
+\newlabel{eqn:cost-function}{{51}{22}{Genetic algorithm objective function}{equation.4.51}{}}
+\newlabel{eqn:crop-value}{{52}{22}{Genetic algorithm objective function}{equation.4.52}{}}
+\newlabel{eqn:input-costs}{{53}{22}{Genetic algorithm objective function}{equation.4.53}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Model predictive control}{23}{section.5}\protected@file@percent }
+\newlabel{sec:mpc}{{5}{23}{Model predictive control}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Optimization and decision epochs}{23}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:optimization}{{5.1}{23}{Optimization and decision epochs}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Constrained finite-time optimal control}{23}{subsection.5.2}\protected@file@percent }
+\newlabel{subsec:cftoc}{{5.2}{23}{Constrained finite-time optimal control}{subsection.5.2}{}}
+\newlabel{eqn:U0K}{{54}{23}{Constrained finite-time optimal control}{equation.5.54}{}}
+\newlabel{eqn:gen-opt-ctrl-cost}{{55}{23}{Constrained finite-time optimal control}{equation.5.55}{}}
+\newlabel{eqn:dyn-constraint}{{56}{23}{Constrained finite-time optimal control}{equation.5.56}{}}
+\newlabel{eqn:ineq-constraints}{{57}{23}{Constrained finite-time optimal control}{equation.5.57}{}}
+\citation{bynum2021pyomo}
+\citation{wachter2006ipopt}
+\newlabel{eqn:minimization-cftoc}{{58}{24}{Constrained finite-time optimal control}{equation.5.58}{}}
+\newlabel{eqn:stage-cost}{{59}{24}{Constrained finite-time optimal control}{equation.5.59}{}}
+\newlabel{eqn:terminal-cost}{{60}{24}{Constrained finite-time optimal control}{equation.5.60}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Decision variables and search space: MPC}{24}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:design-vars-mpc}{{5.3}{24}{Decision variables and search space: MPC}{subsection.5.3}{}}
+\citation{shahriari2016taking}
+\citation{bergstra2011algorithms}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}MPC parameter tuning via Bayesian optimization}{25}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:mpc-params}{{5.4}{25}{MPC parameter tuning via Bayesian optimization}{subsection.5.4}{}}
+\newlabel{eqn:robust-objective}{{61}{25}{MPC parameter tuning via Bayesian optimization}{equation.5.61}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Bayesian optimization search space for MPC parameters.}}{26}{table.7}\protected@file@percent }
+\newlabel{tab:search-space}{{7}{26}{Bayesian optimization search space for MPC parameters}{table.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Receding-horizon algorithm}{26}{subsection.5.5}\protected@file@percent }
+\newlabel{subsec:mpc-algorithm}{{5.5}{26}{Receding-horizon algorithm}{subsection.5.5}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Model Predictive Control for Irrigation and Fertilization}}{27}{algorithm.1}\protected@file@percent }
+\newlabel{alg:mpc}{{1}{27}{Receding-horizon algorithm}{algorithm.1}{}}
+\citation{kranz2008irrigation}
+\citation{davies2020nitrogen}
+\citation{gouthami2022water}
+\citation{roy2006nutrient}
+\citation{mallarino2015longterm}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{28}{section.6}\protected@file@percent }
+\newlabel{sec:results}{{6}{28}{Results}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Simulation configuration}{28}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:sim-config}{{6.1}{28}{Simulation configuration}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Baseline performance: farmer best practices}{28}{subsection.6.2}\protected@file@percent }
+\newlabel{subsec:baseline}{{6.2}{28}{Baseline performance: farmer best practices}{subsection.6.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Environmental disturbances and control inputs for the baseline (``normal") scenario. Top three panels show hourly precipitation, solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1\nobreakspace  {}inch) and fertilizer (monthly, 90\nobreakspace  {}lbs) application strategy.}}{29}{figure.4}\protected@file@percent }
+\newlabel{fig:baseline-inputs}{{4}{29}{Environmental disturbances and control inputs for the baseline (``normal") scenario. Top three panels show hourly precipitation, solar radiation, and temperature from historical Iowa data. Bottom two panels show the farmer's irrigation (weekly, 1~inch) and fertilizer (monthly, 90~lbs) application strategy}{figure.4}{}}
+\citation{robinson2025usda_crop_report_2025}
+\citation{usda2026iowa_daily_cash_grain_bids}
+\citation{swanson2025high_production_cost_series3}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Genetic algorithm optimization}{30}{subsection.6.3}\protected@file@percent }
+\newlabel{subsec:ga-results}{{6.3}{30}{Genetic algorithm optimization}{subsection.6.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Plant state variable trajectories under the baseline scenario (farmer best practices during mild drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$587/acre in revenue.}}{31}{figure.5}\protected@file@percent }
+\newlabel{fig:baseline-growth}{{5}{31}{Plant state variable trajectories under the baseline scenario (farmer best practices during mild drought). All state variables reach suboptimal final values due to cumulative water stress. This strategy yields \$587/acre in revenue}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces GA convergence across 10 independent runs. Each curve shows the best revenue at each generation. All runs exhibit rapid improvement in early generations followed by convergence to near-optimal solutions. The consistency across runs demonstrates algorithm robustness.}}{32}{figure.6}\protected@file@percent }
+\newlabel{fig:ga-convergence}{{6}{32}{GA convergence across 10 independent runs. Each curve shows the best revenue at each generation. All runs exhibit rapid improvement in early generations followed by convergence to near-optimal solutions. The consistency across runs demonstrates algorithm robustness}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Four-way strategy comparison}{32}{subsection.6.4}\protected@file@percent }
+\newlabel{subsec:comparison}{{6.4}{32}{Four-way strategy comparison}{subsection.6.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Plant state variable trajectories for the best member from each of the 10 independent GA runs. The tight clustering of trajectories demonstrates that different GA runs converge to similar optimal strategies.}}{33}{figure.7}\protected@file@percent }
+\newlabel{fig:state-trajectories}{{7}{33}{Plant state variable trajectories for the best member from each of the 10 independent GA runs. The tight clustering of trajectories demonstrates that different GA runs converge to similar optimal strategies}{figure.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Summary statistics for the four strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean).}}{34}{table.8}\protected@file@percent }
+\newlabel{tab:main-results}{{8}{34}{Summary statistics for the four strategies across 21 weather scenarios. CV = coefficient of variation (standard deviation / mean)}{table.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Revenue distribution across all 21 weather scenarios. Box plots show median, interquartile range, and outliers for each strategy. GA (Normal) achieves the highest median revenue but also exhibits the widest range, while MPC shows the lowest variability.}}{34}{figure.8}\protected@file@percent }
+\newlabel{fig:boxplot}{{8}{34}{Revenue distribution across all 21 weather scenarios. Box plots show median, interquartile range, and outliers for each strategy. GA (Normal) achieves the highest median revenue but also exhibits the widest range, while MPC shows the lowest variability}{figure.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Revenue comparison across all 21 weather scenarios, sorted by extremity index. All optimization-based strategies outperform farmer best practices in most scenarios, with GA (Normal) achieving the highest revenues under normal conditions and GA (Drought) excelling under extreme conditions.}}{34}{figure.9}\protected@file@percent }
+\newlabel{fig:revenue-comparison}{{9}{34}{Revenue comparison across all 21 weather scenarios, sorted by extremity index. All optimization-based strategies outperform farmer best practices in most scenarios, with GA (Normal) achieving the highest revenues under normal conditions and GA (Drought) excelling under extreme conditions}{figure.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Revenue comparison by weather category. GA (Normal) achieves the highest revenues under normal conditions, while GA (Drought) is better suited for extreme weather scenarios.}}{35}{figure.10}\protected@file@percent }
+\newlabel{fig:by-category}{{10}{35}{Revenue comparison by weather category. GA (Normal) achieves the highest revenues under normal conditions, while GA (Drought) is better suited for extreme weather scenarios}{figure.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{35}{section.7}\protected@file@percent }
+\newlabel{sec:discussion}{{7}{35}{Discussion}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Interpretation of results}{35}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:interpretation}{{7.1}{35}{Interpretation of results}{subsection.7.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Revenue (\$/acre) for all 21 weather scenarios sorted by extremity index. Cell shading indicates revenue level (darker green = higher revenue). GA (Normal) dominates in normal/moderate conditions; GA (Drought) excels in drought scenarios; all strategies struggle in extreme combined scenarios.}}{36}{table.9}\protected@file@percent }
+\newlabel{tab:scenario-results}{{9}{36}{Revenue (\$/acre) for all 21 weather scenarios sorted by extremity index. Cell shading indicates revenue level (darker green = higher revenue). GA (Normal) dominates in normal/moderate conditions; GA (Drought) excels in drought scenarios; all strategies struggle in extreme combined scenarios}{table.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Computational considerations}{37}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:compute}{{7.2}{37}{Computational considerations}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Limitations and Future Extensions}{37}{subsection.7.3}\protected@file@percent }
+\newlabel{subsec:future-work}{{7.3}{37}{Limitations and Future Extensions}{subsection.7.3}{}}
+\newlabel{eqn:richards-growth}{{62}{37}{Limitations and Future Extensions}{equation.7.62}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{38}{section.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{38}{Conclusion}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Acknowledgements}{40}{section.9}\protected@file@percent }
+\@writefile{toc}{\let\numberline\tmptocnumberline}
+\@writefile{toc}{\contentsline {section}{\numberline {Appendix \nobreakspace  {}A}Supplementary Information}{41}{appendix.A}\protected@file@percent }
+\newlabel{sec:supplementary}{{Appendix \nobreakspace  {}A}{41}{Supplementary Information}{appendix.A}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {Appendix \nobreakspace  {}A.1}Nutrient absorption dynamics}{41}{subsection.A.1}\protected@file@percent }
+\newlabel{subsec:supp-nutrient}{{Appendix \nobreakspace  {}A.1}{41}{Nutrient absorption dynamics}{subsection.A.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.11}{\ignorespaces Applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption dynamics are evident in the lag between applied inputs and the smoothed absorbed signals. Water absorption ($\sigma _w = 30$\nobreakspace  {}hr) responds more quickly than fertilizer absorption ($\sigma _f = 300$\nobreakspace  {}hr).}}{41}{figure.11}\protected@file@percent }
+\newlabel{fig:applied-absorbed}{{A.11}{41}{Applied versus absorbed nutrients under the baseline farmer strategy. The delayed absorption dynamics are evident in the lag between applied inputs and the smoothed absorbed signals. Water absorption ($\sigma _w = 30$~hr) responds more quickly than fertilizer absorption ($\sigma _f = 300$~hr)}{figure.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.12}{\ignorespaces Cumulative absorbed nutrients (solid) versus expected levels (dashed red). The growing gap between actual and expected water absorption reflects the drought stress accumulating over the season.}}{42}{figure.12}\protected@file@percent }
+\newlabel{fig:cumulative}{{A.12}{42}{Cumulative absorbed nutrients (solid) versus expected levels (dashed red). The growing gap between actual and expected water absorption reflects the drought stress accumulating over the season}{figure.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.13}{\ignorespaces Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress.}}{43}{figure.13}\protected@file@percent }
+\newlabel{fig:divergence}{{A.13}{43}{Instantaneous divergence from expected cumulative nutrient levels. Higher divergence indicates greater stress}{figure.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.14}{\ignorespaces Nutrient factor evolution under the baseline scenario. The water nutrient factor $\nu _w$ declines due to cumulative drought stress, while fertilizer, temperature, and radiation factors remain closer to 1.0 (no stress). The declining $\nu _w$ (which later recovers) reduces effective growth rates and carrying capacities throughout the season.}}{44}{figure.14}\protected@file@percent }
+\newlabel{fig:nutrient-factors}{{A.14}{44}{Nutrient factor evolution under the baseline scenario. The water nutrient factor $\nu _w$ declines due to cumulative drought stress, while fertilizer, temperature, and radiation factors remain closer to 1.0 (no stress). The declining $\nu _w$ (which later recovers) reduces effective growth rates and carrying capacities throughout the season}{figure.14}{}}
+\bibstyle{elsarticle-num}
+\bibdata{bibliography}
+\bibcite{usda-farm-income}{{1}{}{{}}{{}}}
+\bibcite{zohdi2024digitaltwin}{{2}{}{{}}{{}}}
+\bibcite{mengi2023indoorfarming}{{3}{}{{}}{{}}}
+\bibcite{goodrich2022sensors}{{4}{}{{}}{{}}}
+\bibcite{tagkopoulos2024aifs}{{5}{}{{}}{{}}}
+\bibcite{verhulst1838}{{6}{}{{}}{{}}}
+\bibcite{jones2003dssat}{{7}{}{{}}{{}}}
+\bibcite{holzworth2014apsim}{{8}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {Appendix \nobreakspace  {}A.2}Suboptimal GA strategies}{45}{subsection.A.2}\protected@file@percent }
+\newlabel{subsec:supp-suboptimal}{{Appendix \nobreakspace  {}A.2}{45}{Suboptimal GA strategies}{subsection.A.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {A.15}{\ignorespaces Plant state variable trajectories for the worst member from each GA run's final population. These suboptimal strategies achieve almost no growth, confirming that the model does not guarantee excellent growth and appropriately penalizes poor resource allocation strategies.}}{46}{figure.15}\protected@file@percent }
+\newlabel{fig:worst}{{A.15}{46}{Plant state variable trajectories for the worst member from each GA run's final population. These suboptimal strategies achieve almost no growth, confirming that the model does not guarantee excellent growth and appropriately penalizes poor resource allocation strategies}{figure.15}{}}
+\bibcite{wofost}{{9}{}{{}}{{}}}
+\bibcite{precision-ag-review}{{10}{}{{}}{{}}}
+\bibcite{irrigation-optimization}{{11}{}{{}}{{}}}
+\bibcite{dp-irrigation}{{12}{}{{}}{{}}}
+\bibcite{ga-agriculture}{{13}{}{{}}{{}}}
+\bibcite{goldberg1989ga}{{14}{}{{}}{{}}}
+\bibcite{ga-irrigation-scheduling}{{15}{}{{}}{{}}}
+\bibcite{ga-fertilizer}{{16}{}{{}}{{}}}
+\bibcite{ipcc2021}{{17}{}{{}}{{}}}
+\bibcite{rawlings2017mpc}{{18}{}{{}}{{}}}
+\bibcite{corn-nitrogen}{{19}{}{{}}{{}}}
+\bibcite{corn-irrigation}{{20}{}{{}}{{}}}
+\bibcite{corn-temperature}{{21}{}{{}}{{}}}
+\bibcite{azi2025sweetcorn_bion_fertilizer}{{22}{}{{}}{{}}}
+\bibcite{lum2024azolla_sweetcorn_growth}{{23}{}{{}}{{}}}
+\bibcite{liu2024irrigation_fertilizer_silage_corn}{{24}{}{{}}{{}}}
+\bibcite{khan2014pistia_phytochemistry}{{25}{}{{}}{{}}}
+\bibcite{groundnut}{{26}{}{{}}{{}}}
+\bibcite{geometric-mean-growth}{{27}{}{{}}{{}}}
+\bibcite{ren2022agronomic_traits_climate_maize_yield}{{28}{}{{}}{{}}}
+\bibcite{stubbs2023plant_height_maize_lodging}{{29}{}{{}}{{}}}
+\bibcite{wang2022maize_tassel_anther_pollen_genetics}{{30}{}{{}}{{}}}
+\bibcite{silveira2024adaptability_maize_tassel_yield}{{31}{}{{}}{{}}}
+\bibcite{fsa-acreage}{{32}{}{{}}{{}}}
+\bibcite{NSRDB}{{33}{}{{}}{{}}}
+\bibcite{noaa-precip}{{34}{}{{}}{{}}}
+\bibcite{corn-nutrient-management}{{35}{}{{}}{{}}}
+\bibcite{corn-growth-stages}{{36}{}{{}}{{}}}
+\bibcite{corn-physiology}{{37}{}{{}}{{}}}
+\bibcite{bayer2018height_difference_corn}{{38}{}{{}}{{}}}
+\bibcite{kellersfarmstand2018sweetcorn_fieldcorn_height}{{39}{}{{}}{{}}}
+\bibcite{nanda2017corn_leaf_number_maturity}{{40}{}{{}}{{}}}
+\bibcite{nielsen2025tassel_emergence_pollen_shed}{{41}{}{{}}{{}}}
+\bibcite{ufseeds2024pencil_cob_corn_seed}{{42}{}{{}}{{}}}
+\bibcite{bayer2020corn_growth_stages_gdu}{{43}{}{{}}{{}}}
+\bibcite{ucdavis2024corn_crop_development}{{44}{}{{}}{{}}}
+\bibcite{sisson2020corn_growth_stages}{{45}{}{{}}{{}}}
+\bibcite{westco_corn_growth}{{46}{}{{}}{{}}}
+\bibcite{cornstates2018corn_growth_stages_gdu}{{47}{}{{}}{{}}}
+\bibcite{eisenthal2025fertilizer_prices}{{48}{}{{}}{{}}}
+\bibcite{ncga2025corn_production_costs}{{49}{}{{}}{{}}}
+\bibcite{swanson2025high_production_costs_part3}{{50}{}{{}}{{}}}
+\bibcite{farmonaut2025corn_land_costs}{{51}{}{{}}{{}}}
+\bibcite{newman2023irrigating_us_crops}{{52}{}{{}}{{}}}
+\bibcite{RATHORE2024101373}{{53}{}{{}}{{}}}
+\bibcite{berger2020estimating_bushels_corn_ground}{{54}{}{{}}{{}}}
+\bibcite{groenke2018estimating_corn_yield_potential}{{55}{}{{}}{{}}}
+\bibcite{bayer2023estimating_corn_yield}{{56}{}{{}}{{}}}
+\bibcite{licht2020corn_yield_estimates}{{57}{}{{}}{{}}}
+\bibcite{usda2026iowa_cash_grain_bids}{{58}{}{{}}{{}}}
+\bibcite{sucu2020plant_density_corn_silage}{{59}{}{{}}{{}}}
+\bibcite{dhaliwal2021sweetcorn_density_tolerance}{{60}{}{{}}{{}}}
+\bibcite{hanna2024corn_weight}{{61}{}{{}}{{}}}
+\bibcite{hommood2020physical_mechanical_sweetcorn}{{62}{}{{}}{{}}}
+\bibcite{kranz2008irrigation}{{63}{}{{}}{{}}}
+\bibcite{hatfield2015temperature}{{64}{}{{}}{{}}}
+\bibcite{bynum2021pyomo}{{65}{}{{}}{{}}}
+\bibcite{wachter2006ipopt}{{66}{}{{}}{{}}}
+\bibcite{shahriari2016taking}{{67}{}{{}}{{}}}
+\bibcite{bergstra2011algorithms}{{68}{}{{}}{{}}}
+\bibcite{davies2020nitrogen}{{69}{}{{}}{{}}}
+\bibcite{gouthami2022water}{{70}{}{{}}{{}}}
+\bibcite{roy2006nutrient}{{71}{}{{}}{{}}}
+\bibcite{mallarino2015longterm}{{72}{}{{}}{{}}}
+\bibcite{robinson2025usda_crop_report_2025}{{73}{}{{}}{{}}}
+\bibcite{usda2026iowa_daily_cash_grain_bids}{{74}{}{{}}{{}}}
+\bibcite{swanson2025high_production_cost_series3}{{75}{}{{}}{{}}}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\gdef \@abspage@last{56}

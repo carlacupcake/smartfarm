@@ -180,8 +180,25 @@ class Population:
 
         self.costs = costs
 
+        # Post-process: apply resource constraints (since C++ extension may
+        # not have been rebuilt with constraint support)
+        max_water = self.ga_params.max_seasonal_water
+        max_fert = self.ga_params.max_seasonal_fertilizer
+        if max_water is not None or max_fert is not None:
+            sim_hours = self.model_params.simulation_hours
+            for i in range(self.num_members):
+                irr_freq, irr_amt = self.values[i, 0], self.values[i, 1]
+                fert_freq, fert_amt = self.values[i, 2], self.values[i, 3]
+                step_if = max(1, int(np.ceil(irr_freq)))
+                step_ff = max(1, int(np.ceil(fert_freq)))
+                total_w = len(range(0, sim_hours, step_if)) * irr_amt
+                total_f = len(range(0, sim_hours, step_ff)) * fert_amt
+                if (max_water is not None and total_w > max_water) or \
+                   (max_fert is not None and total_f > max_fert):
+                    self.costs[i] = 1e6
+
         return self
-    
+
 
     def set_costs_with_lambda(
         self,
@@ -407,8 +424,14 @@ class Population:
             "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),
         }
 
+        # Resource constraints (only include if set)
+        if ga.max_seasonal_water is not None:
+            context["max_seasonal_water"] = float(ga.max_seasonal_water)
+        if ga.max_seasonal_fertilizer is not None:
+            context["max_seasonal_fertilizer"] = float(ga.max_seasonal_fertilizer)
+
         return context
-    
+
 
     def _build_sim_context_dict_cpp(self) -> dict:
         """
@@ -505,5 +528,11 @@ class Population:
             "weight_irrigation":     float(getattr(ga, "weight_irrigation",    1.0)),
             "weight_fertilizer":     float(getattr(ga, "weight_fertilizer",    1.0)),
         }
+
+        # Resource constraints (only include if set)
+        if ga.max_seasonal_water is not None:
+            context["max_seasonal_water"] = float(ga.max_seasonal_water)
+        if ga.max_seasonal_fertilizer is not None:
+            context["max_seasonal_fertilizer"] = float(ga.max_seasonal_fertilizer)
 
         return context

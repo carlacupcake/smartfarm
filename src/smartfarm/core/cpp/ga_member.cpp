@@ -161,7 +161,13 @@ public:
       w_leaf_area(dict_get_double(context, "weight_leaf_area")),
       w_fruit(dict_get_double(context,     "weight_fruit_biomass")),
       w_irrig(dict_get_double(context,     "weight_irrigation")),
-      w_fert(dict_get_double(context,      "weight_fertilizer"))
+      w_fert(dict_get_double(context,      "weight_fertilizer")),
+
+      // Resource constraints (negative means no constraint)
+      max_seasonal_water(context.contains("max_seasonal_water") ?
+          dict_get_double(context, "max_seasonal_water") : -1.0),
+      max_seasonal_fertilizer(context.contains("max_seasonal_fertilizer") ?
+          dict_get_double(context, "max_seasonal_fertilizer") : -1.0)
     {
         // disturbances (hourly)
         hourly_precipitation = dict_get_vec(context, "hourly_precipitation");
@@ -258,6 +264,9 @@ private:
     double kh, kA, kN, kc, kP;
 
     double w_height, w_leaf_area, w_fruit, w_irrig, w_fert;
+
+    double max_seasonal_water;      // -1.0 means no constraint
+    double max_seasonal_fertilizer; // -1.0 means no constraint
 
     // Context arrays
     std::vector<double> hourly_precipitation, hourly_temperature, hourly_radiation;
@@ -481,13 +490,21 @@ private:
             P[(size_t)(t+1)] = logistic_step(P[(size_t)t], aP_hat, kP_hat, dt);
         }
 
-        // Cost (negative revenue)
-        const double profit   = w_fruit * P.back() + w_height * h.back() + w_leaf_area * A.back();
+        // Resource totals
         double sum_irrig = 0.0, sum_fert = 0.0;
         for (int t = 0; t < total_time_steps; ++t) {
             sum_irrig += irrigation[(size_t)t];
             sum_fert  += fertilizer[(size_t)t];
         }
+
+        // Resource constraint check (death penalty)
+        if ((max_seasonal_water > 0 && sum_irrig > max_seasonal_water) ||
+            (max_seasonal_fertilizer > 0 && sum_fert > max_seasonal_fertilizer)) {
+            return 1e6;
+        }
+
+        // Cost (negative revenue)
+        const double profit   = w_fruit * P.back() + w_height * h.back() + w_leaf_area * A.back();
         const double expenses = (w_irrig * sum_irrig) + (w_fert * sum_fert);
         const double revenue  = profit - expenses;
         const double cost     = -revenue;

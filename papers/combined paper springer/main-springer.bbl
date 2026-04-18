@@ -1,0 +1,1173 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{75}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{{Economic Research
+  Service}}{2024}]{usda-farm-income}
+\begin{botherref}
+\oauthor{\bsnm{{Economic Research Service}}}:
+Farm income and wealth statistics.
+US Department of Agriculture
+(2024)
+\end{botherref}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Zohdi}{2024}]{zohdi2024digitaltwin}
+\begin{barticle}
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A machine-learning enabled digital-twin framework for next generation
+  precision agriculture and forestry}.
+\bjtitle{Computer Methods in Applied Mechanics and Engineering}
+\bvolume{428},
+\bfpage{117250}
+(\byear{2024})
+\doiurl{10.1016/j.cma.2024.117250}
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Mengi et~al.}{2023}]{mengi2023indoorfarming}
+\begin{barticle}
+\bauthor{\bsnm{Mengi}, \binits{E.}},
+\bauthor{\bsnm{Becker}, \binits{C.J.}},
+\bauthor{\bsnm{Sedky}, \binits{M.}},
+\bauthor{\bsnm{Yu}, \binits{S.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{A digital-twin and rapid optimization framework for optical design of
+  indoor farming systems}.
+\bjtitle{Computational Mechanics}
+\bvolume{72},
+\bfpage{953}--\blpage{970}
+(\byear{2023})
+\doiurl{10.1007/s00466-023-02421-9}
+\end{barticle}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Goodrich et~al.}{2022}]{goodrich2022sensors}
+\begin{barticle}
+\bauthor{\bsnm{Goodrich}, \binits{P.}},
+\bauthor{\bsnm{Betancourt}, \binits{O.}},
+\bauthor{\bsnm{Arias}, \binits{A.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}}:
+\batitle{Placement and drone flight path mapping of agricultural soil sensors
+  using machine learning}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{198},
+\bfpage{107591}
+(\byear{2022})
+\doiurl{10.1016/j.compag.2022.107591}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Tagkopoulos
+  et~al.}{2022}]{tagkopoulos2024aifs}
+\begin{barticle}
+\bauthor{\bsnm{Tagkopoulos}, \binits{I.}},
+\bauthor{\bsnm{Brown}, \binits{S.F.}},
+\bauthor{\bsnm{Liu}, \binits{X.}},
+\bauthor{\bsnm{Zhao}, \binits{Q.}},
+\bauthor{\bsnm{Zohdi}, \binits{T.I.}},
+\bauthor{\bsnm{Earles}, \binits{J.M.}},
+\bauthor{\bsnm{Nitin}, \binits{N.}},
+\bauthor{\bsnm{Runcie}, \binits{D.E.}},
+\bauthor{\bsnm{Lemay}, \binits{D.G.}},
+\bauthor{\bsnm{Smith}, \binits{A.D.}},
+\bauthor{\bsnm{Ronald}, \binits{P.C.}},
+\bauthor{\bsnm{Feng}, \binits{H.}},
+\bauthor{\bsnm{Youtsey}, \binits{G.D.}}:
+\batitle{Special report: {AI} institute for next generation food systems
+  ({AIFS})}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{196},
+\bfpage{106819}
+(\byear{2022})
+\doiurl{10.1016/j.compag.2022.106819}
+\end{barticle}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Verhulst}{1838}]{verhulst1838}
+\begin{barticle}
+\bauthor{\bsnm{Verhulst}, \binits{P.-F.}}:
+\batitle{Notice sur la loi que la population suit dans son accroissement}.
+\bjtitle{Correspondance math{\'e}matique et physique}
+\bvolume{10},
+\bfpage{113}--\blpage{126}
+(\byear{1838})
+\doiurl{10.1007/BF02309004}
+\end{barticle}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Jones et~al.}{2003}]{jones2003dssat}
+\begin{barticle}
+\bauthor{\bsnm{Jones}, \binits{J.W.}},
+\bauthor{\bsnm{Hoogenboom}, \binits{G.}},
+\bauthor{\bsnm{Porter}, \binits{C.H.}},
+\bauthor{\bsnm{Boote}, \binits{K.J.}},
+\bauthor{\bsnm{Batchelor}, \binits{W.D.}},
+\bauthor{\bsnm{Hunt}, \binits{L.}},
+\bauthor{\bsnm{Wilkens}, \binits{P.W.}},
+\bauthor{\bsnm{Singh}, \binits{U.}},
+\bauthor{\bsnm{Gijsman}, \binits{A.J.}},
+\bauthor{\bsnm{Ritchie}, \binits{J.T.}}:
+\batitle{The dssat cropping system model}.
+\bjtitle{European Journal of Agronomy}
+\bvolume{18}(\bissue{3-4}),
+\bfpage{235}--\blpage{265}
+(\byear{2003})
+\doiurl{10.1016/S1161-0301(02)00107-7}
+\end{barticle}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Holzworth et~al.}{2014}]{holzworth2014apsim}
+\begin{barticle}
+\bauthor{\bsnm{Holzworth}, \binits{D.P.}},
+\bauthor{\bsnm{Huth}, \binits{N.I.}},
+\bauthor{\bsnm{deVoil}, \binits{P.G.}},
+\bauthor{\bsnm{Zurcher}, \binits{E.J.}},
+\bauthor{\bsnm{Herrmann}, \binits{N.I.}},
+\bauthor{\bsnm{McLean}, \binits{G.}},
+\bauthor{\bsnm{Chenu}, \binits{K.}},
+\bauthor{\bsnm{Oosterom}, \binits{E.J.}},
+\bauthor{\bsnm{Snow}, \binits{V.}},
+\bauthor{\bsnm{Murphy}, \binits{C.}}, \betal:
+\batitle{Apsim--evolution towards a new generation of agricultural systems
+  simulation}.
+\bjtitle{Environmental Modelling \& Software}
+\bvolume{62},
+\bfpage{327}--\blpage{350}
+(\byear{2014})
+\doiurl{10.1016/j.envsoft.2014.07.009}
+\end{barticle}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Van~Diepen et~al.}{1989}]{wofost}
+\begin{barticle}
+\bauthor{\bsnm{Van~Diepen}, \binits{C.}},
+\bauthor{\bsnm{Wolf}, \binits{J.}},
+\bauthor{\bsnm{Van~Keulen}, \binits{H.}},
+\bauthor{\bsnm{Rappoldt}, \binits{C.}}:
+\batitle{Wofost: a simulation model of crop production}.
+\bjtitle{Soil Use and Management}
+\bvolume{5}(\bissue{1}),
+\bfpage{16}--\blpage{24}
+(\byear{1989})
+\doiurl{10.1111/j.1475-2743.1989.tb00755.x}
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Gebbers and
+  Adamchuk}{2010}]{precision-ag-review}
+\begin{barticle}
+\bauthor{\bsnm{Gebbers}, \binits{R.}},
+\bauthor{\bsnm{Adamchuk}, \binits{V.I.}}:
+\batitle{Precision agriculture and food security}.
+\bjtitle{Science}
+\bvolume{327}(\bissue{5967}),
+\bfpage{828}--\blpage{831}
+(\byear{2010})
+\doiurl{10.1126/science.1183899}
+\end{barticle}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Singh}{2012}]{irrigation-optimization}
+\begin{barticle}
+\bauthor{\bsnm{Singh}, \binits{A.}}:
+\batitle{An overview of the optimization modelling applications}.
+\bjtitle{Journal of Hydrology}
+\bvolume{466--467},
+\bfpage{167}--\blpage{182}
+(\byear{2012})
+\doiurl{10.1016/j.jhydrol.2012.08.004}
+\end{barticle}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Epperson et~al.}{1993}]{dp-irrigation}
+\begin{barticle}
+\bauthor{\bsnm{Epperson}, \binits{J.E.}},
+\bauthor{\bsnm{Hook}, \binits{J.E.}},
+\bauthor{\bsnm{Mustafa}, \binits{Y.R.}}:
+\batitle{Dynamic programming for improving irrigation scheduling strategies of
+  maize}.
+\bjtitle{Agricultural Systems}
+\bvolume{42}(\bissue{1}),
+\bfpage{85}--\blpage{101}
+(\byear{1993})
+\doiurl{10.1016/0308-521X(93)90070-I} .
+\bcomment{Applications of Dynamic Optimization Techniques to Agricultural
+  Problems}
+\end{barticle}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Ding and Lin}{2020}]{ga-agriculture}
+\begin{barticle}
+\bauthor{\bsnm{Ding}, \binits{W.}},
+\bauthor{\bsnm{Lin}, \binits{C.}}:
+\batitle{Application of genetic algorithms to agriculture: a review}.
+\bjtitle{Computers and Electronics in Agriculture}
+\bvolume{175},
+\bfpage{105524}
+(\byear{2020})
+\doiurl{10.1016/j.compag.2020.105524}
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Goldberg}{1989}]{goldberg1989ga}
+\begin{bbook}
+\bauthor{\bsnm{Goldberg}, \binits{D.E.}}:
+\bbtitle{Genetic Algorithms in Search, Optimization, and Machine Learning}.
+\bpublisher{Addison-Wesley},
+\blocation{Reading, MA}
+(\byear{1989})
+\end{bbook}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Wardlaw and
+  Bhaktikul}{2004}]{ga-irrigation-scheduling}
+\begin{barticle}
+\bauthor{\bsnm{Wardlaw}, \binits{R.}},
+\bauthor{\bsnm{Bhaktikul}, \binits{K.}}:
+\batitle{Application of genetic algorithms for irrigation water scheduling}.
+\bjtitle{Irrigation and Drainage}
+\bvolume{53}(\bissue{4}),
+\bfpage{397}--\blpage{414}
+(\byear{2004})
+\doiurl{10.1002/ird.121}
+\end{barticle}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Yu and Fu}{2025}]{ga-fertilizer}
+\begin{barticle}
+\bauthor{\bsnm{Yu}, \binits{Z.}},
+\bauthor{\bsnm{Fu}, \binits{W.}}:
+\batitle{Optimization of nitrogen fertilization strategies for drip irrigation
+  of cotton in large fields by dssat combined with a genetic algorithm}.
+\bjtitle{Applied Sciences}
+\bvolume{15}(\bissue{7}),
+\bfpage{3580}
+(\byear{2025})
+\end{barticle}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{{IPCC}}{2021}]{ipcc2021}
+\begin{botherref}
+\oauthor{\bsnm{{IPCC}}}:
+Climate change 2021: The physical science basis. contribution of working group
+  i to the sixth assessment report of the intergovernmental panel on climate
+  change.
+Technical report,
+Cambridge University Press
+(2021).
+\doiurl{10.1017/9781009157896}
+\end{botherref}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Rawlings et~al.}{2017}]{rawlings2017mpc}
+\begin{bbook}
+\bauthor{\bsnm{Rawlings}, \binits{J.B.}},
+\bauthor{\bsnm{Mayne}, \binits{D.Q.}},
+\bauthor{\bsnm{Diehl}, \binits{M.}}:
+\bbtitle{Model Predictive Control: Theory, Computation, and Design},
+\bedition{2nd} edn.
+\bpublisher{Nob Hill Publishing},
+\blocation{Madison, WI}
+(\byear{2017})
+\end{bbook}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Sawyer et~al.}{2006}]{corn-nitrogen}
+\begin{botherref}
+\oauthor{\bsnm{Sawyer}, \binits{J.E.}},
+\oauthor{\bsnm{Nafziger}, \binits{E.D.}},
+\oauthor{\bsnm{Randall}, \binits{G.W.}},
+\oauthor{\bsnm{Bundy}, \binits{L.G.}},
+\oauthor{\bsnm{Rehm}, \binits{G.W.}},
+\oauthor{\bsnm{Joern}, \binits{B.C.}}:
+Nitrogen management for corn production.
+Iowa State University Extension Publication PM
+\textbf{1714}
+(2006)
+\end{botherref}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{Payero et~al.}{2008}]{corn-irrigation}
+\begin{barticle}
+\bauthor{\bsnm{Payero}, \binits{J.O.}},
+\bauthor{\bsnm{Tarkalson}, \binits{D.D.}},
+\bauthor{\bsnm{Irmak}, \binits{S.}},
+\bauthor{\bsnm{Davison}, \binits{D.R.}},
+\bauthor{\bsnm{Petersen}, \binits{J.L.}}:
+\batitle{Effect of irrigation amounts applied with subsurface drip irrigation
+  on corn evapotranspiration, yield, water use efficiency, and dry matter
+  production in a semiarid climate}.
+\bjtitle{Agricultural Water Management}
+\bvolume{95}(\bissue{8}),
+\bfpage{895}--\blpage{908}
+(\byear{2008})
+\doiurl{10.1016/j.agwat.2008.02.015}
+\end{barticle}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{S{\'a}nchez et~al.}{2014}]{corn-temperature}
+\begin{barticle}
+\bauthor{\bsnm{S{\'a}nchez}, \binits{B.}},
+\bauthor{\bsnm{Rasmussen}, \binits{A.}},
+\bauthor{\bsnm{Porter}, \binits{J.R.}}:
+\batitle{Temperatures and the growth and development of maize and rice: a
+  review}.
+\bjtitle{Global Change Biology}
+\bvolume{20}(\bissue{2}),
+\bfpage{408}--\blpage{417}
+(\byear{2014})
+\doiurl{10.1111/gcb.12389}
+\end{barticle}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Azi
+  et~al.}{2025}]{azi2025sweetcorn_bion_fertilizer}
+\begin{botherref}
+\oauthor{\bsnm{Azi}, \binits{A.}}, et al.:
+Growth and yield of sweet corn (zea mays var. rugosa) in response to bio-n and
+  different levels of inorganic fertilizers.
+Asian Journal of Agricultural and Horticultural Research
+(2025).
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{Lum
+  et~al.}{2024}]{lum2024azolla_sweetcorn_growth}
+\begin{botherref}
+\oauthor{\bsnm{Lum}, \binits{M.S.}},
+\oauthor{\bsnm{Aldam}, \binits{N.F.b.}},
+\oauthor{\bsnm{Chin}, \binits{C.F.S.}}:
+The effect of azolla (azolla pinnata) extract on the growth and yield of sweet
+  corn under reduced nitrogen fertilization practice.
+Sarhad Journal of Agriculture
+\textbf{40}(Special Issue 1)
+(2024).
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 24
+\bibitem[\protect\citeauthoryear{Liu
+  et~al.}{2024}]{liu2024irrigation_fertilizer_silage_corn}
+\begin{barticle}
+\bauthor{\bsnm{Liu}, \binits{Y.}},
+\bauthor{\bsnm{Wang}, \binits{N.}},
+\bauthor{\bsnm{Jiang}, \binits{C.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}}:
+\batitle{Effects of irrigation type and fertilizer application rate on growth,
+  yield, and water and fertilizer use efficiency of silage corn in the north
+  china plain}.
+\bjtitle{PeerJ}
+\bvolume{12},
+\bfpage{18315}
+(\byear{2024})
+\doiurl{10.7717/peerj.18315} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 25
+\bibitem[\protect\citeauthoryear{Khan
+  et~al.}{2014}]{khan2014pistia_phytochemistry}
+\begin{barticle}
+\bauthor{\bsnm{Khan}, \binits{M.A.}},
+\bauthor{\bsnm{Marwat}, \binits{K.B.}},
+\bauthor{\bsnm{Gul}, \binits{B.}},
+\bauthor{\bsnm{Wahid}, \binits{F.}},
+\bauthor{\bsnm{Khan}, \binits{H.}},
+\bauthor{\bsnm{Hashim}, \binits{S.}}:
+\batitle{Pistia stratiotes l. (araceae): Phytochemistry, use in medicines,
+  phytoremediation, biogas and management options}.
+\bjtitle{Pakistan Journal of Botany}
+\bvolume{46}(\bissue{3}),
+\bfpage{851}--\blpage{860}
+(\byear{2014}).
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 26
+\bibitem[\protect\citeauthoryear{Dodd et~al.}{2023}]{groundnut}
+\begin{barticle}
+\bauthor{\bsnm{Dodd}, \binits{J.}},
+\bauthor{\bsnm{Sweby}, \binits{P.K.}},
+\bauthor{\bsnm{Mayes}, \binits{S.}},
+\bauthor{\bsnm{Murchie}, \binits{E.H.}},
+\bauthor{\bsnm{Karunaratne}, \binits{A.S.}},
+\bauthor{\bsnm{Massawe}, \binits{F.}},
+\bauthor{\bsnm{Tindall}, \binits{M.J.}}:
+\batitle{A multiscale mathematical model describing the growth and development
+  of bambara groundnut}.
+\bjtitle{Journal of Theoretical Biology}
+\bvolume{560},
+\bfpage{111373}
+(\byear{2023})
+\doiurl{10.1016/j.jtbi.2022.111373}
+\end{barticle}
+\endbibitem
+
+%%% 27
+\bibitem[\protect\citeauthoryear{Lewontin and
+  Cohen}{1969}]{geometric-mean-growth}
+\begin{barticle}
+\bauthor{\bsnm{Lewontin}, \binits{R.C.}},
+\bauthor{\bsnm{Cohen}, \binits{D.}}:
+\batitle{On population growth in a randomly varying environment}.
+\bjtitle{Proceedings of the National Academy of Sciences}
+\bvolume{62}(\bissue{4}),
+\bfpage{1056}--\blpage{1060}
+(\byear{1969})
+\doiurl{10.1073/pnas.62.4.1056}
+\end{barticle}
+\endbibitem
+
+%%% 28
+\bibitem[\protect\citeauthoryear{Ren
+  et~al.}{2022}]{ren2022agronomic_traits_climate_maize_yield}
+\begin{barticle}
+\bauthor{\bsnm{Ren}, \binits{H.}},
+\bauthor{\bsnm{Liu}, \binits{Y.}},
+\bauthor{\bsnm{Zhang}, \binits{J.}},
+\bauthor{\bsnm{Li}, \binits{D.}},
+\bauthor{\bsnm{Wang}, \binits{Y.}},
+\bauthor{\bsnm{Zhang}, \binits{J.}}:
+\batitle{Effects of agronomic traits and climatic factors on yield and yield
+  stability of summer maize in the huang?huai?hai plain}.
+\bjtitle{Frontiers in Plant Science}
+\bvolume{13},
+\bfpage{1042107}
+(\byear{2022})
+\doiurl{10.3389/fpls.2022.1042107} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 29
+\bibitem[\protect\citeauthoryear{Stubbs
+  et~al.}{2023}]{stubbs2023plant_height_maize_lodging}
+\begin{barticle}
+\bauthor{\bsnm{Stubbs}, \binits{C.J.}},
+\bauthor{\bsnm{Cook}, \binits{D.D.}},
+\bauthor{\bsnm{Robertson}, \binits{D.J.}}:
+\batitle{The effect of plant height on maize stalk lodging resistance}.
+\bjtitle{Field Crops Research}
+\bvolume{300},
+\bfpage{109008}
+(\byear{2023})
+\doiurl{10.1016/j.fcr.2023.109008} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 30
+\bibitem[\protect\citeauthoryear{Wang
+  et~al.}{2022}]{wang2022maize_tassel_anther_pollen_genetics}
+\begin{barticle}
+\bauthor{\bsnm{Wang}, \binits{Y.}},
+\bauthor{\bsnm{Bao}, \binits{J.}},
+\bauthor{\bsnm{Wan}, \binits{X.}},
+\bauthor{\bsnm{Wu}, \binits{S.}},
+\bauthor{\bsnm{Feng}, \binits{C.}},
+\bauthor{\bsnm{Qin}, \binits{Y.}},
+\bauthor{\bsnm{Guo}, \binits{Y.}},
+\bauthor{\bsnm{Dong}, \binits{Z.}}:
+\batitle{Genetic structure and molecular mechanisms underlying the formation of
+  tassel, anther, and pollen in the male inflorescence of maize (zea mays l.)}.
+\bjtitle{Cells}
+\bvolume{11}(\bissue{11}),
+\bfpage{1753}
+(\byear{2022})
+\doiurl{10.3390/cells11111753} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 31
+\bibitem[\protect\citeauthoryear{Silveira
+  et~al.}{2024}]{silveira2024adaptability_maize_tassel_yield}
+\begin{barticle}
+\bauthor{\bsnm{Silveira}, \binits{D.L.}},
+\bauthor{\bsnm{Cargnelutti~Filho}, \binits{A.}},
+\bauthor{\bsnm{Toebe}, \binits{M.}},
+\bauthor{\bsnm{Burin}, \binits{C.}},
+\bauthor{\bsnm{Szareski}, \binits{V.J.}}:
+\batitle{Adaptability and stability of grain yield and maize tassel traits}.
+\bjtitle{Ciencia Rural}
+\bvolume{54}(\bissue{3}),
+\bfpage{20230319}
+(\byear{2024})
+\doiurl{10.1590/0103-8478cr20230319} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 32
+\bibitem[\protect\citeauthoryear{{US Department of
+  Agriculture}}{2023}]{fsa-acreage}
+\begin{botherref}
+\oauthor{\bsnm{{US Department of Agriculture}}}:
+2023 acreage data as of august 9, 2023.
+Fsa crop acreage data reported to fsa,
+US Department of Agriculture Farm Service Agency
+(2023)
+\end{botherref}
+\endbibitem
+
+%%% 33
+\bibitem[\protect\citeauthoryear{Sengupta et~al.}{2018}]{NSRDB}
+\begin{barticle}
+\bauthor{\bsnm{Sengupta}, \binits{M.}},
+\bauthor{\bsnm{Xie}, \binits{Y.}},
+\bauthor{\bsnm{Lopez}, \binits{A.}},
+\bauthor{\bsnm{Habte}, \binits{A.}},
+\bauthor{\bsnm{Maclaurin}, \binits{G.}},
+\bauthor{\bsnm{Shelby}, \binits{J.}}:
+\batitle{The national solar radiation data base (nsrdb)}.
+\bjtitle{Renewable and Sustainable Energy Reviews}
+\bvolume{89},
+\bfpage{51}--\blpage{60}
+(\byear{2018})
+\doiurl{10.1016/j.rser.2018.03.003}
+\end{barticle}
+\endbibitem
+
+%%% 34
+\bibitem[\protect\citeauthoryear{{National Oceanic and Atmospheric
+  Administration}}{2024}]{noaa-precip}
+\begin{botherref}
+\oauthor{\bsnm{{National Oceanic and Atmospheric Administration}}}:
+Climate Data Online
+(2024).
+\url{https://www.ncdc.noaa.gov/cdo-web/}
+\end{botherref}
+\endbibitem
+
+%%% 35
+\bibitem[\protect\citeauthoryear{Sawyer
+  et~al.}{2006}]{corn-nutrient-management}
+\begin{botherref}
+\oauthor{\bsnm{Sawyer}, \binits{J.}},
+\oauthor{\bsnm{Nafziger}, \binits{E.}},
+\oauthor{\bsnm{Randall}, \binits{G.}},
+\oauthor{\bsnm{Bundy}, \binits{L.}},
+\oauthor{\bsnm{Rehm}, \binits{G.}},
+\oauthor{\bsnm{Joern}, \binits{B.}}:
+Concepts and rational for regional nitrogen rate guidelines for corn.
+University Extension Iowa State University Ames
+(2006)
+\end{botherref}
+\endbibitem
+
+%%% 36
+\bibitem[\protect\citeauthoryear{Abendroth et~al.}{2011}]{corn-growth-stages}
+\begin{botherref}
+\oauthor{\bsnm{Abendroth}, \binits{L.J.}},
+\oauthor{\bsnm{Elmore}, \binits{R.W.}},
+\oauthor{\bsnm{Boyer}, \binits{M.J.}},
+\oauthor{\bsnm{Marlay}, \binits{S.K.}}:
+In corn growth and development.
+Iowa State University Extension Publication PMR
+\textbf{1009}
+(2011)
+\end{botherref}
+\endbibitem
+
+%%% 37
+\bibitem[\protect\citeauthoryear{Schierbaum}{2004}]{corn-physiology}
+\begin{barticle}
+\bauthor{\bsnm{Schierbaum}, \binits{F.}}:
+\batitle{Book reviews: Corn: Chemistry and technology, 2nd edition. by pamela
+  j. white and lawrence a. johnson (editors)}.
+\bjtitle{Starch-starke - STARCH}
+\bvolume{56},
+\bfpage{263}--\blpage{264}
+(\byear{2004})
+\doiurl{10.1002/star.200490027}
+\end{barticle}
+\endbibitem
+
+%%% 38
+\bibitem[\protect\citeauthoryear{{Bayer Crop
+  Science}}{2018}]{bayer2018height_difference_corn}
+\begin{botherref}
+\oauthor{\bsnm{{Bayer Crop Science}}}:
+Height Difference Between Traditional Corn Products and Short Stature Corn
+  Hybrids
+(2018).
+\url{https://www.cropscience.bayer.us/articles/traits/height-difference-between-traditional-corn-products-and-short-stature-corn-hybrids}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 39
+\bibitem[\protect\citeauthoryear{{Keller's
+  Farmstand}}{2018}]{kellersfarmstand2018sweetcorn_fieldcorn_height}
+\begin{botherref}
+\oauthor{\bsnm{{Keller's Farmstand}}}:
+Sweet Corn vs. Field Corn Height
+(2018).
+\url{https://kellersfarmstand.com/sweet-corn-vs-field-corn-height/}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 40
+\bibitem[\protect\citeauthoryear{Nanda}{2017}]{nanda2017corn_leaf_number_maturity}
+\begin{botherref}
+\oauthor{\bsnm{Nanda}, \binits{D.}}:
+Number of Corn Leaves Provides Insight into Maturity
+(2017).
+\url{https://www.farmprogress.com/corn/number-of-corn-leaves-provides-insight-into-maturity}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 41
+\bibitem[\protect\citeauthoryear{Nielsen}{2025}]{nielsen2025tassel_emergence_pollen_shed}
+\begin{botherref}
+\oauthor{\bsnm{Nielsen}, \binits{R.L.}}:
+Tassel Emergence and Pollen Shed
+(2025).
+\url{https://www.agry.purdue.edu/ext/corn/news/timeless/tassels.html}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 42
+\bibitem[\protect\citeauthoryear{{Urban Farmer Seeds (UF
+  Seeds)}}{2024}]{ufseeds2024pencil_cob_corn_seed}
+\begin{botherref}
+\oauthor{\bsnm{{Urban Farmer Seeds (UF Seeds)}}}:
+Pencil Cob Corn Seed
+(2024).
+\url{https://www.ufseeds.com/product/pencil-cob-corn-seed/COPCB.html}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 43
+\bibitem[\protect\citeauthoryear{{Bayer Crop
+  Science}}{2020}]{bayer2020corn_growth_stages_gdu}
+\begin{botherref}
+\oauthor{\bsnm{{Bayer Crop Science}}}:
+Corn Growth Stages and GDU Requirements
+(2020).
+\url{https://www.cropscience.bayer.us/articles/bayer/corn-growth-stages-and-gdu-requirements}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 44
+\bibitem[\protect\citeauthoryear{{University of California,
+  Davis}}{2024}]{ucdavis2024corn_crop_development}
+\begin{botherref}
+\oauthor{\bsnm{{University of California, Davis}}}:
+Crop Development
+(2024).
+\url{https://corn.ucdavis.edu/crop-development}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 45
+\bibitem[\protect\citeauthoryear{Sisson
+  et~al.}{2020}]{sisson2020corn_growth_stages}
+\begin{botherref}
+\oauthor{\bsnm{Sisson}, \binits{A.J.}},
+\oauthor{\bsnm{Mueller}, \binits{D.}},
+\oauthor{\bsnm{Conley}, \binits{S.P.}},
+\oauthor{\bsnm{Gerber}, \binits{C.K.}}:
+Corn Growth Stages
+(2020).
+\url{https://cropprotectionnetwork.org/web-books/crop-scouting-basics-for-corn-and-soybean?section=21-corn-growth-stages}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 46
+\bibitem[\protect\citeauthoryear{{Western Cooperative
+  Company}}{2024}]{westco_corn_growth}
+\begin{botherref}
+\oauthor{\bsnm{{Western Cooperative Company}}}:
+Corn Growth
+(2024).
+\url{https://www.westco.coop/pages/custom.php?id=33409}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 47
+\bibitem[\protect\citeauthoryear{{Corn
+  States}}{2018}]{cornstates2018corn_growth_stages_gdu}
+\begin{botherref}
+\oauthor{\bsnm{{Corn States}}}:
+Corn Growth Stages and GDU Requirements
+(2018).
+\url{https://www.corn-states.com/app/uploads/2018/07/corn-growth-stages-and-gdu-requirements.pdf}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 48
+\bibitem[\protect\citeauthoryear{Eisenthal}{2025}]{eisenthal2025fertilizer_prices}
+\begin{botherref}
+\oauthor{\bsnm{Eisenthal}, \binits{J.}}:
+Fertilizer Prices Put Economic Squeeze On Farmers
+(2025).
+\url{https://www.farms.com/news/fertilizer-prices-put-economic-squeeze-on-farmers-235057.aspx}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 49
+\bibitem[\protect\citeauthoryear{{National Corn Growers
+  Association}}{2025}]{ncga2025corn_production_costs}
+\begin{botherref}
+\oauthor{\bsnm{{National Corn Growers Association}}}:
+What Is Driving High Production Costs in Corn?
+(2025).
+\url{https://www.morningagclips.com/what-is-driving-high-production-costs-in-corn/}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 50
+\bibitem[\protect\citeauthoryear{Swanson}{2025}]{swanson2025high_production_costs_part3}
+\begin{botherref}
+\oauthor{\bsnm{Swanson}, \binits{K.}}:
+High Production Cost Series, Part 3
+(2025).
+\url{https://ncga.com/stay-informed/media/the-corn-economy/article/2025/08/high-production-cost-series-part-3}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 51
+\bibitem[\protect\citeauthoryear{{Farmonaut}}{2025}]{farmonaut2025corn_land_costs}
+\begin{botherref}
+\oauthor{\bsnm{{Farmonaut}}}:
+Average Cost to Clear Land, Plant Corn, Farm Insurance
+(2025).
+\url{https://farmonaut.com/usa/average-cost-to-clear-land-plant-corn-farm-insurance}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 52
+\bibitem[\protect\citeauthoryear{Newman}{2023}]{newman2023irrigating_us_crops}
+\begin{botherref}
+\oauthor{\bsnm{Newman}, \binits{M.}}:
+Irrigating More U.S. Crops by Mid-Century Will Be Worth the Investment
+(2023).
+\url{https://natsci.msu.edu/news/2023-08-irrigating-more-us-crops-by-mid-century-will-be-worth-the-investment.aspx}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 53
+\bibitem[\protect\citeauthoryear{Rathore et~al.}{2024}]{RATHORE2024101373}
+\begin{barticle}
+\bauthor{\bsnm{Rathore}, \binits{L.S.}},
+\bauthor{\bsnm{Kumar}, \binits{M.}},
+\bauthor{\bsnm{McNider}, \binits{R.T.}},
+\bauthor{\bsnm{Magliocca}, \binits{N.}},
+\bauthor{\bsnm{Ellenburg}, \binits{W.}}:
+\batitle{Contrasting corn acreage trends in the midwest and southeast: The role
+  of yield, climate, economics, and irrigation}.
+\bjtitle{Journal of Agriculture and Food Research}
+\bvolume{18},
+\bfpage{101373}
+(\byear{2024})
+\doiurl{10.1016/j.jafr.2024.101373}
+\end{barticle}
+\endbibitem
+
+%%% 54
+\bibitem[\protect\citeauthoryear{Berger}{2020}]{berger2020estimating_bushels_corn_ground}
+\begin{botherref}
+\oauthor{\bsnm{Berger}, \binits{A.}}:
+Estimating Bushels of Corn on the Ground by Counting Ears Prior to Grazing with
+  Cattle
+(2020).
+\url{https://beef.unl.edu/estimating-bushels-corn-ground-counting-ears-prior-grazing-cattle/}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 55
+\bibitem[\protect\citeauthoryear{Groenke}{2018}]{groenke2018estimating_corn_yield_potential}
+\begin{botherref}
+\oauthor{\bsnm{Groenke}, \binits{B.}}:
+Estimating Corn Yield Potential
+(2018).
+\url{https://www.canr.msu.edu/news/estimating-corn-yield-potential}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 56
+\bibitem[\protect\citeauthoryear{{Bayer Crop
+  Science}}{2023}]{bayer2023estimating_corn_yield}
+\begin{botherref}
+\oauthor{\bsnm{{Bayer Crop Science}}}:
+Estimating Corn Yield
+(2023).
+\url{https://www.cropscience.bayer.us/articles/channel/estimating-corn-yield}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 57
+\bibitem[\protect\citeauthoryear{Licht and
+  Clemens}{2020}]{licht2020corn_yield_estimates}
+\begin{botherref}
+\oauthor{\bsnm{Licht}, \binits{M.}},
+\oauthor{\bsnm{Clemens}, \binits{Z.}}:
+Corn Yield Estimates
+(2020).
+\url{https://crops.extension.iastate.edu/encyclopedia/corn-yield-estimates}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 58
+\bibitem[\protect\citeauthoryear{{USDA Agricultural Marketing
+  Service}}{2026}]{usda2026iowa_cash_grain_bids}
+\begin{botherref}
+\oauthor{\bsnm{{USDA Agricultural Marketing Service}}}:
+Iowa Daily Cash Grain Bids
+(2026).
+\url{https://www.ams.usda.gov/mnreports/ams_2850.pdf}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 59
+\bibitem[\protect\citeauthoryear{Sucu}{2020}]{sucu2020plant_density_corn_silage}
+\begin{botherref}
+\oauthor{\bsnm{Sucu}, \binits{E.}}:
+Optimizing Plant Density Improves Corn Silage Quality
+(2020).
+\url{https://dellait.com/optimizing-plant-density-improves-corn-silage-quality/}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 60
+\bibitem[\protect\citeauthoryear{Dhaliwal
+  et~al.}{2021}]{dhaliwal2021sweetcorn_density_tolerance}
+\begin{barticle}
+\bauthor{\bsnm{Dhaliwal}, \binits{D.S.}},
+\bauthor{\bsnm{Assefa}, \binits{Y.}},
+\bauthor{\bsnm{Williams}, \binits{M.M.}}:
+\batitle{Historical trends in sweet corn plant density tolerance}.
+\bjtitle{Frontiers in Plant Science}
+\bvolume{12},
+\bfpage{685066}
+(\byear{2021})
+\doiurl{10.3389/fpls.2021.685066} .
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 61
+\bibitem[\protect\citeauthoryear{{Hanna
+  Instruments}}{2024}]{hanna2024corn_weight}
+\begin{botherref}
+\oauthor{\bsnm{{Hanna Instruments}}}:
+Weight of Corn
+(2024).
+\url{https://www.hanna-one.com/weight-corn.html}
+Accessed 2026-03-08
+\end{botherref}
+\endbibitem
+
+%%% 62
+\bibitem[\protect\citeauthoryear{Hommood and
+  Isaak}{2020}]{hommood2020physical_mechanical_sweetcorn}
+\begin{barticle}
+\bauthor{\bsnm{Hommood}, \binits{M.I.}},
+\bauthor{\bsnm{Isaak}, \binits{M.}}:
+\batitle{Physical and mechanical properties of sweet corn plant}.
+\bjtitle{Agricultural Engineering International: CIGR Journal}
+\bvolume{22}(\bissue{2}),
+\bfpage{138}--\blpage{147}
+(\byear{2020}).
+Accessed 2026-03-08
+\end{barticle}
+\endbibitem
+
+%%% 63
+\bibitem[\protect\citeauthoryear{Kranz et~al.}{2008}]{kranz2008irrigation}
+\begin{botherref}
+\oauthor{\bsnm{Kranz}, \binits{W.L.}},
+\oauthor{\bsnm{Irmak}, \binits{S.}},
+\oauthor{\bsnm{Donk}, \binits{S.J.}},
+\oauthor{\bsnm{Yonts}, \binits{C.D.}},
+\oauthor{\bsnm{Martin}, \binits{D.L.}}:
+Irrigation management for corn.
+Technical Report G1850,
+University of Nebraska--Lincoln Extension
+(2008).
+\url{https://extensionpubs.unl.edu/publication/g1850/}
+\end{botherref}
+\endbibitem
+
+%%% 64
+\bibitem[\protect\citeauthoryear{Hatfield and
+  Prueger}{2015}]{hatfield2015temperature}
+\begin{barticle}
+\bauthor{\bsnm{Hatfield}, \binits{J.L.}},
+\bauthor{\bsnm{Prueger}, \binits{J.H.}}:
+\batitle{Temperature extremes: Effect on plant growth and development}.
+\bjtitle{Weather and Climate Extremes}
+\bvolume{10},
+\bfpage{4}--\blpage{10}
+(\byear{2015})
+\doiurl{10.1016/j.wace.2015.08.001}
+\end{barticle}
+\endbibitem
+
+%%% 65
+\bibitem[\protect\citeauthoryear{Bynum et~al.}{2021}]{bynum2021pyomo}
+\begin{bbook}
+\bauthor{\bsnm{Bynum}, \binits{M.L.}},
+\bauthor{\bsnm{Hackebeil}, \binits{G.A.}},
+\bauthor{\bsnm{Hart}, \binits{W.E.}},
+\bauthor{\bsnm{Laird}, \binits{C.D.}},
+\bauthor{\bsnm{Nicholson}, \binits{B.L.}},
+\bauthor{\bsnm{Siirola}, \binits{J.D.}},
+\bauthor{\bsnm{Watson}, \binits{J.-P.}},
+\bauthor{\bsnm{Woodruff}, \binits{D.L.}}:
+\bbtitle{Pyomo---Optimization Modeling in {Python}},
+\bedition{3rd} edn.
+\bpublisher{Springer}, \blocation{???}
+(\byear{2021}).
+\doiurl{10.1007/978-3-030-68928-5}
+\end{bbook}
+\endbibitem
+
+%%% 66
+\bibitem[\protect\citeauthoryear{W{\"a}chter and
+  Biegler}{2006}]{wachter2006ipopt}
+\begin{barticle}
+\bauthor{\bsnm{W{\"a}chter}, \binits{A.}},
+\bauthor{\bsnm{Biegler}, \binits{L.T.}}:
+\batitle{On the implementation of an interior-point filter line-search
+  algorithm for large-scale nonlinear programming}.
+\bjtitle{Mathematical Programming}
+\bvolume{106}(\bissue{1}),
+\bfpage{25}--\blpage{57}
+(\byear{2006})
+\doiurl{10.1007/s10107-004-0559-y}
+\end{barticle}
+\endbibitem
+
+%%% 67
+\bibitem[\protect\citeauthoryear{Shahriari et~al.}{2016}]{shahriari2016taking}
+\begin{barticle}
+\bauthor{\bsnm{Shahriari}, \binits{B.}},
+\bauthor{\bsnm{Swersky}, \binits{K.}},
+\bauthor{\bsnm{Wang}, \binits{Z.}},
+\bauthor{\bsnm{Adams}, \binits{R.P.}},
+\bauthor{\bsnm{Freitas}, \binits{N.}}:
+\batitle{Taking the human out of the loop: A review of {Bayesian}
+  optimization}.
+\bjtitle{Proceedings of the IEEE}
+\bvolume{104}(\bissue{1}),
+\bfpage{148}--\blpage{175}
+(\byear{2016})
+\doiurl{10.1109/JPROC.2015.2494218}
+\end{barticle}
+\endbibitem
+
+%%% 68
+\bibitem[\protect\citeauthoryear{Bergstra
+  et~al.}{2011}]{bergstra2011algorithms}
+\begin{bchapter}
+\bauthor{\bsnm{Bergstra}, \binits{J.}},
+\bauthor{\bsnm{Bardenet}, \binits{R.}},
+\bauthor{\bsnm{Bengio}, \binits{Y.}},
+\bauthor{\bsnm{K\'{e}gl}, \binits{B.}}:
+\bctitle{Algorithms for hyper-parameter optimization}.
+In: \beditor{\bsnm{Shawe-Taylor}, \binits{J.}},
+\beditor{\bsnm{Zemel}, \binits{R.}},
+\beditor{\bsnm{Bartlett}, \binits{P.}},
+\beditor{\bsnm{Pereira}, \binits{F.}},
+\beditor{\bsnm{Weinberger}, \binits{K.Q.}} (eds.)
+\bbtitle{Advances in Neural Information Processing Systems},
+vol. \bseriesno{24}.
+\bpublisher{Curran Associates, Inc.}, \blocation{???}
+(\byear{2011})
+\end{bchapter}
+\endbibitem
+
+%%% 69
+\bibitem[\protect\citeauthoryear{Davies et~al.}{2020}]{davies2020nitrogen}
+\begin{barticle}
+\bauthor{\bsnm{Davies}, \binits{B.}},
+\bauthor{\bsnm{Coulter}, \binits{J.A.}},
+\bauthor{\bsnm{Pagliari}, \binits{P.H.}}:
+\batitle{Timing and rate of nitrogen fertilization influence maize yield and
+  nitrogen use efficiency}.
+\bjtitle{PLOS ONE}
+\bvolume{15}(\bissue{5}),
+\bfpage{0233674}
+(\byear{2020})
+\doiurl{10.1371/journal.pone.0233674}
+\end{barticle}
+\endbibitem
+
+%%% 70
+\bibitem[\protect\citeauthoryear{Gouthami and
+  Ashok~Kumar}{2022}]{gouthami2022water}
+\begin{botherref}
+\oauthor{\bsnm{Gouthami}, \binits{B.}},
+\oauthor{\bsnm{Ashok~Kumar}, \binits{B.}}:
+Water management in maize.
+Just Agriculture
+\textbf{2}(7)
+(2022).
+Article ID: 059, e-ISSN: 2582-8223
+\end{botherref}
+\endbibitem
+
+%%% 71
+\bibitem[\protect\citeauthoryear{Roy et~al.}{2006}]{roy2006nutrient}
+\begin{bchapter}
+\bauthor{\bsnm{Roy}, \binits{R.N.}},
+\bauthor{\bsnm{Finck}, \binits{A.}},
+\bauthor{\bsnm{Blair}, \binits{G.J.}},
+\bauthor{\bsnm{Tandon}, \binits{H.L.S.}}:
+\bctitle{Nutrient management guidelines for some major field crops}.
+In: \bbtitle{Plant Nutrition for Food Security: A Guide for Integrated Nutrient
+  Management}.
+\bsertitle{FAO Fertilizer and Plant Nutrition Bulletin},
+pp. \bfpage{235}--\blpage{274}.
+\bpublisher{Food and Agriculture Organization of the United Nations},
+\blocation{Rome}
+(\byear{2006}).
+\bcomment{Chap. 8. FAO document a0443e}.
+\burl{https://www.fao.org/4/a0443e/a0443e04.pdf}
+\end{bchapter}
+\endbibitem
+
+%%% 72
+\bibitem[\protect\citeauthoryear{Mallarino
+  et~al.}{2015}]{mallarino2015longterm}
+\begin{botherref}
+\oauthor{\bsnm{Mallarino}, \binits{A.}},
+\oauthor{\bsnm{Barbieri}, \binits{P.}},
+\oauthor{\bsnm{Pecinovsky}, \binits{K.}}:
+Long-term phosphorus and potassium fertilization effects on yields of corn and
+  soybean grown in rotation.
+Technical Report ISRF14-13, RFR-A14104,
+Iowa State University, Northeast Research and Demonstration Farm,
+Nashua, IA
+(2015).
+Winter 2015.
+\url{https://www.agronext.iastate.edu/soilfertility/info/NE%20farm%20report_PK%20Winter%202015-Long%20term%20P-K%20effects.pdf}
+\end{botherref}
+\endbibitem
+
+%%% 73
+\bibitem[\protect\citeauthoryear{Robinson}{2025}]{robinson2025usda_crop_report_2025}
+\begin{botherref}
+\oauthor{\bsnm{Robinson}, \binits{A.}}:
+USDA Crop Report Continues Large 2025 Crop Production Estimates.
+\url{https://www.iowafarmbureau.com/Article/USDA-Crop-Report-Continues-Large-2025-Crop-Production-Estimates}.
+Iowa Farm Bureau. Accessed: 2026-03-08
+(2025)
+\end{botherref}
+\endbibitem
+
+%%% 74
+\bibitem[\protect\citeauthoryear{{USDA Agricultural Marketing
+  Service}}{2026}]{usda2026iowa_daily_cash_grain_bids}
+\begin{botherref}
+\oauthor{\bsnm{{USDA Agricultural Marketing Service}}}:
+Iowa Daily Cash Grain Bids.
+\url{https://www.ams.usda.gov/mnreports/ams_2850.pdf}.
+Livestock, Poultry and Grain Market News Division. Accessed: 2026-03-08
+(2026)
+\end{botherref}
+\endbibitem
+
+%%% 75
+\bibitem[\protect\citeauthoryear{Swanson}{2025}]{swanson2025high_production_cost_series3}
+\begin{botherref}
+\oauthor{\bsnm{Swanson}, \binits{K.}}:
+High Production Cost Series, Part 3.
+\url{https://ncga.com/stay-informed/media/the-corn-economy/article/2025/08/high-production-cost-series-part-3}.
+National Corn Growers Association. Accessed: 2026-03-08
+(2025)
+\end{botherref}
+\endbibitem
+
+\end{thebibliography}

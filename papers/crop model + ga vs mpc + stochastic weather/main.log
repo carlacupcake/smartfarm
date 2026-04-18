@@ -1,0 +1,1133 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.8.31)  16 MAR 2026 14:24
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**main.tex
+(./main.tex
+LaTeX2e <2020-10-01> patch level 4
+L3 programming layer <2021-02-18>
+(/usr/local/texlive/2021/texmf-dist/tex/latex/elsarticle/elsarticle.cls
+Document Class: elsarticle 2020/11/20, 3.3: Elsevier Ltd
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2021-02-18 L3 programming layer (loader) 
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count179
+\l__pdf_internal_box=\box47
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3packages/xparse/xparse-2020-10-
+01.sty
+(/usr/local/texlive/2021/texmf-dist/tex/latex/l3packages/xparse/xparse-generic.
+tex))) (/usr/local/texlive/2021/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count180
+)
+\@bls=\dimen138
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2020/04/10 v1.4m Standard LaTeX document class
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2020/04/10 v1.4m Standard LaTeX file (size option)
+)
+\c@part=\count181
+\c@section=\count182
+\c@subsection=\count183
+\c@subsubsection=\count184
+\c@paragraph=\count185
+\c@subparagraph=\count186
+\c@figure=\count187
+\c@table=\count188
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen139
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 105.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen140
+\Gin@req@width=\dimen141
+)
+\c@tnote=\count189
+\c@fnote=\count190
+\c@cnote=\count191
+\c@ead=\count192
+\c@author=\count193
+\@eadauthor=\toks16
+\c@affn=\count194
+\absbox=\box48
+\elsarticlehighlightsbox=\box49
+\elsarticlegrabsbox=\box50
+\keybox=\box51
+\Columnwidth=\dimen142
+\space@left=\dimen143
+\els@boxa=\box52
+\els@boxb=\box53
+\leftMargin=\dimen144
+\@enLab=\toks17
+\@sep=\skip49
+\@@sep=\skip50
+
+(./main.spl) (/usr/local/texlive/2021/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip51
+\bibsep=\skip52
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count195
+)
+\splwrite=\write3
+\openout3 = `main.spl'.
+
+\appnamewidth=\dimen145
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count196
+\float@exts=\toks18
+\float@box=\box54
+\@float@everytoks=\toks19
+\@floatcapt=\box55
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks20
+\c@algorithm=\count197
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count198
+\c@ALG@rem=\count199
+\c@ALG@nested=\count266
+\ALG@tlm=\skip53
+\ALG@thistlm=\skip54
+\c@ALG@Lnr=\count267
+\c@ALG@blocknr=\count268
+\c@ALG@storecount=\count269
+\c@ALG@tmpcounter=\count270
+\ALG@tmplength=\skip55
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
+Package: algpseudocode 
+
+Document Style - pseudocode environments for use with the `algorithmicx' style
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2020/09/23 v2.17i AMS math features
+\@mathmargin=\skip56
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks21
+\ex@=\dimen146
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen147
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count271
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count272
+\leftroot@=\count273
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count274
+\DOTSCASE@=\count275
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box56
+\strutbox@=\box57
+\big@size=\dimen148
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count276
+\c@MaxMatrixCols=\count277
+\dotsspace@=\muskip16
+\c@parentequation=\count278
+\dspbrk@lvl=\count279
+\tag@help=\toks22
+\row@=\count280
+\column@=\count281
+\maxfields@=\count282
+\andhelp@=\toks23
+\eqnshift@=\dimen149
+\alignsep@=\dimen150
+\tagshift@=\dimen151
+\tagwidth@=\dimen152
+\totwidth@=\dimen153
+\lineht@=\dimen154
+\@envbody=\toks24
+\multlinegap=\skip57
+\multlinetaggap=\skip58
+\mathdisplay@stack=\toks25
+LaTeX Info: Redefining \[ on input line 2923.
+LaTeX Info: Redefining \] on input line 2924.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2020/05/29 v2.20.6
+\thm@style=\toks26
+\thm@bodyfont=\toks27
+\thm@headfont=\toks28
+\thm@notefont=\toks29
+\thm@headpunct=\toks30
+\thm@preskip=\skip59
+\thm@postskip=\skip60
+\thm@headsep=\skip61
+\dth@everypar=\toks31
+LaTeX Info: Redefining \qed on input line 273.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/appendix/appendix.sty
+Package: appendix 2020/02/08 v1.2c extra appendix facilities
+\c@@pps=\count283
+\c@@ppsavesec=\count284
+\c@@ppsaveapp=\count285
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/tools/array.sty
+Package: array 2020/10/01 v2.5c Tabular extension package (FMi)
+\col@sep=\dimen155
+\ar@mcellbox=\box58
+\extrarowheight=\dimen156
+\NC@list=\toks32
+\extratabsurround=\skip62
+\backup@length=\skip63
+\ar@cellbox=\box59
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen157
+\lightrulewidth=\dimen158
+\cmidrulewidth=\dimen159
+\belowrulesep=\dimen160
+\belowbottomsep=\dimen161
+\aboverulesep=\dimen162
+\abovetopsep=\dimen163
+\cmidrulesep=\dimen164
+\cmidrulekern=\dimen165
+\defaultaddspace=\dimen166
+\@cmidla=\count286
+\@cmidlb=\count287
+\@aboverulesep=\dimen167
+\@belowrulesep=\dimen168
+\@thisruleclass=\count288
+\@lastruleclass=\count289
+\@thisrulewidth=\dimen169
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2021-02-27 v7.00k Hypertext links for LaTeX
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2020/03/06 v1.0d TeX engine tests
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+)
+\@linkdim=\dimen170
+\Hy@linkcounter=\count290
+\Hy@pagecounter=\count291
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2021-02-27 v7.00k Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/hyperref-langpatches.def
+File: hyperref-langpatches.def 2021-02-27 v7.00k Hyperref: patches for babel la
+nguages
+) (/usr/local/texlive/2021/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count292
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2021-02-27 v7.00k Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4192.
+Package hyperref Info: Link nesting OFF on input line 4197.
+Package hyperref Info: Hyper index ON on input line 4200.
+Package hyperref Info: Plain pages OFF on input line 4207.
+Package hyperref Info: Backreferencing OFF on input line 4212.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4445.
+\c@Hy@tempcnt=\count293
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4804.
+\XeTeXLinkMargin=\dimen171
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count294
+\Field@Width=\dimen172
+\Fld@charsize=\dimen173
+Package hyperref Info: Hyper figures OFF on input line 6075.
+Package hyperref Info: Link nesting OFF on input line 6080.
+Package hyperref Info: Hyper index ON on input line 6083.
+Package hyperref Info: backreferencing OFF on input line 6090.
+Package hyperref Info: Link coloring OFF on input line 6095.
+Package hyperref Info: Link coloring with OCG OFF on input line 6100.
+Package hyperref Info: PDF/A mode OFF on input line 6105.
+LaTeX Info: Redefining \ref on input line 6145.
+LaTeX Info: Redefining \pageref on input line 6149.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2020/08/17 v1.0a Emulation of the original atbegshi packa
+ge
+with kernel methods
+)
+\Hy@abspage=\count295
+\c@Item=\count296
+\c@Hfootnote=\count297
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2021-02-27 v7.00k Hyperref driver for pdfTeX
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atvery packag
+e
+with kernel methods
+)
+\Fld@listcount=\count298
+\c@bookmark@seq@number=\count299
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+86.
+)
+\Hy@SectionHShift=\skip64
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2005/11/02 line numbers on paragraphs v4.41
+\linenopenalty=\count300
+\output=\toks33
+\linenoprevgraf=\count301
+\linenumbersep=\dimen174
+\linenumberwidth=\dimen175
+\c@linenumber=\count302
+\c@pagewiselinenumber=\count303
+\c@LN@truepage=\count304
+\c@internallinenumber=\count305
+\c@internallinenumbers=\count306
+\quotelinenumbersep=\dimen176
+\bframerule=\dimen177
+\bframesep=\dimen178
+\bframebox=\box60
+LaTeX Info: Redefining \\ on input line 3056.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count307
+\lst@gtempboxa=\box61
+\lst@token=\toks34
+\lst@length=\count308
+\lst@currlwidth=\dimen179
+\lst@column=\count309
+\lst@pos=\count310
+\lst@lostspace=\dimen180
+\lst@width=\dimen181
+\lst@newlines=\count311
+\lst@lineno=\count312
+\lst@maxwidth=\dimen182
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count313
+\lst@skipnumbers=\count314
+\lst@framebox=\box62
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+))
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/ncctools/manyfoot.sty
+Package: manyfoot 2019/08/03 v1.11 Many Footnote Levels Package (NCC)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/ncctools/nccfoots.sty
+Package: nccfoots 2005/02/03 v1.2 NCC Footnotes Package (NCC)
+)
+\MFL@columnwidth=\dimen183
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/mathalpha/mathalpha.sty
+Package: mathalpha 2019/10/05 - 1.13mathalpha (License LPPL) Michael Sharpe
+
+`mathalpha' v1.13, 2019/10/05, a renaming of mathalfa (msharpe)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2020/11/20 v2.8 package option processing (HA)
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/local/texlive/2021/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks35
+\XKV@tempa@toks=\toks36
+)
+\XKV@depth=\count315
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+))
+LaTeX Font Info:    Redeclaring math alphabet \mathcal on input line 199.
+LaTeX Font Info:    Overwriting math alphabet `\mathcal' in version `bold'
+(Font)                  U/cmsy/m/n --> U/cmsy/b/n on input line 200.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/jknapltx/mathrsfs.sty
+Package: mathrsfs 1996/01/01 Math RSFS package v1.0 (jk)
+\symrsfs=\mathgroup6
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip65
+\multirow@cntb=\count316
+\multirow@dima=\skip66
+\bigstrutjot=\dimen184
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(/usr/local/texlive/2021/texmf-dist/tex/latex/colortbl/colortbl.sty
+Package: colortbl 2020/01/04 v1.0e Color table columns (DPC)
+\everycr=\toks37
+\minrowclearance=\skip67
+)
+(./main.aux)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+
+(/usr/local/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count317
+\scratchdimen=\dimen185
+\scratchbox=\box63
+\nofMPsegments=\count318
+\nofMParguments=\count319
+\everyMPshowfont=\toks38
+\MPscratchCnt=\count320
+\MPscratchDim=\dimen186
+\MPnumerator=\count321
+\makeMPintoPDFobject=\count322
+\everyMPtoPDFconversion=\toks39
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+Package hyperref Info: Link coloring OFF on input line 35.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+\c@section@level=\count323
+)
+LaTeX Info: Redefining \ref on input line 35.
+LaTeX Info: Redefining \pageref on input line 35.
+LaTeX Info: Redefining \nameref on input line 35.
+ (./main.out) (./main.out)
+\@outlinefile=\write4
+\openout4 = `main.out'.
+
+\c@lstlisting=\count324
+
+Overfull \hbox (0.82928pt too wide) in paragraph at lines 71--72
+[]\OT1/cmr/m/n/12 Genetic al-go-rithm op-ti-miza-tion achieves 35% rev-enue im-
+prove-ment over
+ []
+
+[1
+
+{/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Trying to load font information for U+msa on input line 87.
+
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 87.
+
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 87
+.
+
+(/usr/local/texlive/2021/texmf-dist/tex/latex/jknapltx/ursfs.fd
+File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
+)
+Overfull \hbox (2.61108pt too wide) has occurred while \output is active
+[] 
+ []
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.87 \end{frontmatter}
+                       [1
+
+
+] [2]
+Overfull \hbox (2.18481pt too wide) in paragraph at lines 100--101
+[]\OT1/cmr/m/n/12 Climate change is in-creas-ing the fre-quency and sever-ity o
+f ex-treme weather
+ []
+
+
+Overfull \hbox (11.38889pt too wide) in paragraph at lines 100--101
+\OT1/cmr/m/n/12 tional ap-proaches to ir-ri-ga-tion and fer-til-izer schedul-in
+g rely on fixed strategies---
+ []
+
+
+Overfull \hbox (27.12067pt too wide) in paragraph at lines 106--107
+\OT1/cmr/m/n/12 fil-ter-ing, pro-vid-ing a physiologically-motivated yet com-pu
+-ta-tion-ally tractable
+ []
+
+
+Overfull \hbox (24.53598pt too wide) in paragraph at lines 110--111
+\OT1/cmr/m/n/12 adap-tive MPC---across 21 weather sce-nar-ios, re-veal-ing that
+ pre-optimization
+ []
+
+[3]
+<figures/plant-as-control-sys.png, id=248, 712.6625pt x 434.62375pt>
+File: figures/plant-as-control-sys.png Graphic file (type png)
+<use figures/plant-as-control-sys.png>
+Package pdftex.def Info: figures/plant-as-control-sys.png  used on input line 1
+24.
+(pdftex.def)             Requested size: 272.99881pt x 166.49173pt.
+
+Overfull \hbox (4.7126pt too wide) in paragraph at lines 138--153
+ [][] 
+ []
+
+
+Overfull \hbox (4.7126pt too wide) in paragraph at lines 159--174
+ [][] 
+ []
+
+[4] [5 <./figures/plant-as-control-sys.png>] [6] [7] [8] [9] [10]
+<figures/metabolism_transformations.png, id=346, 644.6484pt x 1065.9825pt>
+File: figures/metabolism_transformations.png Graphic file (type png)
+<use figures/metabolism_transformations.png>
+Package pdftex.def Info: figures/metabolism_transformations.png  used on input 
+line 320.
+(pdftex.def)             Requested size: 272.99881pt x 451.43442pt.
+
+
+LaTeX Warning: Float too large for page by 10.87886pt on input line 323.
+
+
+Overfull \hbox (40.47942pt too wide) in paragraph at lines 356--367
+ [][] 
+ []
+
+
+Overfull \hbox (23.14673pt too wide) in paragraph at lines 373--384
+ [][] 
+ []
+
+[11] [12 <./figures/metabolism_transformations.png>]
+Overfull \hbox (1.33621pt too wide) in paragraph at lines 412--413
+[]\OT1/cmr/m/n/12 To eval-u-ate op-ti-mizer ro-bust-ness, we gen-er-ate a suite
+ of stochas-tic weather
+ []
+
+[13] [14] [15] [16] [17] [18] [19] [20]
+<figures/ga-alg.png, id=544, 654.445pt x 939.51pt>
+File: figures/ga-alg.png Graphic file (type png)
+<use figures/ga-alg.png>
+Package pdftex.def Info: figures/ga-alg.png  used on input line 676.
+(pdftex.def)             Requested size: 234.00238pt x 335.92963pt.
+ [21 <./figures/ga-alg.png>] [22]
+[23] [24]
+Overfull \hbox (53.83687pt too wide) in paragraph at lines 822--823
+[]\OT1/cmr/m/n/12 The MPC cost func-tion con-tains seven tun-able weights: $\OM
+L/cmm/m/it/12 ![]; ![]; ![]; ![]; ![]; ![]; ![]$\OT1/cmr/m/n/12 ,
+ []
+
+
+Overfull \hbox (3.15852pt too wide) in paragraph at lines 824--825
+[]\OT1/cmr/m/n/12 Bayesian Op-ti-miza-tion (BO) is well-suited to hy-per-pa-ram
+-e-ter tun-ing prob-
+ []
+
+LaTeX Font Info:    Trying to load font information for U+dutchcal on input lin
+e 826.
+(/usr/local/texlive/2021/texmf-dist/tex/latex/dutchcal/udutchcal.fd
+File: udutchcal.fd 2011/06/16 Fontinst v1.933 font definitions for U/dutchcal.
+)
+Overfull \hbox (0.60857pt too wide) in paragraph at lines 826--827
+[]\OT1/cmr/m/n/12 Tree-structured Parzen Es-ti-ma-tion (TPE) [[]] mod-els the p
+os-te-rior (prob-
+ []
+
+[25]
+Overfull \hbox (0.41142pt too wide) in paragraph at lines 864--866
+[]\OT1/cmr/m/n/12 MPC im-ple-ments the CFTOC in a receding-horizon fash-ion, re
+-optimizing
+ []
+
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 874.
+
+Underfull \hbox (badness 10000) in paragraph at lines 886--887
+[] \OT1/cmr/m/n/12 Ap-ply $(\OML/cmm/m/it/12 u[]\OT1/cmr/m/n/12 [\OML/cmm/m/it/
+12 k\OT1/cmr/m/n/12 ]\OML/cmm/m/it/12 =\OT1/cmr/m/n/12 24\OML/cmm/m/it/12 ; u[]
+\OT1/cmr/m/n/12 [\OML/cmm/m/it/12 k\OT1/cmr/m/n/12 ]\OML/cmm/m/it/12 =\OT1/cmr/
+m/n/12 24)$ with ac-tual weather
+ []
+
+[26] [27]
+<figures/no_opt_hourly_controls_and_disturbances.png, id=619, 641.7576pt x 979.
+2585pt>
+File: figures/no_opt_hourly_controls_and_disturbances.png Graphic file (type pn
+g)
+<use figures/no_opt_hourly_controls_and_disturbances.png>
+Package pdftex.def Info: figures/no_opt_hourly_controls_and_disturbances.png  u
+sed on input line 928.
+(pdftex.def)             Requested size: 292.5pt x 446.32536pt.
+ [28] [29 <./figures/no_opt_hourly_controls_and_disturbances.png>]
+<figures/no_opt_crop_growth.png, id=642, 641.7576pt x 979.2585pt>
+File: figures/no_opt_crop_growth.png Graphic file (type png)
+<use figures/no_opt_crop_growth.png>
+Package pdftex.def Info: figures/no_opt_crop_growth.png  used on input line 939
+.
+(pdftex.def)             Requested size: 292.5pt x 446.32536pt.
+<figures/ga_convg_10_runs.png, id=644, 642.4803pt x 208.8603pt>
+File: figures/ga_convg_10_runs.png Graphic file (type png)
+<use figures/ga_convg_10_runs.png>
+Package pdftex.def Info: figures/ga_convg_10_runs.png  used on input line 955.
+(pdftex.def)             Requested size: 390.0pt x 126.78314pt.
+<figures/crop_growth_results_best.png, id=646, 641.7576pt x 979.2585pt>
+File: figures/crop_growth_results_best.png Graphic file (type png)
+<use figures/crop_growth_results_best.png>
+Package pdftex.def Info: figures/crop_growth_results_best.png  used on input li
+ne 964.
+(pdftex.def)             Requested size: 292.5pt x 446.32536pt.
+
+Overfull \hbox (5.42018pt too wide) in paragraph at lines 969--970
+\OT1/cmr/m/it/12 worst \OT1/cmr/m/n/12 mem-ber in each GA run's fi-nal pop-u-la
+-tion (Sup-ple-men-tary Fig-ure []A.15[]).
+ []
+
+
+Overfull \hbox (2.8987pt too wide) in paragraph at lines 976--977
+[]\OT1/cmr/m/n/12 We com-pare four ir-ri-ga-tion and fer-til-iza-tion strate-gi
+es across all 21 weather
+ []
+
+[30] [31 <./figures/no_opt_crop_growth.png>]
+Overfull \hbox (1.33301pt too wide) in paragraph at lines 978--979
+[]\OT1/cmr/bx/n/12 Farmer Best Prac-tices. \OT1/cmr/m/n/12 Stan-dard agro-nomic
+ rec-om-men-da-tions: weekly
+ []
+
+<figures/four_way_revenue_boxplot.png, id=669, 715.473pt x 245.718pt>
+File: figures/four_way_revenue_boxplot.png Graphic file (type png)
+<use figures/four_way_revenue_boxplot.png>
+Package pdftex.def Info: figures/four_way_revenue_boxplot.png  used on input li
+ne 1006.
+(pdftex.def)             Requested size: 390.0pt x 133.93802pt.
+[32 <./figures/ga_convg_10_runs.png>] [33 <./figures/crop_growth_results_best.p
+ng>]
+<figures/four_way_revenue_comparison.png, id=684, 843.15pt x 245.718pt>
+File: figures/four_way_revenue_comparison.png Graphic file (type png)
+<use figures/four_way_revenue_comparison.png>
+Package pdftex.def Info: figures/four_way_revenue_comparison.png  used on input
+ line 1015.
+(pdftex.def)             Requested size: 390.0pt x 113.65779pt.
+
+Overfull \hbox (17.62643pt too wide) in paragraph at lines 1020--1021
+\OT1/cmr/m/n/12 (Nor-mal) dom-i-nates un-der nor-mal and mod-er-ate con-di-tion
+s, while GA (Drought)
+ []
+
+[34 <./figures/four_way_revenue_boxplot.png> <./figures/four_way_revenue_compar
+ison.png>]
+<figures/four_way_by_category.png, id=693, 611.4042pt x 245.718pt>
+File: figures/four_way_by_category.png Graphic file (type png)
+<use figures/four_way_by_category.png>
+Package pdftex.def Info: figures/four_way_by_category.png  used on input line 1
+024.
+(pdftex.def)             Requested size: 390.0pt x 156.74156pt.
+
+Overfull \hbox (29.78627pt too wide) in paragraph at lines 1043--1070
+ [][] 
+ []
+
+[35 <./figures/four_way_by_category.png>] [36] [37] [38] [39]
+Underfull \hbox (badness 10000) in paragraph at lines 1153--1155
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1156--1158
+
+ []
+
+[40]
+<figures/no_opt_applied_absorbed.png, id=728, 648.9846pt x 784.1295pt>
+File: figures/no_opt_applied_absorbed.png Graphic file (type png)
+<use figures/no_opt_applied_absorbed.png>
+Package pdftex.def Info: figures/no_opt_applied_absorbed.png  used on input lin
+e 1180.
+(pdftex.def)             Requested size: 292.5pt x 353.41736pt.
+<figures/no_opt_cum_values.png, id=729, 641.7576pt x 784.1295pt>
+File: figures/no_opt_cum_values.png Graphic file (type png)
+<use figures/no_opt_cum_values.png>
+Package pdftex.def Info: figures/no_opt_cum_values.png  used on input line 1187
+.
+(pdftex.def)             Requested size: 292.5pt x 357.3897pt.
+<figures/no_opt_cum_div.png, id=730, 647.5392pt x 784.1295pt>
+File: figures/no_opt_cum_div.png Graphic file (type png)
+<use figures/no_opt_cum_div.png>
+Package pdftex.def Info: figures/no_opt_cum_div.png  used on input line 1194.
+(pdftex.def)             Requested size: 292.5pt x 354.19508pt.
+<figures/no_opt_nutrient_factors.png, id=731, 647.5392pt x 784.1295pt>
+File: figures/no_opt_nutrient_factors.png Graphic file (type png)
+<use figures/no_opt_nutrient_factors.png>
+Package pdftex.def Info: figures/no_opt_nutrient_factors.png  used on input lin
+e 1201.
+(pdftex.def)             Requested size: 292.5pt x 354.19508pt.
+ [41 <./figures/no_opt_applied_absorbed.png>] [42 <./figures/no_opt_cum_values.
+png>] [43 <./figures/no_opt_cum_div.png>] [44 <./figures/no_opt_nutrient_factor
+s.png>]
+<figures/crop_growth_results_worst.png, id=755, 641.7576pt x 979.2585pt>
+File: figures/crop_growth_results_worst.png Graphic file (type png)
+<use figures/crop_growth_results_worst.png>
+Package pdftex.def Info: figures/crop_growth_results_worst.png  used on input l
+ine 1215.
+(pdftex.def)             Requested size: 292.5pt x 446.32536pt.
+ (./main.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 9--13
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . ers . usda . gov / da
+ta-[]products /
+ []
+
+[45] [46 <./figures/crop_growth_results_worst.png>]
+Underfull \hbox (badness 6775) in paragraph at lines 84--92
+\OT1/cmr/m/n/12 ming for im-prov-ing ir-ri-ga-tion schedul-ing strate-gies of m
+aize[],
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 84--92
+\OT1/cmr/m/n/12 Agri-cul-tural Sys-tems 42 (1) (1993) 85--101, ap-pli-ca-tions 
+of
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 84--92
+\OT1/cmr/m/n/12 Dy-namic Op-ti-miza-tion Tech-niques to Agri-cul-tural Prob-lem
+s.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 84--92
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . sciencedirect . com /
+ science / article / pii /
+ []
+
+[47]
+Underfull \hbox (badness 10000) in paragraph at lines 153--159
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / researcherslinks . com / cu
+rrent-[]issues /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 153--159
+\OT1/cmtt/m/n/12 The-[]Effect-[]Azolla-[]Azolla-[]pinnata-[]Extract-[]Growth / 
+14 / 34 /
+ []
+
+[48]
+Underfull \hbox (badness 10000) in paragraph at lines 220--227
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . scielo . br / j / cr 
+/ a / 5tGN99hwhFgDjGmx8WgfDns /
+ []
+
+[49]
+Underfull \hbox (badness 10000) in paragraph at lines 262--267
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . cropscience . bayer .
+ us / articles / traits /
+ []
+
+
+Overfull \hbox (145.50278pt too wide) in paragraph at lines 262--267
+\OT1/cmtt/m/n/12 height-[]difference-[]between-[]traditional-[]corn-[]products-
+[]and-[]short-[]stature-[]corn-[]hybrids$[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 269--273
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / kellersfarmstand . com /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 275--279
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . farmprogress . com / 
+corn /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 281--285
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . agry . purdue . edu /
+ ext / corn / news / timeless /
+ []
+
+[50]
+Underfull \hbox (badness 7777) in paragraph at lines 287--291
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . ufseeds . com / produ
+ct / pencil-[]cob-[]corn-[]seed /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 293--297
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . cropscience . bayer .
+ us / articles / bayer /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 304--308
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / cropprotectionnetwork . org
+ / web-[]books /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 304--308
+\OT1/cmtt/m/n/12 crop-[]scouting-[]basics-[]for-[]corn-[]and-[]soybean ? sectio
+n =
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 315--319
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . corn-[]states . com /
+ app / uploads / 2018 / 07 /
+ []
+
+
+Overfull \hbox (183.75955pt too wide) in paragraph at lines 321--325
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . farms . com / news / 
+fertilizer-[]prices-[]put-[]economic-[]squeeze-[]on-[]farmers-[]235057 .
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 327--331
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . morningagclips . com 
+/
+ []
+
+[51]
+Overfull \hbox (147.20953pt too wide) in paragraph at lines 339--343
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / farmonaut . com / usa / ave
+rage-[]cost-[]to-[]clear-[]land-[]plant-[]corn-[]farm-[]insurance$[] 
+ []
+
+
+Overfull \hbox (316.43462pt too wide) in paragraph at lines 345--349
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / natsci . msu . edu / news /
+ 2023-[]08-[]irrigating-[]more-[]us-[]crops-[]by-[]mid-[]century-[]will-[]be-[]
+worth-[]the-[]investment .
+ []
+
+
+Underfull \hbox (badness 3579) in paragraph at lines 351--359
+\OT1/cmr/m/n/12 len-burg, []Con-trast-ing corn acreage trends in the mid-west a
+nd
+ []
+
+
+Underfull \hbox (badness 3019) in paragraph at lines 351--359
+\OT1/cmr/m/n/12 south-east: The role of yield, cli-mate, eco-nomics, and ir-ri-
+ga-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 351--359
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . sciencedirect . com /
+ science / article / pii /
+ []
+
+
+Overfull \hbox (202.78456pt too wide) in paragraph at lines 361--366
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / beef . unl . edu / estimati
+ng-[]bushels-[]corn-[]ground-[]counting-[]ears-[]prior-[]grazing-[]cattle/$[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 368--372
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . canr . msu . edu / ne
+ws /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 374--378
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . cropscience . bayer .
+ us / articles / channel /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 380--384
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / crops . extension . iastate
+ . edu / encyclopedia /
+ []
+
+
+Overfull \hbox (121.50952pt too wide) in paragraph at lines 392--396
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / dellait . com / optimizing-
+[]plant-[]density-[]improves-[]corn-[]silage-[]quality/$[] 
+ []
+
+[52]
+Underfull \hbox (badness 10000) in paragraph at lines 412--417
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / cigrjournal . org / index .
+ php / Ejounral / article /
+ []
+
+[53]
+Underfull \hbox (badness 10000) in paragraph at lines 468--473
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / justagriculture . in / file
+s / newsletter / 2022 /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 484--490
+\OT1/cmr/m/n/12 URL []$\OT1/cmtt/m/n/12 https : / / www . agronext . iastate . 
+edu / soilfertility / info /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 484--490
+\OT1/cmtt/m/n/12 NE % 20farm % 20report _ PK % 20Winter % 202015-[]Long % 20ter
+m % 20P-[]K %
+ []
+
+
+Underfull \hbox (badness 1924) in paragraph at lines 492--495
+[]\OT1/cmr/m/n/12 A. Robin-son, Usda crop re-port con-tin-ues large 2025 crop p
+ro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 492--495
+\OT1/cmr/m/n/12 duc-tion es-ti-mates, []$\OT1/cmtt/m/n/12 https : / / www . iow
+afarmbureau . com / Article /
+ []
+
+
+Overfull \hbox (30.44157pt too wide) in paragraph at lines 492--495
+\OT1/cmtt/m/n/12 USDA-[]Crop-[]Report-[]Continues-[]Large-[]2025-[]Crop-[]Produ
+ction-[]Estimates$[]\OT1/cmr/m/n/12 ,
+ []
+
+
+Underfull \hbox (badness 5475) in paragraph at lines 497--500
+[]\OT1/cmr/m/n/12 USDA Agri-cul-tural Mar-ket-ing Ser-vice, Iowa daily cash gra
+in
+ []
+
+
+Underfull \hbox (badness 5622) in paragraph at lines 497--500
+\OT1/cmr/m/n/12 bids, []$\OT1/cmtt/m/n/12 https : / / www . ams . usda . gov / 
+mnreports / ams _ 2850 . pdf$[]\OT1/cmr/m/n/12 , live-
+ []
+
+[54]
+Underfull \hbox (badness 10000) in paragraph at lines 502--505
+[]\OT1/cmr/m/n/12 K. Swan-son, High pro-duc-tion cost se-ries, part 3, []$\OT1/
+cmtt/m/n/12 https :
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 502--505
+\OT1/cmtt/m/n/12 / / ncga . com / stay-[]informed / media / the-[]corn-[]econom
+y / article /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 502--505
+\OT1/cmtt/m/n/12 2025 / 08 / high-[]production-[]cost-[]series-[]part-[]3$[]\OT
+1/cmr/m/n/12 , na-tional Corn
+ []
+
+) [55] (./main.aux)
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 94FC319772DE3921234058C6E6899D67;8313.
+ ) 
+Here is how much of TeX's memory you used:
+ 14172 strings out of 478994
+ 209721 string characters out of 5858184
+ 539078 words of memory out of 5000000
+ 31112 multiletter control sequences out of 15000+600000
+ 421404 words of font info for 96 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 83i,16n,88p,1792b,752s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
+}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/dutchcal/DutchCalReg.pf
+b></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+></usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+</usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></
+usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
+r/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
+local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
+cal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/lo
+cal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></us
+r/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/
+local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/lo
+cal/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/loca
+l/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/t
+exlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texl
+ive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texliv
+e/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive
+/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2
+021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/202
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2021
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2021/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/local/texlive/2021/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2021/tex
+mf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2021
+/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2021/t
+exmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
+Output written on main.pdf (56 pages, 1934006 bytes).
+PDF statistics:
+ 1200 PDF objects out of 1200 (max. 8388607)
+ 1042 compressed objects within 11 object streams
+ 274 named destinations out of 1000 (max. 500000)
+ 412 words of extra memory for PDF output out of 10000 (max. 10000000)
+

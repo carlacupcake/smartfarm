@@ -181,43 +181,43 @@ def get_default_scenarios() -> List[WeatherScenario]:
     """
     scenarios = [
         # Normal years (1-5): minimal perturbation
-        WeatherScenario(name="normal_1", precip_scale=1.0, temp_offset=0.0, noise_std=0.03),
-        WeatherScenario(name="normal_2", precip_scale=0.95, temp_offset=0.5, noise_std=0.03),
-        WeatherScenario(name="normal_3", precip_scale=1.05, temp_offset=-0.5, noise_std=0.03),
-        WeatherScenario(name="normal_4", precip_scale=0.9, temp_offset=1.0, noise_std=0.05),
-        WeatherScenario(name="normal_5", precip_scale=1.1, temp_offset=-1.0, noise_std=0.05),
+        WeatherScenario(name="normal 1", precip_scale=1.0, temp_offset=0.0, noise_std=0.03),
+        WeatherScenario(name="normal 2", precip_scale=0.95, temp_offset=0.5, noise_std=0.03),
+        WeatherScenario(name="normal 3", precip_scale=1.05, temp_offset=-0.5, noise_std=0.03),
+        WeatherScenario(name="normal 4", precip_scale=0.9, temp_offset=1.0, noise_std=0.05),
+        WeatherScenario(name="normal 5", precip_scale=1.1, temp_offset=-1.0, noise_std=0.05),
 
         # Moderate years (6-10): noticeable but not extreme
-        WeatherScenario(name="moderate_dry", precip_scale=0.75, temp_offset=1.5, noise_std=0.05),
-        WeatherScenario(name="moderate_wet", precip_scale=1.25, temp_offset=-1.0, noise_std=0.05),
-        WeatherScenario(name="moderate_warm", precip_scale=0.9, temp_offset=2.5, noise_std=0.05),
-        WeatherScenario(name="moderate_cool", precip_scale=1.1, temp_offset=-2.0, noise_std=0.05),
-        WeatherScenario(name="moderate_variable", precip_scale=1.0, temp_offset=0.0, noise_std=0.15),
+        WeatherScenario(name="moderate dry", precip_scale=0.75, temp_offset=1.5, noise_std=0.05),
+        WeatherScenario(name="moderate wet", precip_scale=1.25, temp_offset=-1.0, noise_std=0.05),
+        WeatherScenario(name="moderate warm", precip_scale=0.9, temp_offset=2.5, noise_std=0.05),
+        WeatherScenario(name="moderate cool", precip_scale=1.1, temp_offset=-2.0, noise_std=0.05),
+        WeatherScenario(name="moderate variable", precip_scale=1.0, temp_offset=0.0, noise_std=0.15),
 
         # Drought years (11-14): reduced precipitation with possible events
         WeatherScenario(
-            name="mild_drought",
+            name="mild drought",
             precip_scale=0.6,
             temp_offset=1.0,
             noise_std=0.05,
             drought_periods=[(800, 300, 0.5)]  # mid-season partial drought
         ),
         WeatherScenario(
-            name="summer_drought",
+            name="summer drought",
             precip_scale=0.7,
             temp_offset=2.0,
             noise_std=0.05,
             drought_periods=[(1200, 500, 0.7)]  # summer drought during critical growth
         ),
         WeatherScenario(
-            name="early_drought",
+            name="early drought",
             precip_scale=0.65,
             temp_offset=1.5,
             noise_std=0.05,
             drought_periods=[(200, 400, 0.8)]  # early season drought
         ),
         WeatherScenario(
-            name="late_drought",
+            name="late drought",
             precip_scale=0.7,
             temp_offset=1.0,
             noise_std=0.05,
@@ -225,19 +225,19 @@ def get_default_scenarios() -> List[WeatherScenario]:
         ),
 
         # Wet/cool years (15-16)
-        WeatherScenario(name="wet_year", precip_scale=1.4, temp_offset=-1.5, noise_std=0.05),
-        WeatherScenario(name="cool_wet", precip_scale=1.3, temp_offset=-2.5, noise_std=0.08),
+        WeatherScenario(name="wet year", precip_scale=1.4, temp_offset=-1.5, noise_std=0.05),
+        WeatherScenario(name="cool wet", precip_scale=1.3, temp_offset=-2.5, noise_std=0.08),
 
         # Heat stress years (17-18)
         WeatherScenario(
-            name="heat_stress",
+            name="heat stress",
             precip_scale=0.8,
             temp_offset=2.0,
             noise_std=0.05,
             heatwave_periods=[(1400, 150, 6)]  # heat wave during flowering
         ),
         WeatherScenario(
-            name="multiple_heatwaves",
+            name="multiple heatwaves",
             precip_scale=0.85,
             temp_offset=1.5,
             noise_std=0.05,
@@ -246,7 +246,7 @@ def get_default_scenarios() -> List[WeatherScenario]:
 
         # Extreme years (19-20)
         WeatherScenario(
-            name="extreme_drought_heat",
+            name="extreme drought heat",
             precip_scale=0.4,
             temp_offset=3.0,
             noise_std=0.08,
@@ -254,7 +254,7 @@ def get_default_scenarios() -> List[WeatherScenario]:
             heatwave_periods=[(1200, 200, 8)]
         ),
         WeatherScenario(
-            name="worst_case",
+            name="worst case",
             precip_scale=0.35,
             temp_offset=4.0,
             noise_std=0.1,

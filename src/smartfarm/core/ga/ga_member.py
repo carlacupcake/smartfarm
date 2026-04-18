@@ -332,10 +332,17 @@ class Member:
             c[t+1] = logistic_step(c[t], ac_hat[t], kc_hat[t], dt)
             P[t+1] = logistic_step(P[t], aP_hat[t], kP_hat[t], dt)
 
+        # Resource constraint check (death penalty for infeasible candidates)
+        total_water = np.sum(irrigation)
+        total_fert = np.sum(fertilizer)
+        if (self.ga_params.max_seasonal_water is not None and total_water > self.ga_params.max_seasonal_water) or \
+           (self.ga_params.max_seasonal_fertilizer is not None and total_fert > self.ga_params.max_seasonal_fertilizer):
+            return 1e6
+
         # Combined objective (negative because GA minimizes)
         profit = self.ga_params.weight_fruit_biomass * P[-1] + self.ga_params.weight_height * h[-1] + self.ga_params.weight_leaf_area * A[-1]
-        expenses = (self.ga_params.weight_irrigation * np.sum(irrigation)
-                    + self.ga_params.weight_fertilizer * np.sum(fertilizer))
+        expenses = (self.ga_params.weight_irrigation * total_water
+                    + self.ga_params.weight_fertilizer * total_fert)
         revenue = profit - expenses
         cost = -revenue # GA minimizes cost, but we want to maximize revenue
 

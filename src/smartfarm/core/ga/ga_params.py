@@ -1,5 +1,5 @@
 # ga_params.py
-from typing import Annotated
+from typing import Annotated, Optional
 from pydantic import BaseModel, Field, PositiveInt
 
 
@@ -51,4 +51,14 @@ class GeneticAlgorithmParams(BaseModel):
         default=4450, # $4/bushel, 1 bushel is ~25.5 kg so $0.157 per kg, 28,350 plants per acre => 4450 dollar-plants per kg-acre
         description="Economic reward per unit of fruit biomass produced \
             (in $ per kg-acre-plant basis); drives the GA to maximize harvest value."
+    )
+    max_seasonal_water: Optional[float] = Field(
+        default=None,
+        description="Maximum total seasonal irrigation (inches). When set, candidates \
+            exceeding this cap receive a death penalty. None means no constraint."
+    )
+    max_seasonal_fertilizer: Optional[float] = Field(
+        default=None,
+        description="Maximum total seasonal fertilizer (lbs). When set, candidates \
+            exceeding this cap receive a death penalty. None means no constraint."
     )

@@ -3,51 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: elsarticle-num.bst
 Database file #1: bibliography.bib
-Repeated entry---line 281 of file bibliography.bib
- : @misc{nsrdb
- :            ,
-I'm skipping whatever remains of this entry
-Warning--entry type for "fsa-acreage" isn't style-file defined
---line 385 of file bibliography.bib
-You've used 29 entries,
+You've used 63 entries,
             2952 wiz_defined-function locations,
-            883 strings with 11620 characters,
-and the built_in function-call counts, 9046 in all, are:
-= -- 877
-> -- 350
+            1078 strings with 19743 characters,
+and the built_in function-call counts, 17870 in all, are:
+= -- 1706
+> -- 624
 < -- 1
-+ -- 136
-- -- 107
-* -- 735
-:= -- 1303
-add.period$ -- 49
-call.type$ -- 29
-change.case$ -- 29
++ -- 250
+- -- 187
+* -- 1335
+:= -- 2551
+add.period$ -- 91
+call.type$ -- 63
+change.case$ -- 64
 chr.to.int$ -- 0
-cite$ -- 29
-duplicate$ -- 231
-empty$ -- 949
-format.name$ -- 127
-if$ -- 2276
+cite$ -- 63
+duplicate$ -- 528
+empty$ -- 2040
+format.name$ -- 221
+if$ -- 4636
 int.to.chr$ -- 0
-int.to.str$ -- 29
-missing$ -- 27
-newline$ -- 119
-num.names$ -- 29
-pop$ -- 141
+int.to.str$ -- 63
+missing$ -- 39
+newline$ -- 262
+num.names$ -- 63
+pop$ -- 423
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 552
+skip$ -- 1074
 stack$ -- 0
-substring$ -- 468
-swap$ -- 73
+substring$ -- 668
+swap$ -- 156
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 63
-width$ -- 31
-write$ -- 284
-(There was 1 error message)
+while$ -- 109
+width$ -- 65
+write$ -- 586

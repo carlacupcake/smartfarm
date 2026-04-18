@@ -169,9 +169,8 @@ class GeneticAlgorithm:
                 start_member=parents_plus_kids,
             )
 
-            # Evaluate the costs of the gth generation with Lambda
+            # Evaluate the costs of the gth generation
             population.set_costs()
-            print(f"Time to evaluate generation {g}: {t1 - t0:.2f} s")
 
             # Sort the costs for the gth generation
             [sorted_costs, sorted_indices] = population.sort_costs()

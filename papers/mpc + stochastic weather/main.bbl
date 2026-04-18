@@ -23,8 +23,8 @@ T.~I. Zohdi, A machine-learning enabled digital-twin framework for next
 E.~Mengi, O.~A. Samara, T.~I. Zohdi, Crop-driven optimization of agrivoltaics
   using a digital-replica framework, Smart Agricultural Technology 4 (2023)
   100150.
-\newblock \href {https://doi.org/10.1016/j.atech.2022.100150}
-  {\path{doi:10.1016/j.atech.2022.100150}}.
+\newblock \href {https://doi.org/10.1016/j.atech.2022.100168}
+  {\path{doi:10.1016/j.atech.2022.100168}}.
 
 \bibitem{betancourt2024spray}
 J.~O. Betancourt, I.~Li, E.~Mengi, L.~Corrales, T.~I. Zohdi, A computational
@@ -41,11 +41,6 @@ I.~Tagkopoulos, S.~F. Brown, X.~Liu, Q.~Zhao, T.~I. Zohdi, J.~M. Earles,
 \newblock \href {https://doi.org/10.1016/j.compag.2022.106819}
   {\path{doi:10.1016/j.compag.2022.106819}}.
 
-\bibitem{becker2025ga}
-C.~J. Becker, T.~I. Zohdi, Optimizing irrigation and fertilizer strategy using
-  a crop growth model with delayed nutrient absorption dynamics, Computers and
-  Electronics in AgricultureUnder review (2025).
-
 \bibitem{rawlings2017mpc}
 J.~B. Rawlings, D.~Q. Mayne, M.~Diehl, Model Predictive Control: Theory,
   Computation, and Design, 2nd Edition, Nob Hill Publishing, 2017.
@@ -58,11 +53,12 @@ B.~Shahriari, K.~Swersky, Z.~Wang, R.~P. Adams, N.~de~Freitas, Taking the human
   {\path{doi:10.1109/JPROC.2015.2494218}}.
 
 \bibitem{bergstra2011algorithms}
-J.~Bergstra, R.~Bardenet, Y.~Bengio, B.~K{\'e}gl, Algorithms for
-  hyper-parameter optimization, in: Advances in Neural Information Processing
-  Systems, Vol.~24, 2011, pp. 2546--2554.
-\newblock \href {https://doi.org/10.5555/2986459.2986743}
-  {\path{doi:10.5555/2986459.2986743}}.
+J.~Bergstra, R.~Bardenet, Y.~Bengio, B.~K\'{e}gl,
+  \href{https://proceedings.neurips.cc/paper_files/paper/2011/file/86e8f7ab32cfd12577bc2619bc635690-Paper.pdf}{Algorithms
+  for hyper-parameter optimization}, in: J.~Shawe-Taylor, R.~Zemel,
+  P.~Bartlett, F.~Pereira, K.~Weinberger (Eds.), Advances in Neural Information
+  Processing Systems, Vol.~24, Curran Associates, Inc., 2011.
+\newline\urlprefix\url{https://proceedings.neurips.cc/paper_files/paper/2011/file/86e8f7ab32cfd12577bc2619bc635690-Paper.pdf}
 
 \bibitem{bynum2021pyomo}
 M.~L. Bynum, G.~A. Hackebeil, W.~E. Hart, C.~D. Laird, B.~L. Nicholson, J.~D.
@@ -84,12 +80,17 @@ A.~W{\"a}chter, L.~T. Biegler, On the implementation of an interior-point
   accessed: 2024 (2024).
 
 \bibitem{corn-nutrient-management}
-J.~E. Sawyer, A.~P. Mallarino, Nutrient management for corn following corn,
-  Tech. Rep. PM 2088, Iowa State University Extension (2017).
+A.~P. Mallarino,
+  \href{https://www.agronext.iastate.edu/soilfertility/info/Mallarino_PK%20Manag%20Approaches%20Concepts_XIX%20LA%20Soil%20Congress.pdf}{Nutrient
+  management for increased crop productivity and reduced environmental
+  impacts}, Tech. Rep. PM 2088, Iowa State University Extension (2017).
+\newline\urlprefix\url{https://www.agronext.iastate.edu/soilfertility/info/Mallarino_PK%20Manag%20Approaches%20Concepts_XIX%20LA%20Soil%20Congress.pdf}
 
 \bibitem{kranz2008irrigation}
-W.~L. Kranz, S.~Irmak, S.~J. van Donk, C.~D. Yonts, D.~L. Martin, Irrigation
-  management for corn, NebGuide~(G1850) (2008).
+W.~L. Kranz, S.~Irmak, S.~J. van Donk, C.~D. Yonts, D.~L. Martin,
+  \href{https://extensionpubs.unl.edu/publication/g1850/2008/pdf/view/g1850-2008.pdf}{Irrigation
+  management for corn}, NebGuide~(G1850) (2008).
+\newline\urlprefix\url{https://extensionpubs.unl.edu/publication/g1850/2008/pdf/view/g1850-2008.pdf}
 
 \bibitem{davies2020nitrogen}
 B.~Davies, J.~A. Coulter, P.~H. Pagliari, Timing and rate of nitrogen
