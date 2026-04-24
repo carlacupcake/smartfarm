@@ -1,0 +1,74 @@
+This is BibTeX, Version 0.99d (TeX Live 2021)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: sn-mathphys-num.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: bibliography.bib
+Repeated entry---line 237 of file bibliography.bib
+ : @article{mengi2023agrivoltaics
+ :                               ,
+I'm skipping whatever remains of this entry
+sn-mathphys-num.bst [2024/07/19 v1.1  bibliography style]
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 79 entries,
+            7485 wiz_defined-function locations,
+            1684 strings with 28218 characters,
+and the built_in function-call counts, 540345 in all, are:
+= -- 89400
+> -- 2175
+< -- 753
++ -- 44511
+- -- 710
+* -- 21592
+:= -- 97884
+add.period$ -- 104
+call.type$ -- 79
+change.case$ -- 440
+chr.to.int$ -- 1870
+cite$ -- 79
+duplicate$ -- 3001
+empty$ -- 17623
+format.name$ -- 1830
+if$ -- 133616
+int.to.chr$ -- 1
+int.to.str$ -- 111
+missing$ -- 0
+newline$ -- 1161
+num.names$ -- 398
+pop$ -- 1730
+preamble$ -- 1
+purify$ -- 346
+quote$ -- 0
+skip$ -- 51224
+stack$ -- 0
+substring$ -- 60864
+swap$ -- 1385
+text.length$ -- 878
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 2889
+warning$ -- 0
+while$ -- 2051
+width$ -- 0
+write$ -- 1638
+(There was 1 error message)
